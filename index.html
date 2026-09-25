@@ -324,6 +324,12 @@
   .cta-actions .btn2{font-family:var(--font-serif);font-size:15px;font-weight:800;color:var(--accent-ink);
     background:var(--accent);border:none;padding:12px 30px;border-radius:999px;cursor:pointer;transition:.2s;box-shadow:0 8px 24px rgba(178,58,38,.4)}
   .cta-actions .btn2:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(178,58,38,.5)}
+  .field--sync{border-top:1px dashed rgba(178,58,38,.3);padding-top:14px;margin-top:14px}
+  .sync-row{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .btn--sm{font-size:12.5px;padding:6px 14px;border:1px solid var(--line);background:rgba(250,244,230,.7);
+    border-radius:4px;cursor:pointer;color:var(--ink-2);transition:.2s}
+  .btn--sm:hover{background:var(--accent);color:#fff}
+  .sync-state{font-size:12px;color:var(--muted)}
 
   .reveal{opacity:0;transform:translateY(30px);transition:opacity .75s ease,transform .75s ease}
   .reveal.in{opacity:1;transform:none}
@@ -744,6 +750,17 @@
       <div class="hint">人物相对屏幕宽度的百分比，默认 36，越大越突出（上限受屏幕高度约束）。</div>
     </div>
 
+    <div class="field field--sync">
+      <label>云端同步（保存后自动更新线上）</label>
+      <input type="password" id="cfgToken" placeholder="GitHub Token（仅本人填写）" autocomplete="off" />
+      <div class="hint">填写后，「编辑内容」保存会自动上传到线上（GitHub Pages），所有访客刷新即可看到最新内容。Token 仅保存在本机浏览器，不会写入页面代码。</div>
+      <div class="sync-row">
+        <button class="btn btn--sm" id="btnPushCloud" type="button">立即同步到线上</button>
+        <button class="btn btn--sm" id="btnPullCloud" type="button">从线上拉取</button>
+        <span class="sync-state" id="syncState">—</span>
+      </div>
+    </div>
+
     <div class="modal__actions">
       <button class="btn" id="btnCancelConfig">取消</button>
       <button class="btn primary" id="btnSaveConfig">保存并应用</button>
@@ -1063,6 +1080,7 @@
       if(k) data[k] = el.innerHTML;
     });
     try{ localStorage.setItem(CONTENT_KEY, JSON.stringify(data)); }catch(e){}
+    scheduleCloudSync();
   }
   function loadContent(){
     try{
@@ -1154,6 +1172,7 @@
     $("#cfgZoom").value = cfg.zoom;
     $("#cfgParallax").value = cfg.parallax;
     $("#cfgCharSize").value = cfg.charSize;
+    if($("#cfgToken")) $("#cfgToken").value = cloudToken;
   }
   function openConfig(){ fillConfigForm(); modal.classList.add("open"); }
   function closeConfig(){ modal.classList.remove("open"); }
@@ -1169,10 +1188,112 @@
     var cs = parseInt($("#cfgCharSize").value, 10);
     cfg.charSize = isNaN(cs) ? 36 : cs;
     saveConfig(cfg);
+    try{ cloudToken = $("#cfgToken").value.trim(); localStorage.setItem(CLOUD_TOKEN_KEY, cloudToken); }catch(e){}
+    if(cloudToken){ setSyncState("已配置 Token，保存即自动同步"); }else{ setSyncState("未配置 Token"); }
     applyConfig();
     closeConfig();
     tryPlay();
   });
+
+  /* ---------- 云端同步（保存后自动更新线上，存储为 GitHub data.json） ---------- */
+  var CLOUD_URL = "https://royi12138.github.io/royi-portfolio/data.json";
+  var CLOUD_REPO = "https://api.github.com/repos/royi12138/royi-portfolio/contents/data.json";
+  var CLOUD_TOKEN_KEY = "pm_cloud_token";
+  var CLOUD_TS_KEY = "pm_cloud_ts";
+  var cloudToken = "";
+  try{ cloudToken = localStorage.getItem(CLOUD_TOKEN_KEY) || ""; }catch(e){}
+  var syncing = false, cloudSyncTimer = null;
+  function collectContent(){
+    var data = {};
+    collectEditables().forEach(function(el){
+      var k = el.id || el.dataset.k;
+      if(k) data[k] = el.innerHTML;
+    });
+    return data;
+  }
+  function setSyncState(t){ var el = $("#syncState"); if(el) el.textContent = t; }
+  function getCloudSha(cb){
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", CLOUD_REPO, true);
+    xhr.setRequestHeader("Authorization", "token " + cloudToken);
+    xhr.setRequestHeader("Accept", "application/vnd.github+json");
+    xhr.onload = function(){ try{ cb(JSON.parse(xhr.responseText).sha); }catch(e){ cb(null); } };
+    xhr.onerror = function(){ cb(null); };
+    xhr.send();
+  }
+  function pushCloud(manual){
+    if(syncing) return;
+    if(!cloudToken){ if(manual) toast("未填写 GitHub Token，无法同步到线上"); return; }
+    syncing = true;
+    if(manual) setSyncState("同步中…");
+    getCloudSha(function(sha){
+      var doc = JSON.stringify({
+        version: 1,
+        ts: new Date().toISOString(),
+        content: collectContent(),
+        config: loadConfig()
+      });
+      var payload = {
+        message: "site content sync " + new Date().toISOString(),
+        content: btoa(unescape(encodeURIComponent(doc)))
+      };
+      if(sha) payload.sha = sha;
+      var xhr = new XMLHttpRequest();
+      xhr.open("PUT", CLOUD_REPO, true);
+      xhr.setRequestHeader("Authorization", "token " + cloudToken);
+      xhr.setRequestHeader("Accept", "application/vnd.github+json");
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onload = function(){
+        syncing = false;
+        if(xhr.status >= 200 && xhr.status < 300){
+          try{ localStorage.setItem(CLOUD_TS_KEY, String(Date.now())); }catch(e){}
+          setSyncState("已同步 " + new Date().toLocaleTimeString());
+          if(manual) toast("已同步到线上，约 1 分钟后访客可见最新内容");
+        }else{
+          setSyncState("同步失败（" + (xhr.status === 401 ? "Token 无效" : "HTTP " + xhr.status) + "）");
+          if(manual) toast("同步失败：" + (xhr.status === 401 ? "Token 无效或已过期" : "HTTP " + xhr.status));
+        }
+      };
+      xhr.onerror = function(){ syncing = false; setSyncState("网络错误"); if(manual) toast("同步失败：网络错误"); };
+      xhr.send(JSON.stringify(payload));
+    });
+  }
+  function pullCloud(){
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", CLOUD_URL + "?t=" + Date.now(), true);
+    xhr.onload = function(){
+      if(xhr.status !== 200) return;
+      try{
+        var d = JSON.parse(xhr.responseText);
+        if(!d || !d.content) return;
+        var local = JSON.parse(localStorage.getItem(CONTENT_KEY) || "{}");
+        var cloudTs = Date.parse(d.ts) || 0;
+        var localTs = parseInt(localStorage.getItem(CLOUD_TS_KEY) || "0", 10) || 0;
+        if(Object.keys(local).length === 0 || cloudTs > localTs){
+          try{
+            localStorage.setItem(CONTENT_KEY, JSON.stringify(d.content));
+            localStorage.setItem(CLOUD_TS_KEY, String(cloudTs));
+          }catch(e){}
+          collectEditables().forEach(function(el){
+            var k = el.id || el.dataset.k;
+            if(k && d.content[k]) el.innerHTML = d.content[k];
+          });
+          setSyncState("已载入线上最新内容");
+        }
+      }catch(e){}
+    };
+    xhr.send();
+  }
+  function scheduleCloudSync(){
+    if(!cloudToken || syncing) return;
+    clearTimeout(cloudSyncTimer);
+    cloudSyncTimer = setTimeout(function(){ pushCloud(false); }, 1500);
+  }
+  var btnPush = $("#btnPushCloud");
+  if(btnPush) btnPush.addEventListener("click", function(){ pushCloud(true); });
+  var btnPull = $("#btnPullCloud");
+  if(btnPull) btnPull.addEventListener("click", function(){ pullCloud(); setSyncState("已拉取线上内容"); });
+  pullCloud();
 
   /* ---------- 管理员登录（仅本人可编辑） ---------- */
   var LOGIN_USER = "如意";
