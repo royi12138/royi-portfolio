@@ -447,7 +447,7 @@
 <div class="dots" id="dots"></div>
 
 <!-- 当前分区签 -->
-<div class="chip" id="secChip"><b>00</b><span>首屏</span></div>
+<div class="chip" id="secChip"><b>00</b><span data-editable>首屏</span></div>
 
 <!-- ===== 内容层 ===== -->
 <main>
@@ -459,7 +459,7 @@
         <h1 class="h1" data-editable id="heroName">郭如意<span class="dot">.</span></h1>
         <div class="role" data-editable id="heroRole">高级产品经理 · 互联网医疗方向</div>
         <p class="tagline" data-editable id="heroTagline">让专业的医疗服务，以更轻的方式抵达每一个家庭。</p>
-        <button class="cta" id="heroCta">走进我的产品世界<span class="arr">↘</span></button>
+        <button class="cta" id="heroCta" data-editable>走进我的产品世界<span class="arr">↘</span></button>
       </div>
       <div class="col col--c" aria-hidden="true"></div>
       <div class="col col--r">
@@ -473,14 +473,14 @@
         <div class="hello" data-editable id="heroNote2"><b>HELLO, YOU.</b>移动鼠标，我会看向你的位置。<br />LOOKING DOWN ↓</div>
       </div>
     </div>
-    <div class="scroll-hint">向下滚动 · 画面随进度切换</div>
+    <div class="scroll-hint" data-editable>向下滚动 · 画面随进度切换</div>
   </section>
 
   <!-- 1 个人基本信息 -->
   <section class="sec" id="info" data-sec="1">
     <div class="grid3 wrap reveal">
       <div class="col col--l">
-        <span class="eyebrow">01 · ABOUT</span>
+        <span class="eyebrow" data-editable>01 · ABOUT</span>
         <h2 class="sec-title" data-editable id="infoTitle">个人基本信息</h2>
         <p class="sec-sub" data-editable id="infoSub">深耕互联网医疗的产品人，关注心血管、中医与康复赛道，相信好的产品能让康复更可及。</p>
         <p class="bio" data-editable id="infoBio">我是郭如意，一名从 Java 开发转型的产品经理。过去 7 年聚焦互联网医疗，主导过 3 个平台从 0 到 1 的搭建，当前负责心脏术后随访与康复方向的在线医疗服务平台，覆盖医生、患者、康复师等多类角色。</p>
@@ -488,12 +488,12 @@
       <div class="col col--c" aria-hidden="true"></div>
       <div class="col col--r">
         <div class="info-grid" id="infoCards">
-          <div class="card"><span class="k">姓名</span><span class="v" data-editable>郭如意</span></div>
-          <div class="card"><span class="k">城市</span><span class="v" data-editable>北京</span></div>
-          <div class="card"><span class="k">现任</span><span class="v" data-editable>瑞华心康（小麦心康）</span></div>
-          <div class="card"><span class="k">方向</span><span class="v" data-editable>心脏术后随访与康复</span></div>
-          <div class="card"><span class="k">经验</span><span class="v" data-editable>7 年</span></div>
-          <div class="card"><span class="k">能力栈</span><span class="v" data-editable>0-1 平台 · 医疗 AI · 多角色协同</span></div>
+          <div class="card"><span class="k" data-editable>姓名</span><span class="v" data-editable>郭如意</span></div>
+          <div class="card"><span class="k" data-editable>城市</span><span class="v" data-editable>北京</span></div>
+          <div class="card"><span class="k" data-editable>现任</span><span class="v" data-editable>瑞华心康（小麦心康）</span></div>
+          <div class="card"><span class="k" data-editable>方向</span><span class="v" data-editable>心脏术后随访与康复</span></div>
+          <div class="card"><span class="k" data-editable>经验</span><span class="v" data-editable>7 年</span></div>
+          <div class="card"><span class="k" data-editable>能力栈</span><span class="v" data-editable>0-1 平台 · 医疗 AI · 多角色协同</span></div>
         </div>
       </div>
     </div>
@@ -503,24 +503,24 @@
   <section class="sec" id="adv" data-sec="2">
     <div class="grid3 wrap reveal">
       <div class="col col--l">
-        <span class="eyebrow">02 · STRENGTHS</span>
+        <span class="eyebrow" data-editable>02 · STRENGTHS</span>
         <h2 class="sec-title" data-editable id="advTitle">个人优势</h2>
         <p class="sec-sub" data-editable id="advSub">从平台搭建到医疗 AI 落地，从临床路径到用户心智，兼具纵深与广度。</p>
         <div class="metric-row">
-          <span class="m"><b>3</b>次 0→1</span>
-          <span class="m"><b>6</b>类角色协同</span>
-          <span class="m"><b>5</b>层视频标签</span>
+          <span class="m" data-editable><b>3</b>次 0→1</span>
+          <span class="m" data-editable><b>6</b>类角色协同</span>
+          <span class="m" data-editable><b>5</b>层视频标签</span>
         </div>
       </div>
       <div class="col col--c" aria-hidden="true"></div>
       <div class="col col--r">
         <div class="adv-grid" id="advList">
-          <div class="card adv-card"><h3><span class="no">01</span>0→1 平台搭建</h3><p data-editable>主导 3 个医疗平台从 0 到 1，独立负责信息架构、原型设计与需求优先级（MoSCoW）。</p></div>
-          <div class="card adv-card"><h3><span class="no">02</span>垂直领域纵深</h3><p data-editable>深耕心血管 / 中医 / 康复，既懂临床路径，也懂用户真实痛点与心智。</p></div>
-          <div class="card adv-card"><h3><span class="no">03</span>医疗 AI 落地</h3><p data-editable>构建心衰患者 AI 运动处方推荐系统，融合 NYHA 分级与 5 层视频标签体系。</p></div>
-          <div class="card adv-card"><h3><span class="no">04</span>多角色协同设计</h3><p data-editable>覆盖医生 / 患者 / 康复师等 6 类角色，打通随访—康复业务闭环。</p></div>
-          <div class="card adv-card"><h3><span class="no">05</span>技术型产品思维</h3><p data-editable>Java 开发背景，与研发沟通零损耗，能快速评估技术可行性与成本。</p></div>
-          <div class="card adv-card"><h3><span class="no">06</span>结构化交付</h3><p data-editable>偏好表格、流程图与可评审文档，方案清晰、可落地、可追责。</p></div>
+          <div class="card adv-card"><h3><span class="no" data-editable>01</span>0→1 平台搭建</h3><p data-editable>主导 3 个医疗平台从 0 到 1，独立负责信息架构、原型设计与需求优先级（MoSCoW）。</p></div>
+          <div class="card adv-card"><h3><span class="no" data-editable>02</span>垂直领域纵深</h3><p data-editable>深耕心血管 / 中医 / 康复，既懂临床路径，也懂用户真实痛点与心智。</p></div>
+          <div class="card adv-card"><h3><span class="no" data-editable>03</span>医疗 AI 落地</h3><p data-editable>构建心衰患者 AI 运动处方推荐系统，融合 NYHA 分级与 5 层视频标签体系。</p></div>
+          <div class="card adv-card"><h3><span class="no" data-editable>04</span>多角色协同设计</h3><p data-editable>覆盖医生 / 患者 / 康复师等 6 类角色，打通随访—康复业务闭环。</p></div>
+          <div class="card adv-card"><h3><span class="no" data-editable>05</span>技术型产品思维</h3><p data-editable>Java 开发背景，与研发沟通零损耗，能快速评估技术可行性与成本。</p></div>
+          <div class="card adv-card"><h3><span class="no" data-editable>06</span>结构化交付</h3><p data-editable>偏好表格、流程图与可评审文档，方案清晰、可落地、可追责。</p></div>
         </div>
       </div>
     </div>
@@ -530,13 +530,13 @@
   <section class="sec" id="data" data-sec="3">
     <div class="grid3 wrap reveal">
       <div class="col col--l">
-        <span class="eyebrow">03 · RESULTS</span>
+        <span class="eyebrow" data-editable>03 · RESULTS</span>
         <h2 class="sec-title" data-editable id="dataTitle">数据成果</h2>
         <p class="sec-sub" data-editable id="dataSub">用结果说话——每一次迭代都有可量化的业务价值。</p>
         <div class="metric-row">
-          <span class="m"><b>50万+</b>电子处方</span>
-          <span class="m"><b>30万+</b>注册用户</span>
-          <span class="m"><b>5</b>个 0→1 平台</span>
+          <span class="m" data-editable><b>50万+</b>电子处方</span>
+          <span class="m" data-editable><b>30万+</b>注册用户</span>
+          <span class="m" data-editable><b>5</b>个 0→1 平台</span>
         </div>
       </div>
       <div class="col col--c" aria-hidden="true"></div>
@@ -563,12 +563,12 @@
   <section class="sec" id="proj" data-sec="4">
     <div class="grid3 wrap reveal">
       <div class="col col--l">
-        <span class="eyebrow">03 · PROJECTS</span>
+        <span class="eyebrow" data-editable>03 · PROJECTS</span>
         <h2 class="sec-title" data-editable id="projTitle">项目经历</h2>
         <p class="sec-sub" data-editable id="projSub">从 0 到 1 的关键项目，按时间排列；后续可在「编辑内容」中随时追加。</p>
         <div class="metric-row">
-          <span class="m"><b>3</b>个 0→1 平台</span>
-          <span class="m"><b>双端</b>小程序 + PC</span>
+          <span class="m" data-editable><b>3</b>个 0→1 平台</span>
+          <span class="m" data-editable><b>双端</b>小程序 + PC</span>
         </div>
       </div>
       <div class="col col--c" aria-hidden="true"></div>
@@ -647,23 +647,23 @@
   <section class="sec" id="insight" data-sec="5">
     <div class="grid3 wrap reveal">
       <div class="col col--l">
-        <span class="eyebrow">05 · INSIGHTS</span>
+        <span class="eyebrow" data-editable>05 · INSIGHTS</span>
         <h2 class="sec-title" data-editable id="insightTitle">医疗行业洞察</h2>
         <p class="sec-sub" data-editable id="insightSub">懂医疗、懂技术、懂增长——我眼中的互联网医疗。</p>
         <div class="metric-row">
-          <span class="m"><b>AI</b> 4 类场景落地</span>
-          <span class="m"><b>双端</b>用户思维</span>
+          <span class="m" data-editable><b>AI</b> 4 类场景落地</span>
+          <span class="m" data-editable><b>双端</b>用户思维</span>
         </div>
       </div>
       <div class="col col--c" aria-hidden="true"></div>
       <div class="col col--r">
         <div class="insight-grid">
-          <div class="insight-card"><h3><span class="no">01</span><span data-editable>AI 落地在「具体场景」</span></h3><p data-editable>病历识别、智能客服、病历总结、报告解读已在真实业务跑通。医疗 AI 的价值不是炫技，而是把医生从重复劳动中释放出来。</p></div>
-          <div class="insight-card"><h3><span class="no">02</span><span data-editable>双端思维是医疗产品的底色</span></h3><p data-editable>医生要效率与合规，患者要信任与体验。两端诉求不同，产品规则必须「讲得清、可解释」——这是医疗产品和消费产品的根本差异。</p></div>
-          <div class="insight-card"><h3><span class="no">03</span><span data-editable>软硬一体的全周期管理</span></h3><p data-editable>康复 = 平台 + 智能硬件协同：心率 / 血压预警、体征自动采集替代人工录入。数据驱动比患者自报更可靠，闭环才完整。</p></div>
-          <div class="insight-card"><h3><span class="no">04</span><span data-editable>合规是医疗 AI 的生命线</span></h3><p data-editable>回答必带引用、低置信度兜底、口径一致。医疗 AI 宁可「不答」，也不可「乱答」——合规类查询引用准确率做到 94%，是底线能力。</p></div>
-          <div class="insight-card"><h3><span class="no">05</span><span data-editable>0→1 与规模化并重</span></h3><p data-editable>主导 5 个互联网医院从 0→1，也经历 30万+ 用户的规模化运营。两种节奏都要会：快速验证，以及把验证过的模式放大。</p></div>
-          <div class="insight-card"><h3><span class="no">06</span><span data-editable>持续跟踪头部模型</span></h3><p data-editable>长期跟进 GPT / Claude / Deepseek 能力迭代，探索 Agent 任务自动化方向。让模型趋势变成可落地的产品机会。</p></div>
+          <div class="insight-card"><h3><span class="no" data-editable>01</span><span data-editable>AI 落地在「具体场景」</span></h3><p data-editable>病历识别、智能客服、病历总结、报告解读已在真实业务跑通。医疗 AI 的价值不是炫技，而是把医生从重复劳动中释放出来。</p></div>
+          <div class="insight-card"><h3><span class="no" data-editable>02</span><span data-editable>双端思维是医疗产品的底色</span></h3><p data-editable>医生要效率与合规，患者要信任与体验。两端诉求不同，产品规则必须「讲得清、可解释」——这是医疗产品和消费产品的根本差异。</p></div>
+          <div class="insight-card"><h3><span class="no" data-editable>03</span><span data-editable>软硬一体的全周期管理</span></h3><p data-editable>康复 = 平台 + 智能硬件协同：心率 / 血压预警、体征自动采集替代人工录入。数据驱动比患者自报更可靠，闭环才完整。</p></div>
+          <div class="insight-card"><h3><span class="no" data-editable>04</span><span data-editable>合规是医疗 AI 的生命线</span></h3><p data-editable>回答必带引用、低置信度兜底、口径一致。医疗 AI 宁可「不答」，也不可「乱答」——合规类查询引用准确率做到 94%，是底线能力。</p></div>
+          <div class="insight-card"><h3><span class="no" data-editable>05</span><span data-editable>0→1 与规模化并重</span></h3><p data-editable>主导 5 个互联网医院从 0→1，也经历 30万+ 用户的规模化运营。两种节奏都要会：快速验证，以及把验证过的模式放大。</p></div>
+          <div class="insight-card"><h3><span class="no" data-editable>06</span><span data-editable>持续跟踪头部模型</span></h3><p data-editable>长期跟进 GPT / Claude / Deepseek 能力迭代，探索 Agent 任务自动化方向。让模型趋势变成可落地的产品机会。</p></div>
         </div>
       </div>
     </div>
@@ -673,23 +673,22 @@
   <section class="sec" id="hobby" data-sec="6">
     <div class="grid3 wrap reveal">
       <div class="col col--l">
-        <span class="eyebrow">06 · HOBBIES</span>
+        <span class="eyebrow" data-editable>06 · HOBBIES</span>
         <h2 class="sec-title" data-editable id="hobbyTitle">爱好</h2>
         <p class="sec-sub" data-editable id="hobbySub">工作之外，用不同的方式保持对世界的好奇。</p>
         <div class="metric-row">
-          <span class="m">晨间 6 km</span>
-          <span class="m">每月 2 本书</span>
+          <span class="m" data-editable>晨间 6 km</span>
+          <span class="m" data-editable>每月 2 本书</span>
         </div>
       </div>
       <div class="col col--c" aria-hidden="true"></div>
       <div class="col col--r">
         <div class="hobby-grid" id="hobbyList">
-          <div class="hobby-chip"><span class="ic">跑</span><span class="tx" data-editable>晨跑与骑行</span><span class="ds" data-editable>规律运动，体会「循序渐进」的康复哲学</span></div>
-          <div class="hobby-chip"><span class="ic">摄</span><span class="tx" data-editable>摄影</span><span class="ds" data-editable>记录产品与生活的细节，训练场景敏感度</span></div>
-          <div class="hobby-chip"><span class="ic">家</span><span class="tx" data-editable>陪伴宝宝成长</span><span class="ds" data-editable>新手爸爸，理解「长期主义」与「耐心」</span></div>
-          <div class="hobby-chip"><span class="ic">读</span><span class="tx" data-editable>阅读</span><span class="ds" data-editable>医疗、产品与设计类书籍，刷新认知边界</span></div>
-          <div class="hobby-chip"><span class="ic">美</span><span class="tx" data-editable>界面审美</span><span class="ds" data-editable>关注交互细节与视觉节奏，好用也好看</span></div>
-          <div class="hobby-chip"><span class="ic">学</span><span class="tx" data-editable>持续学习</span><span class="ds" data-editable>跟进医疗 AI 与可穿戴设备，把趋势变成机会</span></div>
+          <div class="hobby-chip"><span class="ic" data-editable>跑</span><span class="tx" data-editable>晨跑与骑行</span><span class="ds" data-editable>规律运动，体会「循序渐进」的康复哲学</span></div>
+          <div class="hobby-chip"><span class="ic" data-editable>家</span><span class="tx" data-editable>陪伴宝宝成长</span><span class="ds" data-editable>新手爸爸，理解「长期主义」与「耐心」</span></div>
+          <div class="hobby-chip"><span class="ic" data-editable>读</span><span class="tx" data-editable>阅读</span><span class="ds" data-editable>医疗、产品与设计类书籍，刷新认知边界</span></div>
+          <div class="hobby-chip"><span class="ic" data-editable>美</span><span class="tx" data-editable>界面审美</span><span class="ds" data-editable>关注交互细节与视觉节奏，好用也好看</span></div>
+          <div class="hobby-chip"><span class="ic" data-editable>学</span><span class="tx" data-editable>持续学习</span><span class="ds" data-editable>跟进医疗 AI 与可穿戴设备，把趋势变成机会</span></div>
         </div>
       </div>
     </div>
@@ -810,7 +809,7 @@
     <div class="case-doc active" data-case="kf">
       <h3 class="case-title" data-editable>云康复管理平台 · 心血管全周期</h3>
       <div class="case-role" data-editable>高级产品经理 / 项目经理 · 2025.05 — 至今 · 为麦智能</div>
-      <div class="case-tags"><span>软硬一体</span><span>0→1</span><span>AI 应用</span><span>项目兼管</span></div>
+      <div class="case-tags"><span data-editable>软硬一体</span><span data-editable>0→1</span><span data-editable>AI 应用</span><span data-editable>项目兼管</span></div>
       <div class="case-block"><h4>背景</h4><p data-editable>心血管疾病患者全周期管理平台，聚焦「院内康复 + 居家康复」场景，构建软件平台 + 智能硬件协同的康复闭环；牵头与硬件、运营、医生等 30 人团队协作。</p></div>
       <div class="case-block"><h4>我的职责</h4><p data-editable>产品定位与规划、产品架构搭建、全周期结构化方案交付；将医学专业知识转化为可落地的产品规则与界面方案，实现 AI 报告解读、AI 康复处方推荐、AI 病例识别、智能客服；兼任项目经理，把控关键路径、组织评审、输出甘特图与需求落地 SOP。</p></div>
       <div class="case-block"><h4>核心难点</h4><p data-editable>① 医学知识 → 产品规则：体征监测设备的预警阈值（心率、血压）如何转成医生可解释、患者可理解的产品规则与界面；② 软硬件联动与 30 人跨团队（硬件 / 运营 / 医生）协作的节奏对齐。</p></div>
@@ -822,7 +821,7 @@
     <div class="case-doc" data-case="ai">
       <h3 class="case-title" data-editable>智能 AI 客服 · 统一 RAG 平台</h3>
       <div class="case-role" data-editable>产品负责人 · 2025.05 — 至今 · 为麦智能</div>
-      <div class="case-tags"><span>RAG</span><span>合规</span><span>数据闭环</span></div>
+      <div class="case-tags"><span data-editable>RAG</span><span data-editable>合规</span><span data-editable>数据闭环</span></div>
       <div class="case-block"><h4>背景</h4><p data-editable>员工查询公司信息耗时长、回答口径不一致带来合规风险；需覆盖 300+ 份内部文档、服务 100 名员工。</p></div>
       <div class="case-block"><h4>我的职责</h4><p data-editable>设计「文档识别 → 语义切片 → 关键词召回 → 重排序 → 生成引用」全链路方案；定义召回准确率、回答采纳率、引用准确率、幻觉率等指标；建立每周评测集更新机制；设计低置信度兜底策略与引用溯源面板；建立失败案例反馈闭环，用户一键标记不准确并自动进入标注队列，每周复盘前 20 个失败案例。</p></div>
       <div class="case-block"><h4>核心难点</h4><p data-editable>医疗行业 AI 回答的幻觉与合规风险——无依据回答不可接受，回答口径不一致本身就是风险。</p></div>
@@ -834,7 +833,7 @@
     <div class="case-doc" data-case="trt">
       <h3 class="case-title" data-editable>北京同仁堂互联网医院</h3>
       <div class="case-role" data-editable>高级产品经理 · 2022.04 — 2025.04 · 互联网+中医</div>
-      <div class="case-tags"><span>B2B2C</span><span>0→1</span><span>数据驱动运营</span></div>
+      <div class="case-tags"><span data-editable>B2B2C</span><span data-editable>0→1</span><span data-editable>数据驱动运营</span></div>
       <div class="case-block"><h4>背景</h4><p data-editable>面向全国中小型中医诊所的「互联网 + 中医」在线问诊平台：B2B（医疗 SaaS 服务诊所）与 B2C（患者端问诊购药）双结构。</p></div>
       <div class="case-block"><h4>我的职责</h4><p data-editable>0→1 产品架构搭建：医疗 SaaS 平台、医生端 App、患者小程序、后台 Web 四端；对接医院 HIS、药店 ERP 实现挂号 / 库存 / 价格数据互通；梳理各端首页信息架构；对产品性能、易用性、安全性负责；通过支付漏斗分析驱动运营策略（客服随访系统等）。</p></div>
       <div class="case-block"><h4>核心难点</h4><p data-editable>① 多端多角色：B2B + B2C 四端、医生 / 患者 / 诊所 / 药房协同；② 三方系统数据互通（HIS、ERP）的标准化；③ 线上医疗的合规要求。</p></div>
