@@ -6,104 +6,118 @@
 <title>AI 岗位匹配简历助手</title>
 <style>
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f7f8fc;color:#17181c}
-.wrap{max-width:980px;margin:auto;padding:54px 20px}
-.hero{text-align:center;padding:40px 0 28px}.badge{display:inline-block;padding:7px 12px;border-radius:99px;background:#eef0ff;color:#5b5cf0;font-size:12px;font-weight:700}
-h1{font-size:42px;line-height:1.15;margin:18px 0 12px}.lead{color:#69707b;font-size:16px;line-height:1.75;max-width:700px;margin:auto}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px}
+.wrap{max-width:980px;margin:auto;padding:40px 20px}.hero{text-align:center;padding:34px 0 24px}
+.badge{display:inline-block;padding:7px 12px;border-radius:99px;background:#eef0ff;color:#5b5cf0;font-size:12px;font-weight:700}
+h1{font-size:40px;line-height:1.15;margin:18px 0 12px}.lead{color:#69707b;font-size:16px;line-height:1.75;max-width:700px;margin:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
 .card{background:#fff;border:1px solid #e6e7ed;border-radius:20px;padding:22px;box-shadow:0 10px 28px rgba(20,24,40,.07)}
-.card h2{font-size:19px;margin:0 0 8px}.card p{color:#707680;font-size:13px;line-height:1.6}
-.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;background:#5b5cf0;color:white}
-.upload{margin-top:14px;border:1.5px dashed #cfd2dd;border-radius:16px;padding:28px;text-align:center;background:#fafbff}
-input[type=file]{margin:10px 0;max-width:100%}
-.result{display:none;margin-top:22px}.result.show{display:block}
-.panel{background:#fff;border:1px solid #e6e7ed;border-radius:18px;padding:18px;margin-top:14px}
-.score{font-size:40px;font-weight:800;color:#5b5cf0}
-.item{padding:12px 0;border-bottom:1px solid #eee}.item:last-child{border-bottom:0}
-.item b{display:block;font-size:14px}.item span{display:block;color:#6f7580;font-size:12px;line-height:1.5;margin-top:5px}
-pre{white-space:pre-wrap;background:#f7f8fb;border-radius:12px;padding:14px;font-size:11px;overflow:auto}
-.ok{margin-top:10px;padding:10px 12px;border-radius:12px;background:#edf9f3;color:#14734d;font-size:12px}
-.err{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff4f4;color:#a53d3d;font-size:12px}
-@media(max-width:760px){.grid{grid-template-columns:1fr}h1{font-size:31px}}
+.card h2{font-size:19px;margin:0 0 8px}.card p{color:#707680;font-size:13px;line-height:1.65}
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;background:#5b5cf0;color:white}.btn:disabled{opacity:.55;cursor:wait}
+.upload{margin-top:14px;border:1.5px dashed #cfd2dd;border-radius:16px;padding:24px;text-align:center;background:#fafbff}
+input[type=file]{margin:10px 0;max-width:100%}.consent{font-size:12px;line-height:1.6;color:#646b75;margin:14px 0;text-align:left;display:block}
+.result{display:none;margin-top:22px}.result.show{display:block}.panel{background:#fff;border:1px solid #e6e7ed;border-radius:18px;padding:18px;margin-top:14px}
+.item{padding:13px 0;border-bottom:1px solid #eee}.item:last-child{border-bottom:0}.item b{display:block;font-size:14px}.item span{display:block;color:#6f7580;font-size:13px;line-height:1.6;margin-top:5px}
+.quote{background:#f7f8fb;border-left:3px solid #9b9df8;padding:10px 12px;border-radius:6px;color:#505660;font-size:13px;line-height:1.6;margin-top:10px;white-space:pre-wrap}
+.subtle{color:#747b86;font-size:12px;line-height:1.6}.ok{margin-top:10px;padding:10px 12px;border-radius:12px;background:#edf9f3;color:#14734d;font-size:12px;line-height:1.6}
+.err{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff4f4;color:#a53d3d;font-size:12px;line-height:1.6}
+.tags{font-size:11px;font-weight:700;display:inline-block;border-radius:7px;padding:4px 7px;background:#f0f1f5;color:#505660;margin-bottom:7px}
+.details-title{font-size:16px;margin:0 0 8px}.hidden{display:none!important}pre{white-space:pre-wrap;background:#f7f8fb;border-radius:12px;padding:14px;font-size:11px;overflow:auto}
+@media(max-width:760px){.grid{grid-template-columns:1fr}h1{font-size:31px}.wrap{padding:22px 14px}.card,.panel{padding:16px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <section class="hero">
-    <div class="badge">MVP 0.1 · 真实文件解析</div>
-    <h1>上传简历，先把问题找出来。</h1>
-    <p class="lead">AI 岗位匹配简历助手：先识别你的简历内容，下一阶段将继续加入缺点分析、JD 匹配、逐条修改和 Word 导出。</p>
-  </section>
-
-  <section class="grid">
-    <article class="card">
-      <h2>① 简历体检</h2>
-      <p>支持 PDF、DOCX、JPG、PNG。最多 3 页。上传后自动解析，原始临时文件会在解析完成后清理。</p>
-      <div class="upload">
-        <input id="resumeFile" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png">
-        <div><button class="btn" onclick="parseResume()">开始解析</button></div>
-        <div id="msg"></div>
-      </div>
-    </article>
-
-    <article class="card">
-      <h2>② 下一步会做到什么</h2>
-      <p>解析完成后，系统会沿着这条链路继续升级：</p>
-      <div class="item"><b>发现问题</b><span>指出具体哪一段、为什么是问题。</span></div>
-      <div class="item"><b>补充信息</b><span>缺少真实成果时主动追问，不擅自编数字。</span></div>
-      <div class="item"><b>岗位定制</b><span>上传 JD 后，分析岗位要求与简历差距。</span></div>
-      <div class="item"><b>生成新版</b><span>用户确认后生成 V2，并导出 Word。</span></div>
-    </article>
-  </section>
-
-  <section id="result" class="result">
-    <div class="panel">
-      <div style="color:#777;font-size:12px">解析成功</div>
-      <div id="filename" style="font-weight:800;margin-top:5px"></div>
-      <div style="margin-top:14px"><span class="score" id="pages">1</span> 页</div>
-    </div>
-    <div class="panel">
-      <h3 style="margin-top:0">结构化结果</h3>
-      <div id="summary"></div>
-      <details style="margin-top:12px"><summary>查看 Resume JSON</summary><pre id="json"></pre></details>
-    </div>
-  </section>
+<section class="hero">
+<div class="badge">MVP 0.2 · 简历解析 + 千问分析接口</div>
+<h1>上传简历，找出可改进的问题。</h1>
+<p class="lead">先解析简历，再由 AI 给出有原文依据的修改建议。AI 不应替你编造业绩；每条建议都需要你核对。</p>
+</section>
+<section class="grid">
+<article class="card">
+<h2>① 简历体检</h2><p>支持 PDF、DOCX、JPG、PNG，最多 3 页、10MB。文件会在解析完成后从临时目录清理。</p>
+<div class="upload">
+<input id="resumeFile" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png">
+<div><button class="btn" id="parseBtn" onclick="parseResume()">解析简历</button></div><div id="msg" aria-live="polite"></div>
 </div>
-
+</article>
+<article class="card">
+<h2>② 分析原则</h2>
+<div class="item"><b>引用原文</b><span>只展示能在输入文本中找到原文引用的问题。</span></div>
+<div class="item"><b>不编造事实</b><span>缺少结果、数字或背景时，要求你补充真实信息。</span></div>
+<div class="item"><b>逐条核对</b><span>AI 给的是建议，不会自动把未经确认的内容写入简历。</span></div>
+<div class="item"><b>隐私提醒</b><span>调用 AI 前会尝试隐藏手机号、邮箱和身份证号；其他个人信息仍可能留在简历文本中。</span></div>
+</article>
+</section>
+<section id="result" class="result">
+<div class="panel">
+<div class="subtle">解析成功</div><div id="filename" style="font-weight:800;margin-top:5px"></div><div id="pageCount" class="subtle" style="margin-top:5px"></div>
+<div style="margin-top:16px"><button class="btn" id="analyzeBtn" onclick="analyzeResume()">开始 AI 分析</button></div>
+<label class="consent"><input id="consent" type="checkbox"> 我了解并同意：点击 AI 分析后，脱敏处理后的简历文本将发送到阿里云百炼（千问）模型服务进行分析。请勿上传不愿发送到模型服务的信息。</label>
+<div id="analysisMsg" aria-live="polite"></div>
+</div>
+<div class="panel"><h3 class="details-title">结构化简历内容</h3><div id="summary"></div><details style="margin-top:12px"><summary>查看 Resume JSON（含解析文本）</summary><pre id="json"></pre></details></div>
+<div id="analysisResult" class="hidden">
+<div class="panel"><h3 class="details-title">AI 总体评价</h3><div id="overallSummary" style="line-height:1.75"></div><div id="strengths"></div><div class="subtle" id="privacyNote" style="margin-top:12px"></div></div>
+<div class="panel"><h3 class="details-title">可改进的问题</h3><div id="issues"></div></div>
+</div>
+</section>
+</div>
 <script>
+var currentResume = null;
+function escapeHtml(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
+function showMessage(id,text,isError){document.getElementById(id).innerHTML='<div class="'+(isError?'err':'ok')+'">'+escapeHtml(text)+'</div>';}
+function renderSection(title,items){var arr=Array.isArray(items)?items:[];return '<div class="item"><b>'+escapeHtml(title)+'</b><span>'+(arr.length?arr.slice(0,5).map(escapeHtml).join('；'):'未识别到内容')+'</span></div>';}
 async function parseResume(){
-  var file=document.getElementById('resumeFile').files[0];
-  var msg=document.getElementById('msg');
-  var result=document.getElementById('result');
-  if(!file){msg.innerHTML='<div class="err">请先选择简历文件。</div>';return}
-  msg.innerHTML='<div class="ok">正在解析，请稍候…</div>';
-  var fd=new FormData();fd.append('file',file);
-  try{
-    var res=await fetch('/api/resume/parse',{method:'POST',body:fd});
-    var data=await res.json();
-    if(!res.ok) throw new Error(data.detail||'解析失败');
-    var r=data.resume;
-    document.getElementById('filename').textContent=r.document.filename;
-    document.getElementById('pages').textContent=r.document.pages;
-    var summary='';
-    var sections=[
-      ['基本信息',r.basic_info&&r.basic_info.raw_lines],
-      ['教育经历',r.education],
-      ['工作经历',r.work_experience],
-      ['项目经历',r.project_experience],
-      ['技能',r.skills]
-    ];
-    sections.forEach(function(pair){
-      var arr=pair[1]||[];
-      summary+='<div class="item"><b>'+pair[0]+'</b><span>'+(arr.length?arr.slice(0,5).join('；'):'未识别到内容')+'</span></div>';
-    });
-    document.getElementById('summary').innerHTML=summary;
-    document.getElementById('json').textContent=JSON.stringify(r,null,2);
-    result.classList.add('show');
-    msg.innerHTML='<div class="ok">解析完成。下一阶段接入 AI 简历分析 Agent。</div>';
-    result.scrollIntoView({behavior:'smooth',block:'start'});
-  }catch(e){
-    msg.innerHTML='<div class="err">'+e.message+'</div>';
-  }
+ var file=document.getElementById('resumeFile').files[0],button=document.getElementById('parseBtn');
+ if(!file){showMessage('msg','请先选择简历文件。',true);return;}
+ if(file.size>10*1024*1024){showMessage('msg','文件不能超过 10MB。',true);return;}
+ button.disabled=true;showMessage('msg','正在解析，请稍候…',false);
+ var fd=new FormData();fd.append('file',file);
+ try{
+  var res=await fetch('/api/resume/parse',{method:'POST',body:fd}),data=await res.json();
+  if(!res.ok)throw new Error(data.detail||'解析失败');
+  currentResume=data.resume;
+  document.getElementById('filename').textContent=currentResume.document.filename;
+  document.getElementById('pageCount').textContent=currentResume.document.pages+' 页';
+  document.getElementById('summary').innerHTML=
+   renderSection('基本信息',currentResume.basic_info&&currentResume.basic_info.raw_lines)+
+   renderSection('教育经历',currentResume.education)+renderSection('工作经历',currentResume.work_experience)+
+   renderSection('项目经历',currentResume.project_experience)+renderSection('技能',currentResume.skills);
+  document.getElementById('json').textContent=JSON.stringify(currentResume,null,2);
+  document.getElementById('consent').checked=false;document.getElementById('analysisResult').classList.add('hidden');
+  document.getElementById('analysisMsg').innerHTML='';document.getElementById('result').classList.add('show');
+  showMessage('msg','解析完成。确认隐私提示后，可以启动 AI 分析。',false);
+  document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(e){showMessage('msg',e.message||'解析失败，请稍后重试。',true);}finally{button.disabled=false;}
+}
+function renderAnalysis(analysis){
+ document.getElementById('overallSummary').textContent=analysis.summary||'暂无总体评价。';
+ document.getElementById('privacyNote').textContent=analysis.privacy_note||'';
+ var strengths=Array.isArray(analysis.strengths)?analysis.strengths:[];
+ document.getElementById('strengths').innerHTML=strengths.length?'<div class="item"><b>简历现有优势</b><span>'+strengths.map(escapeHtml).join('；')+'</span></div>':'';
+ var issues=Array.isArray(analysis.issues)?analysis.issues:[];
+ if(!issues.length){document.getElementById('issues').textContent='本次没有找到可展示且能引用原文的问题。可以尝试上传文字更清晰、结构更完整的简历。';return;}
+ document.getElementById('issues').innerHTML=issues.map(function(item,index){
+  var html='<div class="item"><span class="tags">'+escapeHtml(item.section||'整体结构')+' · 问题 '+(index+1)+'</span><div><b>'+escapeHtml(item.problem||'可改进之处')+'</b></div>';
+  html+='<div class="quote">简历原文：'+escapeHtml(item.source_quote||'')+'</div>';
+  if(item.why_it_matters)html+='<p><b>为什么建议改</b><br>'+escapeHtml(item.why_it_matters)+'</p>';
+  if(item.suggestion)html+='<p><b>修改方向</b><br>'+escapeHtml(item.suggestion)+'</p>';
+  if(item.question)html+='<p><b>需要你补充的真实信息</b><br>'+escapeHtml(item.question)+'</p>';
+  return html+'</div>';
+ }).join('');
+}
+async function analyzeResume(){
+ if(!currentResume||!currentResume.raw_text){showMessage('analysisMsg','请先成功解析简历。',true);return;}
+ if(!document.getElementById('consent').checked){showMessage('analysisMsg','请先阅读并勾选 AI 分析的隐私提示。',true);return;}
+ var button=document.getElementById('analyzeBtn');button.disabled=true;button.textContent='正在分析…';
+ showMessage('analysisMsg','正在调用模型，通常需要几十秒，请不要关闭页面。',false);
+ try{
+  var res=await fetch('/api/resume/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text})});
+  var data=await res.json();if(!res.ok)throw new Error(data.detail||'AI 分析失败');
+  renderAnalysis(data.analysis||{});showMessage('analysisMsg','分析完成。请逐条核对建议，尤其是涉及成果和数字的内容。',false);
+  document.getElementById('analysisResult').scrollIntoView({behavior:'smooth',block:'start'});
+ }catch(e){showMessage('analysisMsg',e.message||'AI 分析失败，请稍后重试。',true);}
+ finally{button.disabled=false;button.textContent='重新分析';}
 }
 </script>
 </body>
