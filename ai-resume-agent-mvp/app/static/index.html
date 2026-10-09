@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI 岗位匹配简历助手</title>
+<style>
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f7f8fc;color:#17181c}
+.wrap{max-width:980px;margin:auto;padding:54px 20px}
+.hero{text-align:center;padding:40px 0 28px}.badge{display:inline-block;padding:7px 12px;border-radius:99px;background:#eef0ff;color:#5b5cf0;font-size:12px;font-weight:700}
+h1{font-size:42px;line-height:1.15;margin:18px 0 12px}.lead{color:#69707b;font-size:16px;line-height:1.75;max-width:700px;margin:auto}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:30px}
+.card{background:#fff;border:1px solid #e6e7ed;border-radius:20px;padding:22px;box-shadow:0 10px 28px rgba(20,24,40,.07)}
+.card h2{font-size:19px;margin:0 0 8px}.card p{color:#707680;font-size:13px;line-height:1.6}
+.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;background:#5b5cf0;color:white}
+.upload{margin-top:14px;border:1.5px dashed #cfd2dd;border-radius:16px;padding:28px;text-align:center;background:#fafbff}
+input[type=file]{margin:10px 0;max-width:100%}
+.result{display:none;margin-top:22px}.result.show{display:block}
+.panel{background:#fff;border:1px solid #e6e7ed;border-radius:18px;padding:18px;margin-top:14px}
+.score{font-size:40px;font-weight:800;color:#5b5cf0}
+.item{padding:12px 0;border-bottom:1px solid #eee}.item:last-child{border-bottom:0}
+.item b{display:block;font-size:14px}.item span{display:block;color:#6f7580;font-size:12px;line-height:1.5;margin-top:5px}
+pre{white-space:pre-wrap;background:#f7f8fb;border-radius:12px;padding:14px;font-size:11px;overflow:auto}
+.ok{margin-top:10px;padding:10px 12px;border-radius:12px;background:#edf9f3;color:#14734d;font-size:12px}
+.err{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff4f4;color:#a53d3d;font-size:12px}
+@media(max-width:760px){.grid{grid-template-columns:1fr}h1{font-size:31px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="badge">MVP 0.1 · 真实文件解析</div>
+    <h1>上传简历，先把问题找出来。</h1>
+    <p class="lead">AI 岗位匹配简历助手：先识别你的简历内容，下一阶段将继续加入缺点分析、JD 匹配、逐条修改和 Word 导出。</p>
+  </section>
+
+  <section class="grid">
+    <article class="card">
+      <h2>① 简历体检</h2>
+      <p>支持 PDF、DOCX、JPG、PNG。最多 3 页。上传后自动解析，原始临时文件会在解析完成后清理。</p>
+      <div class="upload">
+        <input id="resumeFile" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png">
+        <div><button class="btn" onclick="parseResume()">开始解析</button></div>
+        <div id="msg"></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>② 下一步会做到什么</h2>
+      <p>解析完成后，系统会沿着这条链路继续升级：</p>
+      <div class="item"><b>发现问题</b><span>指出具体哪一段、为什么是问题。</span></div>
+      <div class="item"><b>补充信息</b><span>缺少真实成果时主动追问，不擅自编数字。</span></div>
+      <div class="item"><b>岗位定制</b><span>上传 JD 后，分析岗位要求与简历差距。</span></div>
+      <div class="item"><b>生成新版</b><span>用户确认后生成 V2，并导出 Word。</span></div>
+    </article>
+  </section>
+
+  <section id="result" class="result">
+    <div class="panel">
+      <div style="color:#777;font-size:12px">解析成功</div>
+      <div id="filename" style="font-weight:800;margin-top:5px"></div>
+      <div style="margin-top:14px"><span class="score" id="pages">1</span> 页</div>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0">结构化结果</h3>
+      <div id="summary"></div>
+      <details style="margin-top:12px"><summary>查看 Resume JSON</summary><pre id="json"></pre></details>
+    </div>
+  </section>
+</div>
+
+<script>
+async function parseResume(){
+  var file=document.getElementById('resumeFile').files[0];
+  var msg=document.getElementById('msg');
+  var result=document.getElementById('result');
+  if(!file){msg.innerHTML='<div class="err">请先选择简历文件。</div>';return}
+  msg.innerHTML='<div class="ok">正在解析，请稍候…</div>';
+  var fd=new FormData();fd.append('file',file);
+  try{
+    var res=await fetch('/api/resume/parse',{method:'POST',body:fd});
+    var data=await res.json();
+    if(!res.ok) throw new Error(data.detail||'解析失败');
+    var r=data.resume;
+    document.getElementById('filename').textContent=r.document.filename;
+    document.getElementById('pages').textContent=r.document.pages;
+    var summary='';
+    var sections=[
+      ['基本信息',r.basic_info&&r.basic_info.raw_lines],
+      ['教育经历',r.education],
+      ['工作经历',r.work_experience],
+      ['项目经历',r.project_experience],
+      ['技能',r.skills]
+    ];
+    sections.forEach(function(pair){
+      var arr=pair[1]||[];
+      summary+='<div class="item"><b>'+pair[0]+'</b><span>'+(arr.length?arr.slice(0,5).join('；'):'未识别到内容')+'</span></div>';
+    });
+    document.getElementById('summary').innerHTML=summary;
+    document.getElementById('json').textContent=JSON.stringify(r,null,2);
+    result.classList.add('show');
+    msg.innerHTML='<div class="ok">解析完成。下一阶段接入 AI 简历分析 Agent。</div>';
+    result.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){
+    msg.innerHTML='<div class="err">'+e.message+'</div>';
+  }
+}
+</script>
+</body>
+</html>
