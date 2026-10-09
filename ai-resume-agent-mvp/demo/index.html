@@ -1,18 +1,292 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI 岗位匹配简历助手 Demo</title>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fc">
+<title>AI 岗位匹配简历助手 · 体验版</title>
 <style>
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f7f8fc;color:#17181c}.wrap{max-width:1120px;margin:auto;padding:54px 20px 80px}.hero{text-align:center;padding:20px 0 35px}.badge{display:inline-block;padding:7px 12px;border-radius:99px;background:#eef0ff;color:#5b5cf0;font-size:12px;font-weight:800}.hero h1{font-size:44px;line-height:1.14;margin:18px 0 12px}.hero p{max-width:760px;margin:auto;color:#6d737d;line-height:1.75}.cta{margin-top:22px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}button{font:inherit;cursor:pointer}.primary,.secondary{padding:12px 17px;border-radius:12px;font-weight:800}.primary{background:#5b5cf0;color:#fff;border:0}.secondary{background:#fff;color:#343841;border:1px solid #e5e6ed}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:#fff;border:1px solid #e5e6ed;border-radius:21px;padding:23px;box-shadow:0 12px 32px rgba(20,24,40,.07)}.card h2{margin:0 0 8px}.card p{color:#707680;line-height:1.65;font-size:14px}.tag{display:inline-block;margin-top:12px;padding:6px 9px;background:#edf9f3;color:#15754f;border-radius:99px;font-size:11px;font-weight:800}.demo{display:none;margin-top:22px}.demo.show{display:block}.panel{background:#fff;border:1px solid #e5e6ed;border-radius:21px;padding:20px;box-shadow:0 12px 32px rgba(20,24,40,.07)}.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}.step{padding:7px 9px;border-radius:99px;background:#f1f2f6;color:#838892;font-size:11px}.step.on{background:#eef0ff;color:#5b5cf0;font-weight:800}.upload{border:1.5px dashed #cfd2dd;border-radius:16px;padding:33px;text-align:center;background:#fafbff}.item{padding:13px;border:1px solid #e8e9ef;border-radius:13px;margin-top:10px}.item b{display:block}.item small{display:block;color:#747985;margin-top:5px;line-height:1.5}.score{font-size:44px;color:#5b5cf0;font-weight:850}.bar{height:9px;background:#eef0f4;border-radius:99px;overflow:hidden}.bar i{display:block;width:78%;height:100%;background:linear-gradient(90deg,#5b5cf0,#8b5cf6)}.diff{display:grid;grid-template-columns:1fr 1fr;gap:11px}.diff div{padding:13px;border-radius:13px;border:1px solid #e6e7ed;line-height:1.6;font-size:13px}.old{background:#fffafa}.new{background:#f7fff9}.footer{color:#8a8f99;text-align:center;font-size:11px;margin-top:32px}@media(max-width:760px){.grid,.diff{grid-template-columns:1fr}.hero h1{font-size:32px}}
-</style></head>
-<body><div class="wrap">
-<section class="hero"><div class="badge">AI 岗位匹配简历助手</div><h1>别再盲改简历。让 AI 告诉你哪里该改。</h1><p>上传简历，找出表达、经历和成果上的问题；准备投某个岗位时，再上传 JD，让 AI 根据岗位要求生成针对性的修改建议。</p><div class="cta"><button class="primary" onclick="start('jd')">开始免费优化简历</button><button class="secondary" onclick="start('general')">先检查我的简历</button></div></section>
-<section class="grid"><article class="card"><h2>检查我的简历</h2><p>还没有具体 JD？先做一次简历体检：发现问题、解释原因、给出优先修改项。</p><span class="tag">适合先体验</span></article><article class="card"><h2>根据 JD 优化</h2><p>准备投具体岗位？上传招聘 JD，找到岗位重点和你当前简历之间的差距。</p><span class="tag">价值更高</span></article></section>
-<section id="general" class="demo"><div class="panel"><div class="steps"><span class="step on">上传</span><span class="step">分析</span><span class="step">确认修改</span><span class="step">生成</span></div><div id="gUpload" class="upload"><h3>上传你的简历</h3><p>PDF / DOCX / JPG / PNG，最多 3 页</p><button class="primary" onclick="analyze('general')">选择示例简历</button></div><div id="gResult" style="display:none"><div class="item"><b>简历质量：82/100</b><small>整体结构清晰，但“做了什么”多，“做成了什么”少。</small></div><div class="item"><b>① 工作经历缺少量化成果</b><small>原文：负责用户增长和产品运营。建议补充真实的用户规模、增长率、转化率等。</small></div><div class="item"><b>② 项目经历没有体现个人贡献</b><small>需要更清晰地说明你负责了什么、推动了什么。</small></div><div class="item"><b>③ 技能描述可以更具体</b><small>用具体工具、业务场景和成果替代泛化表述。</small></div><div class="item"><p><b>需要你补充的信息</b></p><input id="fact" style="width:100%;padding:11px;border:1px solid #e7e8ef;border-radius:10px" placeholder="例如：DAU 从10万提升到15万"><br><button class="primary" style="margin-top:10px" onclick="generate('general')">确认并生成 V2</button></div></div></div></section>
-<section id="jd" class="demo"><div class="panel"><div class="steps"><span class="step on">上传</span><span class="step on">JD 分析</span><span class="step">修改</span><span class="step">生成</span></div><div id="jUpload" class="upload"><h3>上传简历 + 招聘 JD</h3><p>Demo：模拟一个“高级产品经理”岗位</p><button class="primary" onclick="analyze('jd')">选择示例文件</button></div><div id="jResult" style="display:none"><div class="item"><b>高级产品经理 · 岗位匹配度 78/100</b><div class="bar" style="margin-top:10px"><i></i></div></div><div class="item"><b>招聘方最关注</b><small>① B 端产品经验　② 跨部门推动　③ 业务结果</small></div><div class="item"><b>最值得修改</b><small>JD 要求 B 端 SaaS 经验，但当前简历没有明确体现；如果实际做过，请补充客户类型、负责模块和业务结果。</small></div><div class="diff"><div class="old">原文：负责企业客户产品设计和需求分析。</div><div class="new">岗位定制版：负责企业客户产品设计与需求分析，围绕 B 端业务场景推进产品迭代，并结合客户反馈持续优化产品方案。</div></div><button class="primary" style="margin-top:12px" onclick="showLogin()">确认并生成 Word</button></div></div></section>
-<div class="footer">Demo 仅用于验证交互，不连接真实 AI、微信登录或支付。</div></div>
-<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);align-items:center;justify-content:center;padding:20px"><div class="panel" style="max-width:420px;width:100%"><h3>微信登录</h3><p style="color:#707680">真实版本会在这里完成微信登录；当前 Demo 仅模拟。</p><button class="primary" onclick="document.getElementById('modal').style.display='none'">模拟登录继续</button></div></div>
+:root{--ink:#171923;--muted:#6d7280;--line:#e7e8ef;--brand:#5b5cf0;--brand2:#8567f7;--soft:#eff0ff;--green:#14865c;--greenbg:#edfaf3;--orange:#aa690e;--orangebg:#fff7e8;--surface:#fff;--bg:#f7f8fc;--shadow:0 16px 40px rgba(34,38,70,.08)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 50% -10%,#e9eaff 0,transparent 42%),var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+button,input,textarea{font:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:30;height:64px;padding:0 max(16px,calc((100vw - 1080px)/2));background:rgba(255,255,255,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:850;white-space:nowrap}
+.logo{width:34px;height:34px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-size:12px;box-shadow:0 6px 16px #5b5cf033}
+.top-right{display:flex;align-items:center;gap:8px}.beta{font-size:10px;color:var(--brand);background:var(--soft);padding:6px 9px;border-radius:99px;font-weight:800}
+.wrap{max-width:1080px;margin:auto;padding:0 20px 76px}
+.hero{text-align:center;padding:56px 0 26px}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid #dddfff;background:#ffffffb8;color:var(--brand);border-radius:99px;font-size:11px;font-weight:800}
+.spark{width:7px;height:7px;background:#16a36b;border-radius:50%;box-shadow:0 0 0 4px #16a36b18}
+h1{font-size:clamp(31px,5.2vw,49px);line-height:1.13;letter-spacing:-.04em;margin:20px auto 15px;max-width:850px}
+.grad{background:linear-gradient(90deg,var(--brand),#8d54d9);color:transparent;background-clip:text;-webkit-background-clip:text}
+.lead{max-width:740px;margin:auto;color:var(--muted);font-size:15px;line-height:1.8}
+.ctas{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:23px}
+.btn{border:1px solid transparent;border-radius:13px;padding:12px 17px;font-size:13px;font-weight:800;transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px)}
+.primary{background:var(--brand);color:#fff;box-shadow:0 9px 19px #5b5cf02a}.primary:hover{background:#4d4edc}
+.ghost{background:#fff;border-color:var(--line);color:#343845}
+.subnote{margin-top:11px;color:#9297a2;font-size:10px}
+.proofs{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:27px 0 0;text-align:left}
+.proof{background:#ffffffd9;border:1px solid var(--line);border-radius:14px;padding:13px}
+.proof b{font-size:12px;display:block}.proof span{font-size:10px;line-height:1.5;color:var(--muted);display:block;margin-top:5px}
+.section-title{text-align:center;margin:44px 0 17px}.section-title h2{font-size:24px;letter-spacing:-.025em;margin:0}.section-title p{font-size:12px;color:var(--muted);line-height:1.6;margin:8px auto 0}
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mode{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:21px;position:relative;overflow:hidden}
+.mode:after{content:"";position:absolute;width:135px;height:135px;right:-65px;top:-65px;background:radial-gradient(circle,#8b8dff22,transparent 70%);pointer-events:none}
+.mode-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.mode-icon{width:43px;height:43px;border-radius:14px;background:var(--soft);color:var(--brand);display:grid;place-items:center;font-size:12px;font-weight:900}
+.tag{font-size:10px;padding:6px 8px;border-radius:99px;background:var(--greenbg);color:var(--green);font-weight:800;white-space:nowrap}
+.mode h3{margin:15px 0 7px;font-size:17px}.mode p{color:var(--muted);font-size:12px;line-height:1.7;margin:0}
+.mode ul{list-style:none;margin:13px 0 16px;padding:0;display:grid;gap:7px}
+.mode li{font-size:11px;color:#484c58}.mode li:before{content:"✓";color:var(--green);font-weight:900;margin-right:8px}
+.mode .btn{width:100%}
+.process{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:18px}
+.process-item{padding:13px;background:#ffffffad;border:1px solid var(--line);border-radius:13px}
+.process-item b{font-size:11px;display:block}.process-item span{font-size:10px;color:var(--muted);line-height:1.5;display:block;margin-top:5px}
+.app{display:none;margin-top:28px;scroll-margin-top:80px}
+.app.show{display:block}
+.workspace{background:#fff;border:1px solid var(--line);border-radius:21px;overflow:hidden;box-shadow:var(--shadow)}
+.workhead{padding:17px 19px;display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
+.workhead h2{font-size:16px;margin:0}.workhead p{font-size:10px;color:var(--muted);margin:4px 0 0}
+.steps{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.step{font-size:10px;padding:6px 8px;border-radius:99px;background:#f2f3f7;color:#8a8e98}
+.step.on{color:var(--brand);background:var(--soft);font-weight:850}
+.workbody{padding:19px}
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.uploadbox{border:1.5px dashed #cdd0df;background:#fbfbff;border-radius:16px;padding:22px 14px;text-align:center;min-width:0}
+.uploadbox .upicon{width:40px;height:40px;border-radius:13px;background:#fff;border:1px solid var(--line);color:var(--brand);display:grid;place-items:center;margin:0 auto 11px;font-size:11px;font-weight:900}
+.uploadbox b{font-size:13px;display:block}.uploadbox p{font-size:10px;color:var(--muted);line-height:1.6;margin:7px 0 12px}
+input[type=file]{display:block;width:100%;font-size:10px;color:var(--muted);margin:0 auto 11px}
+.filemeta{font-size:10px;color:var(--green);line-height:1.5;overflow-wrap:anywhere;margin-top:7px}
+.notice{border:1px solid #e6e6fb;background:#f8f8ff;color:#686b81;border-radius:12px;padding:10px 12px;font-size:10px;line-height:1.6;margin-top:13px}
+.wide{width:100%;margin-top:14px}
+.status{font-size:11px;line-height:1.6;margin-top:12px}.status.error{color:#bd3333}.status.good{color:var(--green)}
+.results{display:none}.results.show{display:block}
+.result-hero{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.box{border:1px solid var(--line);border-radius:15px;padding:15px;min-width:0}
+.kicker{display:inline-block;font-size:9px;font-weight:900;letter-spacing:.04em;background:var(--soft);color:var(--brand);padding:5px 7px;border-radius:6px}
+.box h3{font-size:14px;margin:10px 0 8px}.muted{color:var(--muted);font-size:11px;line-height:1.7}
+.scoreline{display:flex;align-items:baseline;gap:5px;margin:7px 0}.score{font-size:42px;line-height:1;color:var(--brand);font-weight:900;letter-spacing:-.04em}.scoreline span{color:var(--muted);font-size:11px}
+.bar{height:7px;border-radius:99px;background:#eff0f5;overflow:hidden;margin:8px 0}.bar i{height:100%;display:block;width:82%;background:linear-gradient(90deg,var(--brand),#9b70ed);border-radius:99px}
+.minitags{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}.minitag{font-size:9px;padding:5px 7px;background:#f6f7fa;border-radius:7px;color:#626777}
+.callout{padding:11px;border-radius:11px;background:var(--orangebg);border:1px solid #f5e4c4;color:#895d1e;font-size:11px;line-height:1.65}
+.results-title{display:flex;justify-content:space-between;align-items:end;gap:8px;margin:20px 0 10px}.results-title h3{font-size:14px;margin:0}.results-title span{font-size:10px;color:var(--muted)}
+.issue{border:1px solid var(--line);border-radius:14px;padding:13px;margin-top:9px}
+.issue-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.issue-title{font-size:12px;font-weight:850;line-height:1.5}.priority{font-size:9px;padding:5px 7px;border-radius:99px;background:var(--orangebg);color:var(--orange);white-space:nowrap}
+.issue p{font-size:11px;line-height:1.65;color:var(--muted);margin:7px 0}
+.evidence{font-size:10px;line-height:1.6;color:#626777;background:#f7f8fb;padding:9px;border-radius:9px}
+.suggest{font-size:11px;line-height:1.65;margin-top:8px}
+.check{display:flex;align-items:flex-start;gap:8px;margin-top:10px;font-size:11px;color:#4e5360}.check input{accent-color:var(--brand);margin-top:2px}
+.field{width:100%;border:1px solid #dfe1e9;border-radius:11px;padding:11px 12px;font-size:12px;outline:0;background:#fff}
+.field:focus{border-color:#9b9df8;box-shadow:0 0 0 3px #5b5cf011}
+textarea.field{min-height:85px;resize:vertical}
+.label{display:block;font-size:10px;color:var(--muted);margin-bottom:7px}
+.safety{padding:10px 11px;background:var(--greenbg);color:#16734e;border:1px solid #d0f0df;border-radius:10px;font-size:10px;line-height:1.6;margin-top:9px}
+.actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:13px}
+.actions .btn{font-size:11px;padding:10px 13px}
+.preview{display:none}.preview.show{display:block}
+.diff{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.diffpart{border:1px solid var(--line);border-radius:12px;overflow:hidden;min-width:0}
+.diffhead{font-size:10px;font-weight:850;padding:9px 10px;background:#f7f8fb;border-bottom:1px solid var(--line)}
+.diffbody{font-size:11px;line-height:1.7;padding:11px;overflow-wrap:anywhere}.old{background:#fffafa;color:#754747}.new{background:#f6fff9;color:#285e44}
+.versions{margin-top:14px}.version{padding:11px;border:1px solid var(--line);border-radius:11px;display:flex;align-items:center;justify-content:space-between;gap:9px;margin-top:7px}.version.active{border-color:#c8caff;background:#fafaff}.version b{font-size:11px}.version small{font-size:9px;display:block;color:var(--muted);margin-top:3px}
+.disclaimer{font-size:10px;color:#969aa4;line-height:1.6;text-align:center;margin-top:22px}
+.modal{display:none;position:fixed;inset:0;background:#15162577;z-index:99;align-items:center;justify-content:center;padding:18px}
+.modal.show{display:flex}.modal-card{max-width:390px;width:100%;background:#fff;border-radius:19px;padding:22px;box-shadow:0 25px 80px #12142b35}.modal-card h3{font-size:17px;margin:10px 0 7px}.modal-card p{font-size:11px;color:var(--muted);line-height:1.7}
+.fakewechat{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:13px;padding:12px;background:#fbfffd;margin-top:13px}.wechaticon{background:#1aae68;color:#fff;width:39px;height:39px;display:grid;place-items:center;border-radius:12px;font-weight:900}.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#212331;color:#fff;border-radius:11px;padding:11px 14px;font-size:11px;z-index:120;box-shadow:var(--shadow);display:none;max-width:90vw;text-align:center}.toast.show{display:block}
+@media(max-width:680px){
+ .top{height:58px;padding:0 14px}.brand{font-size:12px}.logo{width:31px;height:31px}.beta{font-size:9px}
+ .wrap{padding:0 14px 50px}.hero{padding:38px 0 18px}.lead{font-size:13px}.ctas .btn{width:100%}
+ .proofs{grid-template-columns:1fr 1fr;gap:7px}.proof{padding:11px}.proof b{font-size:11px}
+ .section-title{margin:36px 0 15px}.section-title h2{font-size:21px}.modes{grid-template-columns:1fr}.mode{padding:17px}
+ .process{gap:6px}.process-item{padding:10px}.process-item b{font-size:10px}
+ .workhead{align-items:flex-start;flex-direction:column;padding:15px}.workbody{padding:13px}
+ .upload-grid{grid-template-columns:1fr}.uploadbox{padding:18px 12px}
+ .result-hero{grid-template-columns:1fr}.score{font-size:38px}
+ .diff{grid-template-columns:1fr}.actions .btn{flex:1}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand"><div class="logo">AI</div><span>AI 岗位匹配简历助手</span></div>
+  <div class="top-right"><span class="beta">体验版</span><button class="btn ghost" style="padding:8px 11px;font-size:10px" onclick="showLogin()">登录</button></div>
+</header>
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow"><span class="spark"></span> 不只是润色，而是告诉你为什么要改</div>
+    <h1>别再盲改简历。<br><span class="grad">让每一段经历，都更有说服力。</span></h1>
+    <p class="lead">上传简历，找出表达、经历和成果上的问题；准备投某个岗位时，再上传招聘 JD。AI 会解释岗位看重什么、你的简历差在哪里，并在你确认后生成修改版。</p>
+    <div class="ctas">
+      <button class="btn primary" onclick="openMode('jd')">✨ 免费体验岗位定制</button>
+      <button class="btn ghost" onclick="openMode('general')">先检查我的简历</button>
+    </div>
+    <div class="subnote">目前为交互体验 Demo。不会将你选择的文件上传到服务器，也不会调用真实 AI。</div>
+    <div class="proofs">
+      <div class="proof"><b>问题说具体</b><span>指出哪一段有问题，并展示原文依据。</span></div>
+      <div class="proof"><b>修改由你决定</b><span>每条建议都可以接受、拒绝或补充。</span></div>
+      <div class="proof"><b>不编造经历</b><span>没有证据的数据，需要你本人补充确认。</span></div>
+      <div class="proof"><b>面向真实投递</b><span>先聚焦清晰、简洁、ATS 友好的 Word 简历。</span></div>
+    </div>
+  </section>
+
+  <section id="choose">
+    <div class="section-title"><h2>你想先解决哪个问题？</h2><p>选一个场景开始，流程只需几步。</p></div>
+    <div class="modes">
+      <article class="mode">
+        <div class="mode-head"><div class="mode-icon">CV</div><span class="tag">建议先从这里开始</span></div>
+        <h3>简历体检：先把基础打好</h3>
+        <p>还没有明确目标岗位？先检查简历哪里写得不清楚、哪些成果没有体现。</p>
+        <ul><li>检查工作经历和项目经历</li><li>定位遗漏信息和表达问题</li><li>根据你的补充信息改写</li><li>查看原文与修改后的对比</li></ul>
+        <button class="btn primary" onclick="openMode('general')">开始简历体检 →</button>
+      </article>
+      <article class="mode">
+        <div class="mode-head"><div class="mode-icon">JD</div><span class="tag">目标更明确</span></div>
+        <h3>岗位定制：为目标职位做准备</h3>
+        <p>已经找到招聘信息？让简历围绕岗位要求展示，而不是一份简历投遍所有公司。</p>
+        <ul><li>提炼 JD 的职责和核心能力</li><li>找出简历与岗位要求的差距</li><li>区分可优化项和真实能力缺口</li><li>生成针对这个岗位的简历版本</li></ul>
+        <button class="btn primary" onclick="openMode('jd')">开始岗位定制 →</button>
+      </article>
+    </div>
+    <div class="process">
+      <div class="process-item"><b>01 · 上传文件</b><span>选择已有简历。岗位定制模式还需要招聘 JD 图片。</span></div>
+      <div class="process-item"><b>02 · 查看建议</b><span>看问题、证据、优先级，并补充 AI 缺少的信息。</span></div>
+      <div class="process-item"><b>03 · 确认生成</b><span>逐条确认之后，生成下一版简历并导出。</span></div>
+    </div>
+  </section>
+
+  <section id="generalApp" class="app">
+    <div class="workspace">
+      <div class="workhead"><div><h2>简历体检</h2><p>先检查简历本身，不需要招聘 JD。</p></div><div class="steps"><span class="step on" id="gs1">1 上传</span><span class="step" id="gs2">2 分析</span><span class="step" id="gs3">3 修改</span><span class="step" id="gs4">4 生成</span></div></div>
+      <div class="workbody">
+        <div id="gUpload">
+          <div class="upload-grid">
+            <div class="uploadbox"><div class="upicon">CV</div><b>选择你的简历</b><p>PDF / DOCX / JPG / PNG<br>最多 3 页，文件最大 10MB</p><input type="file" id="resumeGeneral" accept=".pdf,.docx,.jpg,.jpeg,.png"><div id="gFileMeta" class="filemeta"></div></div>
+            <div class="box"><span class="kicker">你将获得</span><h3>不是简单润色，而是具体修改依据</h3><p class="muted">示例结果会展示三类内容：优先问题、原文证据、可执行建议。之后可以补充真实数据，再生成修改版。</p><div class="minitags"><span class="minitag">工作经历</span><span class="minitag">项目成果</span><span class="minitag">表达清晰度</span><span class="minitag">技能描述</span></div></div>
+          </div>
+          <div class="notice">隐私提示：这是纯前端演示，所选文件不会发送到网络。正式版才会接入文件解析和 AI 分析。</div>
+          <button class="btn primary wide" onclick="runAnalysis('general')">查看简历问题（演示）</button>
+          <div id="gStatus" class="status"></div>
+        </div>
+        <div id="gResults" class="results">
+          <div class="result-hero">
+            <div class="box"><span class="kicker">简历质量示例</span><div class="scoreline"><b class="score">82</b><span>/ 100</span></div><div class="muted">Demo 示例分数，不是对你上传文件的真实分析。</div><div class="minitags"><span class="minitag">工作经历 16/20</span><span class="minitag">项目经历 13/15</span><span class="minitag">成果量化 8/15</span></div></div>
+            <div class="box"><span class="kicker">一句话结论</span><h3>“做了什么”写得多，“做成了什么”写得少。</h3><div class="callout">优先考虑成果量化、个人贡献和技能具体化。不要为了好看而添加未发生的业务结果。</div></div>
+          </div>
+          <div class="results-title"><h3>优先修改的问题</h3><span>示例结果 · 可逐条选择</span></div>
+          <div class="issue"><div class="issue-top"><div class="issue-title">01 · 工作经历缺少量化成果</div><span class="priority">高优先级</span></div><p>“负责用户增长和产品运营”说明了工作职责，但没有体现业务影响。</p><div class="evidence">原文依据：负责用户增长和产品运营。</div><div class="suggest"><b>建议：</b>如有真实数据，可补充用户规模、增长率、转化率或收入等指标。</div><label class="check"><input type="checkbox" class="gcheck" checked><span>接受这条建议</span></label></div>
+          <div class="issue"><div class="issue-top"><div class="issue-title">02 · 项目经历没有明确个人贡献</div><span class="priority">高优先级</span></div><p>“参与项目规划、需求分析和上线”无法分辨团队工作与个人贡献。</p><div class="evidence">原文依据：参与项目规划、需求分析和上线。</div><div class="suggest"><b>建议：</b>补充你负责的模块、关键决策，以及推动项目落地的具体动作。</div><label class="check"><input type="checkbox" class="gcheck" checked><span>接受这条建议</span></label></div>
+          <div class="issue"><div class="issue-top"><div class="issue-title">03 · 技能描述可以更具体</div><span class="priority">建议优化</span></div><p>“产品设计、需求分析、项目管理”偏泛化，不容易形成差异化。</p><div class="evidence">原文依据：熟悉产品设计、需求分析、项目管理。</div><div class="suggest"><b>建议：</b>结合实际工具、业务场景和项目证据展开。</div><label class="check"><input type="checkbox" class="gcheck"><span>接受这条建议</span></label></div>
+          <div class="box" style="margin-top:12px"><span class="kicker">补充真实信息</span><h3>你可以让简历更具体一点</h3><label class="label">例如：这个项目上线后产生了什么结果？</label><textarea id="gFact" class="field" placeholder="请填写真实经历或业务结果；不确定的数字可以留空。"></textarea><div class="safety">AI 不会自行编造数字。你补充的信息会标记为“用户补充”，需要你确认后才加入简历。</div><div class="actions"><button class="btn ghost" onclick="resetMode('general')">重新开始</button><button class="btn primary" onclick="makePreview('general')">确认建议并生成新版本</button></div></div>
+        </div>
+        <div id="gPreview" class="preview">
+          <div class="safety">已生成 Demo 预览。真实版本会再次检查新增事实，并生成可编辑的 DOCX 文件。</div>
+          <div class="diff"><div class="diffpart"><div class="diffhead">原始表述</div><div class="diffbody old">负责用户增长和产品运营。</div></div><div class="diffpart"><div class="diffhead">V2 · 优化预览</div><div class="diffbody new" id="gNewText">负责用户增长和产品运营，并围绕用户数据持续优化增长策略。</div></div></div>
+          <div class="versions"><div class="version active"><div><b>V2 · 通用优化版</b><small>基于已选建议生成</small></div><span class="tag">当前</span></div><div class="version"><div><b>V1 · 原始简历</b><small>保留基础版本</small></div><button class="btn ghost" style="padding:7px 10px;font-size:10px" onclick="toast('演示：可切换查看原始版本')">查看</button></div></div>
+          <div class="actions"><button class="btn ghost" onclick="showLogin()">下载 Word（演示）</button><button class="btn primary" onclick="toast('演示流程已完成')">完成</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="jdApp" class="app">
+    <div class="workspace">
+      <div class="workhead"><div><h2>岗位定制简历</h2><p>上传简历和目标 JD，围绕岗位要求调整表达。</p></div><div class="steps"><span class="step on" id="js1">1 上传</span><span class="step" id="js2">2 分析</span><span class="step" id="js3">3 修改</span><span class="step" id="js4">4 生成</span></div></div>
+      <div class="workbody">
+        <div id="jUpload">
+          <div class="upload-grid">
+            <div class="uploadbox"><div class="upicon">CV</div><b>① 选择简历</b><p>PDF / DOCX / JPG / PNG<br>最多 3 页，最大 10MB</p><input type="file" id="resumeJD" accept=".pdf,.docx,.jpg,.jpeg,.png"><div class="filemeta" id="jResumeMeta"></div></div>
+            <div class="uploadbox"><div class="upicon">JD</div><b>② 选择招聘 JD 图片</b><p>支持 JPG / PNG<br>Demo 仅模拟一个岗位</p><input type="file" id="jdFile" accept=".jpg,.jpeg,.png"><div class="filemeta" id="jdFileMeta"></div></div>
+          </div>
+          <div class="notice">演示说明：页面只读取文件名和大小，不会上传真实文件。点“分析岗位差距”后会展示固定的示例结果。</div>
+          <button class="btn primary wide" onclick="runAnalysis('jd')">分析岗位差距（演示）</button>
+          <div id="jStatus" class="status"></div>
+        </div>
+        <div id="jResults" class="results">
+          <div class="result-hero">
+            <div class="box"><span class="kicker">岗位识别示例</span><h3>高级产品经理 · B 端 SaaS</h3><p class="muted">JD 重点：产品规划、复杂需求分析、跨团队推动、数据意识、SaaS 业务理解。</p><div class="minitags"><span class="minitag">硬性要求</span><span class="minitag">核心技能</span><span class="minitag">加分项</span></div></div>
+            <div class="box"><span class="kicker">岗位匹配示例</span><div class="scoreline"><b class="score">78</b><span>/ 100</span></div><div class="bar"><i style="width:78%"></i></div><div class="muted">该分数为固定示例，并非根据你选择的文件计算。</div></div>
+          </div>
+          <div class="box" style="margin-top:12px"><span class="kicker">招聘方视角</span><h3>这个岗位想看到什么证据？</h3><div class="process"><div class="process-item"><b>① B 端产品</b><span>说明服务的客户、业务流程和产品场景。</span></div><div class="process-item"><b>② 推动能力</b><span>展示如何协调团队并解决交付障碍。</span></div><div class="process-item"><b>③ 业务结果</b><span>补充可验证的项目成果和指标。</span></div></div></div>
+          <div class="results-title"><h3>简历与 JD 的关键差距</h3><span>示例结果</span></div>
+          <div class="issue"><div class="issue-top"><div class="issue-title">01 · B 端 SaaS 经验没有写清楚</div><span class="priority">部分满足</span></div><p>简历中有企业客户相关表达，但没有明确说明是否为 B 端 SaaS 产品。</p><div class="evidence">JD 证据：要求具备 B 端产品设计和 SaaS 业务经验。此处为演示示例。</div><div class="suggest"><b>建议：</b>如果实际做过，请补充客户类型、业务流程、负责模块和成果。</div><label class="check"><input type="checkbox" class="jcheck" checked><span>接受这条建议</span></label></div>
+          <div class="issue"><div class="issue-top"><div class="issue-title">02 · 跨部门推动缺少实例</div><span class="priority">高优先级</span></div><p>只写“协调研发、设计”，没有体现推动过程和最终结果。</p><div class="evidence">JD 证据：负责推动跨部门项目交付。此处为演示示例。</div><div class="suggest"><b>建议：</b>补充一个真实项目中的难点、你的动作和结果。</div><label class="check"><input type="checkbox" class="jcheck" checked><span>接受这条建议</span></label></div>
+          <div class="box" style="margin-top:12px"><span class="kicker">补充事实</span><h3>你实际做过哪些相关工作？</h3><label class="label">例如：负责企业客户平台，服务 200+ 家客户；请只填写真实信息。</label><textarea id="jFact" class="field" placeholder="补充与你经历相关的具体事实……"></textarea><div class="safety">没有实际经验的 JD 要求，不会通过改简历来伪装满足。</div><div class="actions"><button class="btn ghost" onclick="resetMode('jd')">重新开始</button><button class="btn primary" onclick="makePreview('jd')">确认建议并生成定制版</button></div></div>
+        </div>
+        <div id="jPreview" class="preview">
+          <div class="safety">岗位定制版预览已生成。正式版本需再次验证所有新增事实，并导出 DOCX。</div>
+          <div class="diff"><div class="diffpart"><div class="diffhead">原始表述</div><div class="diffbody old">负责企业客户产品设计和需求分析。</div></div><div class="diffpart"><div class="diffhead">V2 · 岗位定制预览</div><div class="diffbody new" id="jNewText">负责企业客户产品设计与需求分析，围绕 B 端业务场景推进产品迭代，并结合客户反馈持续优化产品方案。</div></div></div>
+          <div class="versions"><div class="version active"><div><b>V2-JD · 高级产品经理定制版</b><small>基于该岗位要求生成</small></div><span class="tag">当前</span></div><div class="version"><div><b>V1 · 基础简历</b><small>保留原始版本</small></div><button class="btn ghost" style="padding:7px 10px;font-size:10px" onclick="toast('演示：可切换查看原始版本')">查看</button></div></div>
+          <div class="actions"><button class="btn ghost" onclick="showLogin()">下载 Word（演示）</button><button class="btn primary" onclick="toast('演示流程已完成')">完成</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="disclaimer">交互体验 Demo · 评分、岗位分析与改写内容均为示例数据，不构成求职结果保证。</div>
+</main>
+<div class="modal" id="loginModal"><div class="modal-card"><span class="kicker">体验版说明</span><h3>正式下载功能尚未接入</h3><p>真实产品会在这里完成微信登录后下载可编辑的 DOCX。当前页面仅用于测试手机布局与业务流程，不会登录微信或上传简历。</p><div class="fakewechat"><div class="wechaticon">微</div><div><b style="font-size:12px">微信登录（占位）</b><div style="font-size:10px;color:#777;margin-top:4px">尚未连接真实微信授权</div></div></div><div class="actions"><button class="btn ghost" onclick="closeLogin()">返回继续体验</button><button class="btn primary" onclick="closeLogin();toast('这是交互 Demo，尚未连接真实下载服务')">我知道了</button></div></div></div>
+<div class="toast" id="toast"></div>
 <script>
-function start(id){document.querySelectorAll('.demo').forEach(function(x){x.classList.remove('show')});var el=document.getElementById(id);el.classList.add('show');el.scrollIntoView({behavior:'smooth'})}
-function analyze(mode){if(mode==='general'){document.getElementById('gUpload').style.display='none';document.getElementById('gResult').style.display='block'}else{document.getElementById('jUpload').style.display='none';document.getElementById('jResult').style.display='block'}}
-function generate(mode){if(mode==='general'){var v=document.getElementById('fact').value.trim();if(v) document.getElementById('gResult').querySelector('.item:nth-last-child(2)').innerHTML='<b>已记录你的补充信息</b><small>'+v+'</small>';showLogin()}}
-function showLogin(){document.getElementById('modal').style.display='flex'}
-</script></body></html>
+function byId(id){return document.getElementById(id)}
+function openMode(mode){
+  byId('generalApp').classList.remove('show');byId('jdApp').classList.remove('show');
+  const el=byId(mode==='general'?'generalApp':'jdApp');el.classList.add('show');
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function setStatus(id,msg,type){const el=byId(id);el.textContent=msg;el.className='status '+(type||'')}
+function validFile(inputId,metaId,allowResume){
+  const input=byId(inputId),meta=byId(metaId),file=input.files&&input.files[0];
+  if(!file){meta.textContent='';return null}
+  const name=file.name.toLowerCase(),ext=name.split('.').pop();
+  const allowed=allowResume?['pdf','docx','jpg','jpeg','png']:['jpg','jpeg','png'];
+  if(!allowed.includes(ext)){meta.textContent='文件格式不支持';meta.style.color='#bd3333';return {error:'文件格式不支持，请选择 '+(allowResume?'PDF、DOCX、JPG 或 PNG。':'JPG 或 PNG。')}}
+  if(file.size>10*1024*1024){meta.textContent='文件超过 10MB';meta.style.color='#bd3333';return {error:'文件不能超过 10MB。'}}
+  meta.style.color='var(--green)';meta.textContent='已选择：'+file.name+'（'+(file.size/1024).toFixed(0)+' KB）';return {file:file}
+}
+['resumeGeneral','resumeJD'].forEach(function(id){byId(id).addEventListener('change',function(){const meta=id==='resumeGeneral'?'gFileMeta':'jResumeMeta';validFile(id,meta,true)})});
+byId('jdFile').addEventListener('change',function(){validFile('jdFile','jdFileMeta',false)});
+function runAnalysis(mode){
+  if(mode==='general'){
+    const chosen=validFile('resumeGeneral','gFileMeta',true);if(!chosen){setStatus('gStatus','请先选择一份简历文件。','error');return}if(chosen.error){setStatus('gStatus',chosen.error,'error');return}
+    setStatus('gStatus','示例分析完成。注意：结果是固定演示数据，并未读取文件正文。','good');
+    byId('gUpload').classList.add('hidden');byId('gResults').classList.add('show');setStep('g',2);byId('gResults').scrollIntoView({behavior:'smooth',block:'start'});
+  }else{
+    const resume=validFile('resumeJD','jResumeMeta',true),jd=validFile('jdFile','jdFileMeta',false);
+    if(!resume){setStatus('jStatus','请先选择一份简历文件。','error');return}if(resume.error){setStatus('jStatus',resume.error,'error');return}
+    if(!jd){setStatus('jStatus','请先选择一张招聘 JD 图片。','error');return}if(jd.error){setStatus('jStatus',jd.error,'error');return}
+    setStatus('jStatus','示例分析完成。注意：结果是固定演示数据，并未读取文件正文。','good');
+    byId('jUpload').classList.add('hidden');byId('jResults').classList.add('show');setStep('j',3);byId('jResults').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+function setStep(prefix,step){for(let i=1;i<=4;i++){const el=byId(prefix+'s'+i);if(el)el.classList.toggle('on',i<=step)}}
+function makePreview(mode){
+  if(mode==='general'){
+    const selected=[...document.querySelectorAll('.gcheck:checked')].length;
+    if(!selected){toast('请至少接受一条修改建议，或返回重新选择。');return}
+    const fact=byId('gFact').value.trim();
+    const base='负责用户增长和产品运营，并围绕用户数据持续优化增长策略。';
+    byId('gNewText').textContent=fact?'负责用户增长和产品运营；根据用户补充，'+fact+'。并围绕相关业务数据持续优化增长策略。':base;
+    byId('gResults').classList.remove('show');byId('gPreview').classList.add('show');setStep('g',4);byId('gPreview').scrollIntoView({behavior:'smooth',block:'start'});
+  }else{
+    const selected=[...document.querySelectorAll('.jcheck:checked')].length;
+    if(!selected){toast('请至少接受一条修改建议，或返回重新选择。');return}
+    const fact=byId('jFact').value.trim();
+    const base='负责企业客户产品设计与需求分析，围绕 B 端业务场景推进产品迭代，并结合客户反馈持续优化产品方案。';
+    byId('jNewText').textContent=fact?'负责企业客户产品设计与需求分析；根据用户补充，'+fact+'。围绕 B 端业务场景推进产品迭代。':base;
+    byId('jResults').classList.remove('show');byId('jPreview').classList.add('show');setStep('j',4);byId('jPreview').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+function resetMode(mode){
+  if(mode==='general'){byId('gUpload').classList.remove('hidden');byId('gResults').classList.remove('show');byId('gPreview').classList.remove('show');byId('resumeGeneral').value='';byId('gFileMeta').textContent='';byId('gFact').value='';setStep('g',1);setStatus('gStatus','','')}
+  else{byId('jUpload').classList.remove('hidden');byId('jResults').classList.remove('show');byId('jPreview').classList.remove('show');byId('resumeJD').value='';byId('jdFile').value='';byId('jResumeMeta').textContent='';byId('jdFileMeta').textContent='';byId('jFact').value='';setStep('j',1);setStatus('jStatus','','')}
+  toast('已重置，可重新体验。');
+}
+function showLogin(){byId('loginModal').classList.add('show')}
+function closeLogin(){byId('loginModal').classList.remove('show')}
+function toast(msg){const el=byId('toast');el.textContent=msg;el.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(function(){el.classList.remove('show')},2500)}
+</script>
+</body>
+</html>
