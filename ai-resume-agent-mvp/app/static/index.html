@@ -52,7 +52,7 @@ input[type=file]{margin:10px 0;max-width:100%}.consent{font-size:12px;line-heigh
 <div class="panel">
 <div class="subtle">解析成功</div><div id="filename" style="font-weight:800;margin-top:5px"></div><div id="pageCount" class="subtle" style="margin-top:5px"></div>
 <div style="margin-top:16px"><button class="btn" id="analyzeBtn" onclick="analyzeResume()">开始 AI 分析</button></div>
-<label class="consent"><input id="consent" type="checkbox"> 我了解并同意：点击 AI 分析后，脱敏处理后的简历文本将发送到阿里云百炼（千问）模型服务进行分析。请勿上传不愿发送到模型服务的信息。</label>
+<label class="consent"><input id="consent" type="checkbox"> 我了解并同意：点击 AI 分析后，简历文本会先发送到本项目后端；后端会尝试隐藏手机号、邮箱和身份证号，再将文本发送到阿里云百炼（千问）。姓名、公司名称等其他信息仍可能被发送。请勿上传不愿发送给模型服务的信息。</label>
 <div id="analysisMsg" aria-live="polite"></div>
 </div>
 <div class="panel"><h3 class="details-title">结构化简历内容</h3><div id="summary"></div><details style="margin-top:12px"><summary>查看 Resume JSON（含解析文本）</summary><pre id="json"></pre></details></div>
