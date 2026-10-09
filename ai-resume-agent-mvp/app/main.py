@@ -11,7 +11,10 @@ import pytesseract
 from docx import Document
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
+from pydantic import BaseModel, Field
 from PIL import Image, ImageOps
+
+from app.ai_analysis import analyze_resume_text
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
@@ -19,9 +22,10 @@ TMP_DIR = BASE_DIR.parent / "tmp"
 TMP_DIR.mkdir(exist_ok=True)
 
 MAX_BYTES = 10 * 1024 * 1024
+MAX_ANALYSIS_CHARS = 20_000
 SUPPORTED = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 
-app = FastAPI(title="AI 岗位匹配简历助手", version="0.1.0")
+app = FastAPI(title="AI 岗位匹配简历助手", version="0.2.0")
 
 SECTION_ALIASES = {
     "basic_info": {"个人信息", "基本信息", "个人资料", "联系方式", "contact", "profile"},
@@ -32,15 +36,22 @@ SECTION_ALIASES = {
     "self_intro": {"自我评价", "个人简介", "summary", "profile summary"},
 }
 
+
+class ResumeAnalysisRequest(BaseModel):
+    resume_text: str = Field(min_length=30, max_length=MAX_ANALYSIS_CHARS)
+
+
 def safe_filename(name: str) -> str:
     name = Path(name or "upload").name
     name = re.sub(r"[^\w.\-\u4e00-\u9fff ]+", "_", name)
     return name[:120] or "upload"
 
+
 def normalize_text(text: str) -> str:
     text = text.replace("\u00a0", " ").replace("\r", "")
     lines = [re.sub(r"[ \t]+", " ", x).strip() for x in text.split("\n")]
     return "\n".join(x for x in lines if x)
+
 
 def extract_pdf(path: Path) -> tuple[str, int]:
     doc = fitz.open(path)
@@ -55,12 +66,14 @@ def extract_pdf(path: Path) -> tuple[str, int]:
     finally:
         doc.close()
 
+
 def estimate_docx_pages(document: Document, text: str) -> int:
     breaks = 0
     for paragraph in document.paragraphs:
         breaks += paragraph._p.xml.count('w:type="page"')
     estimated = max(1, (len(text) + 1049) // 1050)
     return max(estimated, breaks + 1)
+
 
 def extract_docx(path: Path) -> tuple[str, int]:
     doc = Document(path)
@@ -76,6 +89,7 @@ def extract_docx(path: Path) -> tuple[str, int]:
     text = normalize_text("\n".join(parts))
     return text, estimate_docx_pages(doc, text)
 
+
 def extract_image(path: Path) -> tuple[str, int]:
     image = Image.open(path)
     image = ImageOps.exif_transpose(image).convert("RGB")
@@ -84,6 +98,7 @@ def extract_image(path: Path) -> tuple[str, int]:
     except pytesseract.TesseractError:
         text = pytesseract.image_to_string(image, config="--psm 6")
     return normalize_text(text), 1
+
 
 def section_for_heading(line: str) -> str | None:
     normalized = re.sub(r"[\s:：|·•/\\]+", "", line).lower()
@@ -102,6 +117,7 @@ def section_for_heading(line: str) -> str | None:
         return "skills"
     return None
 
+
 def parse_sections(text: str) -> dict[str, list[str]]:
     data = {key: [] for key in SECTION_ALIASES}
     data["other"] = []
@@ -117,6 +133,7 @@ def parse_sections(text: str) -> dict[str, list[str]]:
             data[current].append(line)
     return data
 
+
 def extract_basic_info(text: str, sections: dict[str, list[str]]) -> dict[str, Any]:
     email = re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", text)
     phone = re.findall(r"(?:\+?86[-\s]?)?1\d{10}", text)
@@ -127,6 +144,7 @@ def extract_basic_info(text: str, sections: dict[str, list[str]]) -> dict[str, A
         "possible_urls": urls[:3],
         "raw_lines": sections.get("basic_info", [])[:12],
     }
+
 
 def build_resume_json(filename: str, ext: str, text: str, pages: int) -> dict[str, Any]:
     sections = parse_sections(text)
@@ -140,8 +158,9 @@ def build_resume_json(filename: str, ext: str, text: str, pages: int) -> dict[st
         "self_intro": sections["self_intro"],
         "other": sections["other"],
         "raw_text": text,
-        "parser": {"mode": "heuristic_mvp", "note": "下一阶段接入 AI 语义抽取。"},
+        "parser": {"mode": "heuristic_mvp", "note": "已接入千问简历分析；语义抽取仍在后续完善。"},
     }
+
 
 async def save_upload(file: UploadFile) -> Path:
     original = safe_filename(file.filename or "upload")
@@ -167,6 +186,7 @@ async def save_upload(file: UploadFile) -> Path:
         shutil.rmtree(tmp, ignore_errors=True)
         raise
 
+
 def parse_file(path: Path) -> tuple[str, int]:
     suffix = path.suffix.lower()
     if suffix == ".pdf":
@@ -177,13 +197,16 @@ def parse_file(path: Path) -> tuple[str, int]:
         return extract_image(path)
     raise ValueError("unsupported file")
 
+
 @app.get("/")
 def index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
+
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.1.0"}
+    return {"status": "ok", "version": "0.2.0"}
+
 
 @app.post("/api/resume/parse")
 async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
@@ -198,3 +221,9 @@ async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
         return {"ok": True, "resume": resume}
     finally:
         shutil.rmtree(path.parent, ignore_errors=True)
+
+
+@app.post("/api/resume/analyze")
+async def analyze_resume(request: ResumeAnalysisRequest) -> dict[str, Any]:
+    analysis = await analyze_resume_text(request.resume_text)
+    return {"ok": True, "analysis": analysis}
