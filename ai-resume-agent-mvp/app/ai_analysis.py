@@ -39,7 +39,7 @@ def build_messages(resume_text: str) -> list[dict[str, str]]:
 1. 不得补造或推断候选人的业绩数字、收入、团队规模、客户数量、技能、证书、岗位、职责或工作成果。
 2. 每一条问题必须提供 source_quote；它必须是简历正文中连续、逐字一致的原文片段，长度最好在8到100字。不得自己编造引用。引用里不要复述手机号、邮箱或身份证号。
 3. 如果缺少证据，请在 suggestion 中使用【请补充真实信息】或类似占位提示，并在 question 中询问用户；不要把占位内容写成既成事实。
-4. 建议应具体、可执行、语气友善；不要把个人偏好当成硬性标准。最多提出8条最有价值的问题。
+4. 建议应具体、可执行、语气友善；不要把个人偏好当成硬性标准。最多提出6条最有价值的问题，优先保证每条建议具体且有原文依据。
 5. 若简历证据不足，直接说明“需要候选人补充”，不要假装已经验证。
 6. 只输出有效 JSON，不要输出 Markdown 代码围栏或额外解释。必须使用下述结构：
 {
@@ -225,10 +225,19 @@ async def analyze_resume_text(resume_text: str) -> dict[str, Any]:
 
     if not isinstance(content, str) or not content.strip():
         logger.warning(
-            "AI response has no usable message content: model=%s content_type=%s finish_reason=%s",
-            model, content_type, finish_reason,
+            "AI response has no usable message content: model=%s content_type=%s "
+            "finish_reason=%s max_tokens=%s",
+            model, content_type, finish_reason, payload["max_tokens"],
         )
-        raise HTTPException(502, "模型返回了空内容。请检查所选模型是否支持对话文本输出，然后重试。")
+        if finish_reason == "length":
+            raise HTTPException(
+                502,
+                "模型本次生成达到输出长度上限，未能生成完整分析结果。请稍后重试。",
+            )
+        raise HTTPException(
+            502,
+            "模型返回了空内容。请检查模型服务配置后重试；系统日志已记录响应结构（不含简历内容）。",
+        )
 
     normalized = content.strip()
     normalized = re.sub(r"^\s*```(?:json)?\s*", "", normalized, flags=re.IGNORECASE)
