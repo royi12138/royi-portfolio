@@ -205,9 +205,11 @@
   .sec .col--l .eyebrow,.sec .col--r .eyebrow{color:var(--accent);border-color:rgba(178,58,38,.45);
     background:rgba(250,244,230,.75);text-shadow:none}
   .sec-title{font-family:var(--font-serif);font-weight:900;font-size:clamp(30px,4vw,50px);line-height:1.12;
-    letter-spacing:1px;margin-bottom:12px}
-  .sec-sub{color:var(--muted);font-size:14.5px;max-width:480px;margin-bottom:24px}
-  .bio{font-size:15.5px;color:var(--ink-2);max-width:520px;line-height:2}
+    letter-spacing:1px;margin-bottom:12px;color:var(--accent-ink);text-shadow:0 6px 28px rgba(30,18,6,.65)}
+  .sec-sub{color:rgba(247,239,220,.9);font-size:14.5px;max-width:480px;margin-bottom:24px;
+    text-shadow:0 2px 12px rgba(30,18,6,.7)}
+  .bio{font-size:15.5px;color:rgba(247,239,220,.94);max-width:520px;line-height:2;
+    text-shadow:0 2px 12px rgba(30,18,6,.7)}
   .card{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:18px 20px;
     box-shadow:0 10px 26px rgba(70,52,28,.16);backdrop-filter:blur(7px);transition:.22s}
   .card:hover{transform:translateY(-3px);box-shadow:0 16px 34px rgba(70,52,28,.22)}
@@ -315,7 +317,8 @@
   .case-block p{font-size:13.5px;color:var(--ink-2);line-height:1.85}
   /* ================= 访客引导 ================= */
   .sec.cta{padding:72px clamp(20px,4.5vw,64px) 34px;text-align:center}
-  .sec.cta h2{font-family:var(--font-serif);font-weight:900;font-size:clamp(26px,3.4vw,42px);line-height:1.3;margin-bottom:12px}
+  .sec.cta h2{font-family:var(--font-serif);font-weight:900;font-size:clamp(26px,3.4vw,42px);line-height:1.3;margin-bottom:12px;
+    color:var(--accent-ink);text-shadow:0 6px 28px rgba(30,18,6,.65)}
   .sec.cta p{color:var(--accent-ink);opacity:.88;font-size:15px;margin-bottom:26px;max-width:520px;margin-left:auto;margin-right:auto;line-height:1.8}
   .cta-mail{display:inline-block;font-size:15px;font-weight:700;color:var(--accent-ink);background:rgba(247,239,220,.14);
     border:1px solid rgba(247,239,220,.4);padding:11px 24px;border-radius:999px;margin-bottom:20px;text-decoration:none;transition:.2s}
@@ -467,7 +470,7 @@
         <div class="side-note" data-editable id="heroNote1">用产品思维，<br />守护每一次心跳。</div>
         <div class="stats" id="heroStats">
           <span data-editable>7 年互联网医疗经验</span>
-          <span data-editable>3 次 0→1 平台搭建</span>
+          <span data-editable>5 次 0→1 平台搭建</span>
           <span data-editable>心血管 · 中医 · 康复</span>
         </div>
         <div class="hello" data-editable id="heroNote2"><b>HELLO, YOU.</b>移动鼠标，我会看向你的位置。<br />LOOKING DOWN ↓</div>
@@ -483,7 +486,7 @@
         <span class="eyebrow" data-editable>01 · ABOUT</span>
         <h2 class="sec-title" data-editable id="infoTitle">个人基本信息</h2>
         <p class="sec-sub" data-editable id="infoSub">深耕互联网医疗的产品人，关注心血管、中医与康复赛道，相信好的产品能让康复更可及。</p>
-        <p class="bio" data-editable id="infoBio">我是郭如意，一名从 Java 开发转型的产品经理。过去 7 年聚焦互联网医疗，主导过 3 个平台从 0 到 1 的搭建，当前负责心脏术后随访与康复方向的在线医疗服务平台，覆盖医生、患者、康复师等多类角色。</p>
+        <p class="bio" data-editable id="infoBio">我是郭如意，一名从 Java 开发转型的产品经理。过去 7 年聚焦互联网医疗，主导过 5 个平台从 0 到 1 的搭建，当前负责心脏术后随访与康复方向的在线医疗服务平台，覆盖医生、患者、康复师等多类角色。</p>
       </div>
       <div class="col col--c" aria-hidden="true"></div>
       <div class="col col--r">
@@ -507,7 +510,7 @@
         <h2 class="sec-title" data-editable id="advTitle">个人优势</h2>
         <p class="sec-sub" data-editable id="advSub">从平台搭建到医疗 AI 落地，从临床路径到用户心智，兼具纵深与广度。</p>
         <div class="metric-row">
-          <span class="m" data-editable><b>3</b>次 0→1</span>
+          <span class="m" data-editable><b>5</b>次 0→1</span>
           <span class="m" data-editable><b>6</b>类角色协同</span>
           <span class="m" data-editable><b>5</b>层视频标签</span>
         </div>
@@ -515,7 +518,7 @@
       <div class="col col--c" aria-hidden="true"></div>
       <div class="col col--r">
         <div class="adv-grid" id="advList">
-          <div class="card adv-card"><h3><span class="no" data-editable>01</span>0→1 平台搭建</h3><p data-editable>主导 3 个医疗平台从 0 到 1，独立负责信息架构、原型设计与需求优先级（MoSCoW）。</p></div>
+          <div class="card adv-card"><h3><span class="no" data-editable>01</span>0→1 平台搭建</h3><p data-editable>主导 5 个医疗平台从 0 到 1，独立负责信息架构、原型设计与需求优先级（MoSCoW）。</p></div>
           <div class="card adv-card"><h3><span class="no" data-editable>02</span>垂直领域纵深</h3><p data-editable>深耕心血管 / 中医 / 康复，既懂临床路径，也懂用户真实痛点与心智。</p></div>
           <div class="card adv-card"><h3><span class="no" data-editable>03</span>医疗 AI 落地</h3><p data-editable>构建心衰患者 AI 运动处方推荐系统，融合 NYHA 分级与 5 层视频标签体系。</p></div>
           <div class="card adv-card"><h3><span class="no" data-editable>04</span>多角色协同设计</h3><p data-editable>覆盖医生 / 患者 / 康复师等 6 类角色，打通随访—康复业务闭环。</p></div>
@@ -563,11 +566,11 @@
   <section class="sec" id="proj" data-sec="4">
     <div class="grid3 wrap reveal">
       <div class="col col--l">
-        <span class="eyebrow" data-editable>03 · PROJECTS</span>
+        <span class="eyebrow" data-editable>04 · PROJECTS</span>
         <h2 class="sec-title" data-editable id="projTitle">项目经历</h2>
         <p class="sec-sub" data-editable id="projSub">从 0 到 1 的关键项目，按时间排列；后续可在「编辑内容」中随时追加。</p>
         <div class="metric-row">
-          <span class="m" data-editable><b>3</b>个 0→1 平台</span>
+          <span class="m" data-editable><b>5</b>个 0→1 平台</span>
           <span class="m" data-editable><b>双端</b>小程序 + PC</span>
         </div>
       </div>
