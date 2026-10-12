@@ -141,7 +141,7 @@ async def analyze_resume_text(resume_text: str) -> dict[str, Any]:
         "messages": build_messages(redacted_text),
         "response_format": {"type": "json_object"},
         "temperature": 0.2,
-        "max_tokens": 1800,
+        "max_tokens": 8192,
     }
     headers = {
         "Authorization": "Bearer " + api_key,
@@ -149,7 +149,7 @@ async def analyze_resume_text(resume_text: str) -> dict[str, Any]:
     }
 
     try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(50.0, connect=10.0)) as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0)) as client:
             response = await client.post(
                 base_url + "/chat/completions",
                 headers=headers,
