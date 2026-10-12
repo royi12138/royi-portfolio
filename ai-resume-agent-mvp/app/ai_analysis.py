@@ -141,22 +141,30 @@ async def analyze_resume_text(resume_text: str) -> dict[str, Any]:
         "messages": build_messages(redacted_text),
         "response_format": {"type": "json_object"},
         "temperature": 0.2,
-        "max_tokens": 8192,
+        "max_tokens": 4096,
     }
+    # GLM-5.3-Flash always reasons; use the documented low-effort setting.
+    # Do not send thinking=disabled because this model rejects it.
+    if model.lower() == "glm-5.3-flash":
+        payload["thinking"] = {"type": "enabled"}
+        payload["reasoning_effort"] = "low"
+        payload["clear_thinking"] = True
+
     headers = {
         "Authorization": "Bearer " + api_key,
         "Content-Type": "application/json",
     }
 
     try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0)) as client:
+        async with httpx.AsyncClient(timeout=httpx.Timeout(90.0, connect=10.0)) as client:
             response = await client.post(
                 base_url + "/chat/completions",
                 headers=headers,
                 json=payload,
             )
     except httpx.TimeoutException as exc:
-        raise HTTPException(504, "模型分析超时，请稍后重试。") from exc
+        logger.warning("AI upstream timed out: model=%s timeout_seconds=90 max_tokens=%s", model, payload["max_tokens"])
+        raise HTTPException(504, "模型本次分析耗时过长。请稍后重试；如果连续发生，建议将模型切换为更快的非深度推理模型。") from exc
     except httpx.HTTPError as exc:
         logger.warning("AI upstream connection failed: %s", type(exc).__name__)
         raise HTTPException(502, "暂时无法连接 AI 模型服务，请检查后端网络和 Base URL。") from exc
