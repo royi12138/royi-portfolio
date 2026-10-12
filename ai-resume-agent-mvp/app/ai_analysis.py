@@ -182,13 +182,13 @@ async def analyze_resume_text(resume_text: str) -> dict[str, Any]:
                     text_part = block.get("text")
                     if isinstance(text_part, str):
                         pieces.append(text_part)
-            content = "\\n".join(pieces)
+            content = "\n".join(pieces)
         if not isinstance(content, str) or not content.strip():
             raise ValueError("empty model content")
 
         normalized = content.strip()
-        normalized = re.sub(r"^\\s*```(?:json)?\\s*", "", normalized, flags=re.IGNORECASE)
-        normalized = re.sub(r"\\s*```\\s*$", "", normalized)
+        normalized = re.sub(r"^\s*```(?:json)?\s*", "", normalized, flags=re.IGNORECASE)
+        normalized = re.sub(r"\s*```\s*$", "", normalized)
         try:
             parsed = json.loads(normalized)
         except json.JSONDecodeError:
