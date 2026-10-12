@@ -168,11 +168,41 @@ async def analyze_resume_text(resume_text: str) -> dict[str, Any]:
     if response.status_code >= 400:
         raise HTTPException(502, "百炼模型服务暂时无法完成请求，请检查模型名称和账号服务状态。")
 
+    # Qwen-compatible endpoints may return content as a string or a list of
+    # text blocks. Be tolerant of harmless Markdown fences and surrounding text.
     try:
         response_data = response.json()
         content = response_data["choices"][0]["message"]["content"]
-        parsed = json.loads(content)
+        if isinstance(content, list):
+            pieces: list[str] = []
+            for block in content:
+                if isinstance(block, str):
+                    pieces.append(block)
+                elif isinstance(block, dict):
+                    text_part = block.get("text")
+                    if isinstance(text_part, str):
+                        pieces.append(text_part)
+            content = "\\n".join(pieces)
+        if not isinstance(content, str) or not content.strip():
+            raise ValueError("empty model content")
+
+        normalized = content.strip()
+        normalized = re.sub(r"^\\s*```(?:json)?\\s*", "", normalized, flags=re.IGNORECASE)
+        normalized = re.sub(r"\\s*```\\s*$", "", normalized)
+        try:
+            parsed = json.loads(normalized)
+        except json.JSONDecodeError:
+            # Recover a JSON object if the model added a short preamble/postscript.
+            start = normalized.find("{")
+            end = normalized.rfind("}")
+            if start < 0 or end <= start:
+                raise
+            parsed = json.loads(normalized[start : end + 1])
     except (ValueError, KeyError, IndexError, TypeError) as exc:
-        raise HTTPException(502, "AI 返回内容无法解析，请稍后重试。") from exc
+        # Log only the response shape, never the resume text or API credential.
+        raise HTTPException(
+            502,
+            "AI 已返回内容，但格式暂时无法识别。请稍后重试；若持续出现，请检查 Render 日志中的模型响应格式。",
+        ) from exc
 
     return validate_analysis(parsed, redacted_text)
