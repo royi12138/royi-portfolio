@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import re
 from typing import Any
@@ -9,6 +10,7 @@ import httpx
 from fastapi import HTTPException
 
 DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+logger = logging.getLogger(__name__)
 MAX_RESUME_CHARS = 20_000
 
 
@@ -125,7 +127,7 @@ async def analyze_resume_text(resume_text: str) -> dict[str, Any]:
     if not api_key:
         raise HTTPException(
             status_code=503,
-            detail="后端尚未配置千问 API Key。请先部署后端并在部署平台的环境变量中设置 DASHSCOPE_API_KEY。",
+            detail="后端尚未配置模型 API Key。请在部署平台的环境变量中设置 DASHSCOPE_API_KEY。",
         )
 
     redacted_text = redact_sensitive_info(resume_text)
@@ -156,53 +158,98 @@ async def analyze_resume_text(resume_text: str) -> dict[str, Any]:
     except httpx.TimeoutException as exc:
         raise HTTPException(504, "模型分析超时，请稍后重试。") from exc
     except httpx.HTTPError as exc:
-        raise HTTPException(502, "暂时无法连接百炼模型服务，请检查后端网络和 Base URL。") from exc
+        logger.warning("AI upstream connection failed: %s", type(exc).__name__)
+        raise HTTPException(502, "暂时无法连接 AI 模型服务，请检查后端网络和 Base URL。") from exc
 
-    if response.status_code == 401 or response.status_code == 403:
+    if response.status_code in (401, 403):
+        logger.warning("AI upstream authentication failed: status=%s", response.status_code)
         raise HTTPException(
             502,
-            "百炼认证失败。请检查 API Key 是否有效，以及 DASHSCOPE_BASE_URL 是否与该 Key 的地域/计费方案匹配。",
+            "模型服务认证失败。请检查 DASHSCOPE_API_KEY 是否有效，以及 DASHSCOPE_BASE_URL 是否与该 API Key 对应。",
         )
     if response.status_code == 429:
+        logger.warning("AI upstream rate limited: status=429")
         raise HTTPException(429, "模型服务暂时繁忙或触发调用限制，请稍后重试。")
     if response.status_code >= 400:
-        raise HTTPException(502, "百炼模型服务暂时无法完成请求，请检查模型名称和账号服务状态。")
-
-    # Qwen-compatible endpoints may return content as a string or a list of
-    # text blocks. Be tolerant of harmless Markdown fences and surrounding text.
-    try:
-        response_data = response.json()
-        content = response_data["choices"][0]["message"]["content"]
-        if isinstance(content, list):
-            pieces: list[str] = []
-            for block in content:
-                if isinstance(block, str):
-                    pieces.append(block)
-                elif isinstance(block, dict):
-                    text_part = block.get("text")
-                    if isinstance(text_part, str):
-                        pieces.append(text_part)
-            content = "\n".join(pieces)
-        if not isinstance(content, str) or not content.strip():
-            raise ValueError("empty model content")
-
-        normalized = content.strip()
-        normalized = re.sub(r"^\s*```(?:json)?\s*", "", normalized, flags=re.IGNORECASE)
-        normalized = re.sub(r"\s*```\s*$", "", normalized)
-        try:
-            parsed = json.loads(normalized)
-        except json.JSONDecodeError:
-            # Recover a JSON object if the model added a short preamble/postscript.
-            start = normalized.find("{")
-            end = normalized.rfind("}")
-            if start < 0 or end <= start:
-                raise
-            parsed = json.loads(normalized[start : end + 1])
-    except (ValueError, KeyError, IndexError, TypeError) as exc:
-        # Log only the response shape, never the resume text or API credential.
+        # Do not log upstream bodies: they may contain account or request details.
+        logger.warning("AI upstream rejected request: status=%s model=%s", response.status_code, model)
         raise HTTPException(
             502,
-            "AI 已返回内容，但格式暂时无法识别。请稍后重试；若持续出现，请检查 Render 日志中的模型响应格式。",
-        ) from exc
+            f"模型服务请求失败（上游 HTTP {response.status_code}）。请检查模型名称、API Key 和 Base URL。",
+        )
+
+    try:
+        response_data = response.json()
+    except ValueError as exc:
+        logger.warning(
+            "AI response was not JSON: status=%s content_type=%s body_length=%s",
+            response.status_code,
+            response.headers.get("content-type", "unknown"),
+            len(response.content),
+        )
+        raise HTTPException(502, "模型服务返回了无法识别的响应，请稍后重试。") from exc
+
+    # Log response structure only; never log resume text, credentials, or model output.
+    top_keys = sorted(response_data.keys()) if isinstance(response_data, dict) else []
+    choices = response_data.get("choices") if isinstance(response_data, dict) else None
+    first_choice = choices[0] if isinstance(choices, list) and choices else None
+    message = first_choice.get("message") if isinstance(first_choice, dict) else None
+    content = message.get("content") if isinstance(message, dict) else None
+    finish_reason = first_choice.get("finish_reason") if isinstance(first_choice, dict) else None
+    content_type = type(content).__name__
+    content_length = len(content) if isinstance(content, (str, list)) else 0
+    logger.info(
+        "AI response shape: model=%s top_keys=%s choices_type=%s choices_count=%s "
+        "message_type=%s message_keys=%s content_type=%s content_length=%s "
+        "finish_reason=%s has_reasoning_content=%s",
+        model,
+        top_keys,
+        type(choices).__name__,
+        len(choices) if isinstance(choices, list) else 0,
+        type(message).__name__,
+        sorted(message.keys()) if isinstance(message, dict) else [],
+        content_type,
+        content_length,
+        finish_reason,
+        isinstance(message, dict) and bool(message.get("reasoning_content")),
+    )
+
+    if isinstance(content, list):
+        pieces: list[str] = []
+        for block in content:
+            if isinstance(block, str):
+                pieces.append(block)
+            elif isinstance(block, dict) and isinstance(block.get("text"), str):
+                pieces.append(block["text"])
+        content = "\n".join(pieces)
+
+    if not isinstance(content, str) or not content.strip():
+        logger.warning(
+            "AI response has no usable message content: model=%s content_type=%s finish_reason=%s",
+            model, content_type, finish_reason,
+        )
+        raise HTTPException(502, "模型返回了空内容。请检查所选模型是否支持对话文本输出，然后重试。")
+
+    normalized = content.strip()
+    normalized = re.sub(r"^\s*```(?:json)?\s*", "", normalized, flags=re.IGNORECASE)
+    normalized = re.sub(r"\s*```\s*$", "", normalized)
+    try:
+        parsed = json.loads(normalized)
+    except json.JSONDecodeError as original_error:
+        start_json = normalized.find("{")
+        end_json = normalized.rfind("}")
+        try:
+            if start_json < 0 or end_json <= start_json:
+                raise original_error
+            parsed = json.loads(normalized[start_json : end_json + 1])
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.warning(
+                "AI content JSON parse failed: model=%s content_length=%s finish_reason=%s error=%s",
+                model, len(normalized), finish_reason, type(exc).__name__,
+            )
+            raise HTTPException(
+                502,
+                "AI 已返回内容，但无法解析为 JSON。请查看 Render Logs 中的 AI response shape 和 JSON parse failed 记录。",
+            ) from exc
 
     return validate_analysis(parsed, redacted_text)
