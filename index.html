@@ -395,6 +395,58 @@
     .reveal{opacity:1;transform:none;transition:none}
     html{scroll-behavior:auto}
   }
+  /* ================= 首屏：求职意向 + 简历按钮 ================= */
+  .intent{display:inline-block;margin-top:14px;padding:6px 14px;border:1px solid rgba(247,239,220,.5);
+    border-radius:999px;font-size:13px;font-weight:700;letter-spacing:.5px;color:var(--accent-ink);
+    background:rgba(178,58,38,.18);text-shadow:0 1px 6px rgba(30,18,6,.5)}
+  .hero-cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+  .cta--ghost{background:transparent;border:1px solid rgba(247,239,220,.55);color:var(--accent-ink);
+    text-decoration:none;box-shadow:none}
+  .cta--ghost:hover{background:rgba(247,239,220,.12);transform:translateY(-3px)}
+
+  /* ================= 顶栏常驻联系方式 ================= */
+  .top-contact{position:relative;display:flex;align-items:center;gap:10px;pointer-events:auto}
+  .tc-mail{font-size:12.5px;font-weight:700;color:var(--accent-ink);text-decoration:none;
+    border:1px solid rgba(247,239,220,.35);padding:5px 10px;border-radius:999px;white-space:nowrap;
+    text-shadow:0 1px 6px rgba(30,18,6,.5)}
+  .tc-mail:hover{background:rgba(247,239,220,.12)}
+  .tc-wx{font-size:12.5px;font-weight:700;color:var(--accent-ink);background:rgba(178,58,38,.25);
+    border:1px solid rgba(255,190,150,.5);padding:5px 12px;border-radius:999px;cursor:pointer}
+  .tc-wx:hover{background:rgba(178,58,38,.4)}
+  .wx-pop{position:absolute;top:42px;right:0;width:180px;padding:10px;background:rgba(20,16,10,.96);
+    border:1px solid rgba(247,239,220,.25);border-radius:8px;box-shadow:0 14px 34px rgba(0,0,0,.5);
+    display:none;z-index:240;text-align:center}
+  .wx-pop.open{display:block}
+  .wx-pop__img{width:160px;height:auto;object-fit:contain;background:#fff;border-radius:6px}
+  .wx-pop__tip{display:block;font-size:12px;color:var(--accent-ink);line-height:1.6;margin-top:6px}
+  .checkbox-row{display:flex;align-items:center;gap:8px;font-size:13px;color:rgba(247,239,220,.85);cursor:pointer;line-height:1.5}
+  .checkbox-row input{width:auto;margin:0}
+
+  /* ================= 职业履历时间线 ================= */
+  .career{margin-top:54px;padding-top:34px;border-top:1px solid rgba(247,239,220,.18)}
+  .career__title{font-family:var(--font-serif);font-weight:900;font-size:clamp(22px,2.6vw,32px);
+    color:var(--accent-ink);margin-bottom:22px;text-shadow:0 4px 18px rgba(30,18,6,.55)}
+  .career__list{display:grid;gap:16px}
+  .career__item{display:grid;grid-template-columns:140px 1fr;gap:18px;align-items:start;
+    padding:14px 16px;background:rgba(250,244,230,.06);border:1px solid rgba(247,239,220,.14);
+    border-radius:6px;backdrop-filter:blur(4px)}
+  .career__time{font-weight:800;color:var(--accent-ink);font-size:14px;letter-spacing:.5px;
+    text-shadow:0 1px 6px rgba(30,18,6,.5)}
+  .career__co{font-weight:800;color:var(--accent-ink);font-size:16px;margin-bottom:3px;
+    text-shadow:0 1px 6px rgba(30,18,6,.5)}
+  .career__role{font-size:13.5px;color:rgba(247,239,220,.85);margin-bottom:6px}
+  .career__desc{font-size:13.5px;color:rgba(247,239,220,.78);line-height:1.8}
+
+  /* ================= 简历上传（素材配置） ================= */
+  .field--resume input[type=file]{margin-top:6px;color:var(--accent-ink)}
+  .resume-prev{margin-top:8px;font-size:12.5px;color:rgba(247,239,220,.85)}
+  .modal-resume{display:inline-block;margin:6px auto 0}
+
+  @media (max-width:680px){
+    .tc-mail{display:none}
+    .career__item{grid-template-columns:1fr;gap:6px}
+    .hero-cta-row .cta{width:100%;justify-content:center}
+  }
 </style>
 </head>
 <body>
@@ -443,6 +495,15 @@
     <a href="#insight">行业洞察</a>
     <a href="#hobby">爱好</a>
   </nav>
+  <div class="top-contact">
+    <a class="tc-mail" id="tcMail" href="mailto:18410051780@163.com" data-editable>✉ 18410051780@163.com</a>
+    <button class="tc-wx" id="wxBtn" type="button">微信</button>
+    <div class="wx-pop" id="wxPop">
+      <img class="wx-pop__img" src="assets/wechat-qr.jpg" alt="微信二维码"
+           onerror="this.style.display='none';var t=this.nextElementSibling;t.style.display='block';" />
+      <span class="wx-pop__tip" style="display:none">二维码加载失败，请稍后再试</span>
+    </div>
+  </div>
   <button class="login-btn" id="loginBtn" type="button">登录</button>
 </header>
 
@@ -461,8 +522,12 @@
         <span class="eyebrow" data-editable id="heroEyebrow">PRODUCT MANAGER · PORTFOLIO</span>
         <h1 class="h1" data-editable id="heroName">郭如意<span class="dot">.</span></h1>
         <div class="role" data-editable id="heroRole">高级产品经理 · 互联网医疗方向</div>
-        <p class="tagline" data-editable id="heroTagline">让专业的医疗服务，以更轻的方式抵达每一个家庭。</p>
-        <button class="cta" id="heroCta" data-editable>走进我的产品世界<span class="arr">↘</span></button>
+        <div class="intent" data-editable id="heroIntent">求职意向 · 产品组长 / 产品总监 / 高级产品经理</div>
+        <p class="tagline" data-editable id="heroTagline">我用 7 年互联网医疗产品经验，把心脏术后随访与康复做成医生、患者、康复师协同的在线服务平台——让专业的康复，以更轻的方式抵达每一个家庭。</p>
+        <div class="hero-cta-row">
+          <button class="cta" id="heroCta" data-editable>走进我的产品世界<span class="arr">↘</span></button>
+          <a class="cta cta--ghost resume-btn" href="assets/resume.pdf" download>下载简历 PDF</a>
+        </div>
       </div>
       <div class="col col--c" aria-hidden="true"></div>
       <div class="col col--r">
@@ -500,6 +565,35 @@
         </div>
       </div>
     </div>
+  <div class="career reveal">
+    <h3 class="career__title" data-editable>职业履历</h3>
+    <div class="career__list">
+      <div class="career__item">
+        <div class="career__time" data-editable>2025.05 — 至今</div>
+        <div class="career__main">
+          <div class="career__co" data-editable>为麦智能（小麦心康 / 瑞华心康）</div>
+          <div class="career__role" data-editable>高级产品经理 / 项目经理</div>
+          <div class="career__desc" data-editable>心脏术后随访与康复平台、AI 客服、医疗数据结构化分析，覆盖医生 / 患者 / 康复师等 6 类角色。</div>
+        </div>
+      </div>
+      <div class="career__item">
+        <div class="career__time" data-editable>2022.04 — 2025.04</div>
+        <div class="career__main">
+          <div class="career__co" data-editable>北京同仁堂互联网医院</div>
+          <div class="career__role" data-editable>高级产品经理</div>
+          <div class="career__desc" data-editable>互联网+中医 B2B2C 平台 0→1，医疗 SaaS + 医生端 + 患者小程序 + 后台四端，两年注册 30 万+、电子处方 50 万+。</div>
+        </div>
+      </div>
+      <div class="career__item">
+        <div class="career__time" data-editable>2018.07 — 2022.04</div>
+        <div class="career__main">
+          <div class="career__co" data-editable>北京奈特瑞</div>
+          <div class="career__role" data-editable>产品经理 / Java 开发工程师</div>
+          <div class="career__desc" data-editable>张仲景互联网医院、视康医影医生管理系统，从需求到 PRD 再到研发落地，懂代码、沟通零损耗。</div>
+        </div>
+      </div>
+    </div>
+  </div>
   </section>
 
   <!-- 2 个人优势 -->
@@ -763,6 +857,20 @@
       </div>
     </div>
 
+    <div class="field field--wechat">
+      <label class="checkbox-row">
+        <input type="checkbox" id="cfgShowWechat" />
+        显示微信二维码（取消勾选后，访客在顶栏看不到微信入口与二维码）
+      </label>
+    </div>
+
+    <div class="field field--resume">
+      <label>简历 PDF（登录后上传，可替换；访客点击「下载简历」获取）</label>
+      <input type="file" id="cfgResume" accept="application/pdf" />
+      <div class="resume-prev" id="resumePrev"></div>
+      <div class="hint">上传后点击「保存并应用」即可替换全站简历；留空则使用默认 assets/resume.pdf。文件以数据形式随云端同步推送给访客。</div>
+    </div>
+
     <div class="modal__actions">
       <button class="btn" id="btnCancelConfig">取消</button>
       <button class="btn primary" id="btnSaveConfig">保存并应用</button>
@@ -798,6 +906,7 @@
     <button class="close" id="btnCloseContact">×</button>
     <img class="contact-img" src="assets/contact.png" alt="联系一下" />
     <p class="contact-msg">好好好，竟然想得到我</p>
+    <a class="cta cta--ghost resume-btn modal-resume" href="assets/resume.pdf" download>下载简历 PDF</a>
     <div class="modal__actions">
       <button class="btn primary" id="btnCloseContact2">收到！</button>
     </div>
@@ -856,7 +965,10 @@
     material: "assets/video.mp4",
     parallax: 14,
     charSize: 36,
-    zoom: 8
+    zoom: 8,
+    resumeUrl: "assets/resume.pdf",
+    resumeData: null,
+    showWechat: true
   };
   var CONFIG_KEY = "pm_portfolio_config_v5";
   var CONTENT_KEY = "pm_portfolio_content_v3";
@@ -955,13 +1067,24 @@
   document.addEventListener("keydown", function once(){ tryPlay(); document.removeEventListener("keydown", once); });
 
   /* ---------- 素材配置应用 ---------- */
+  function applyResume(){
+    var url = cfg.resumeData || cfg.resumeUrl || "assets/resume.pdf";
+    $$(".resume-btn").forEach(function(b){
+      b.setAttribute("href", url);
+      if(cfg.resumeData){ b.setAttribute("download", "郭如意-简历.pdf"); } else { b.removeAttribute("download"); }
+    });
+  }
   function applyConfig(){
     document.documentElement.style.setProperty("--parallax", cfg.parallax);
     document.documentElement.style.setProperty("--char-w", (cfg.charSize || 36) + "vw");
     document.documentElement.style.setProperty("--zoom", (1 + (parseInt(cfg.zoom,10) || 8) / 100));
     bindMaterial(cfg.material);
+    // 微信二维码显隐：登录后可在「素材配置」切换；隐藏时访客在顶栏看不到微信入口
+    var wxBtn = $("#wxBtn");
+    if(wxBtn){ wxBtn.style.display = (cfg.showWechat === false) ? "none" : ""; }
   }
   applyConfig();
+  applyResume();
 
   /* ---------- 滚动同步：图片模式做 Ken Burns 缩放，视频模式同步进度 ---------- */
   var raf = null, idleTimer = null, lastT = -1, activeIndex = 0;
@@ -1175,6 +1298,12 @@
     $("#cfgParallax").value = cfg.parallax;
     $("#cfgCharSize").value = cfg.charSize;
     if($("#cfgToken")) $("#cfgToken").value = cloudToken;
+    if($("#cfgShowWechat")) $("#cfgShowWechat").checked = (cfg.showWechat !== false);
+    refreshResumePrev();
+  }
+  function refreshResumePrev(){
+    var el = $("#resumePrev"); if(!el) return;
+    el.innerHTML = cfg.resumeData ? "当前：已上传自定义简历（将随云端同步推送给访客）" : "当前：使用默认 assets/resume.pdf";
   }
   function openConfig(){ fillConfigForm(); modal.classList.add("open"); }
   function closeConfig(){ modal.classList.remove("open"); }
@@ -1189,6 +1318,7 @@
     cfg.parallax = isNaN(p) ? 14 : p;
     var cs = parseInt($("#cfgCharSize").value, 10);
     cfg.charSize = isNaN(cs) ? 36 : cs;
+    if($("#cfgShowWechat")) cfg.showWechat = $("#cfgShowWechat").checked;
     saveConfig(cfg);
     try{ cloudToken = $("#cfgToken").value.trim(); localStorage.setItem(CLOUD_TOKEN_KEY, cloudToken); }catch(e){}
     if(cloudToken){ setSyncState("已配置 Token，保存即自动同步"); }else{ setSyncState("未配置 Token"); }
@@ -1196,6 +1326,22 @@
     closeConfig();
     tryPlay();
   });
+  /* ---------- 简历 PDF 上传（登录后，素材配置内） ---------- */
+  var cfgResume = $("#cfgResume");
+  if(cfgResume){
+    cfgResume.addEventListener("change", function(){
+      var f = cfgResume.files && cfgResume.files[0];
+      if(!f) return;
+      if(f.type !== "application/pdf" && !/\.pdf$/i.test(f.name)){ toast("请选择 PDF 文件"); cfgResume.value = ""; return; }
+      var r = new FileReader();
+      r.onload = function(){
+        cfg.resumeData = r.result;
+        saveConfig(cfg); applyResume(); refreshResumePrev();
+        toast("简历已载入，记得点「立即同步到线上」");
+      };
+      r.readAsDataURL(f);
+    });
+  }
 
   /* ---------- 云端同步（保存后自动更新线上，存储为 GitHub data.json） ---------- */
   var CLOUD_URL = "https://royi12138.github.io/royi-portfolio/data.json";
@@ -1280,6 +1426,7 @@
             var k = el.id || el.dataset.k;
             if(k && d.content[k]) el.innerHTML = d.content[k];
           });
+          if(d.config && d.config.resumeData){ cfg.resumeData = d.config.resumeData; if(d.config.resumeUrl) cfg.resumeUrl = d.config.resumeUrl; applyResume(); }
           setSyncState("已载入线上最新内容");
         }
       }catch(e){}
@@ -1299,7 +1446,8 @@
 
   /* ---------- 管理员登录（仅本人可编辑） ---------- */
   var LOGIN_USER = "如意";
-  var LOGIN_PASS = "guoruyi11255213";
+  /* 密码不再以明文写入源码：仅保存 SHA-256 哈希，登录时对输入做哈希比对 */
+  var LOGIN_PASS_HASH = "1a2d60d7a9f05516f0ffe0870b0aca889782997abbe3c475b5fec4d9411ab090";
   var LOGIN_KEY = "pm_logged_in";
   var loggedIn = false;
   try{ loggedIn = localStorage.getItem(LOGIN_KEY) === "1"; }catch(e){}
@@ -1310,6 +1458,12 @@
   }
   var loginModal = $("#loginModal");
   var loginErr = $("#loginErr");
+  function sha256Hex(str){
+    if(!crypto || !crypto.subtle) return Promise.resolve("");
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)).then(function(buf){
+      return Array.prototype.map.call(new Uint8Array(buf), function(b){ return ("0"+b.toString(16)).slice(-2); }).join("");
+    });
+  }
   function openLogin(){
     $("#loginUser").value = ""; $("#loginPass").value = ""; loginErr.textContent = "";
     loginModal.classList.add("open");
@@ -1319,11 +1473,14 @@
   function doLogin(){
     var u = $("#loginUser").value.trim();
     var p = $("#loginPass").value;
-    if(u === LOGIN_USER && p === LOGIN_PASS){
-      loggedIn = true;
-      try{ localStorage.setItem(LOGIN_KEY, "1"); }catch(e){}
-      closeLogin(); applyLogin(); toast("已登录，编辑功能已开启");
-    }else{ loginErr.textContent = "账号或密码错误"; }
+    if(!u || !p){ loginErr.textContent = "请输入账号和密码"; return; }
+    sha256Hex(p).then(function(h){
+      if(u === LOGIN_USER && h === LOGIN_PASS_HASH){
+        loggedIn = true;
+        try{ localStorage.setItem(LOGIN_KEY, "1"); }catch(e){}
+        closeLogin(); applyLogin(); toast("已登录，编辑功能已开启");
+      }else{ loginErr.textContent = "账号或密码错误"; }
+    }).catch(function(){ loginErr.textContent = "登录校验失败，请重试"; });
   }
   $("#loginBtn").addEventListener("click", function(){
     if(loggedIn){
@@ -1344,6 +1501,15 @@
   $("#btnCloseContact").addEventListener("click", closeContact);
   $("#btnCloseContact2").addEventListener("click", closeContact);
   contactModal.addEventListener("click", function(e){ if(e.target === contactModal) closeContact(); });
+
+  /* ---------- 微信二维码弹层（顶栏常驻） ---------- */
+  var wxBtn = $("#wxBtn"), wxPop = $("#wxPop");
+  if(wxBtn && wxPop){
+    wxBtn.addEventListener("click", function(e){ e.stopPropagation(); wxPop.classList.toggle("open"); });
+    document.addEventListener("click", function(e){
+      if(wxPop.classList.contains("open") && !wxPop.contains(e.target) && e.target !== wxBtn){ wxPop.classList.remove("open"); }
+    });
+  }
 
   /* ---------- 项目深度解读（Case Study）弹窗 ---------- */
   var caseModal = $("#caseModal");
