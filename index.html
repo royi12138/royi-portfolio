@@ -791,7 +791,7 @@
     </div>
   </section>
   <footer>
-    <p data-editable id="footerNote">© 2026 郭如意 · 本页所有文字均可在「编辑内容」中实时修改并自动保存到本机。</p>
+    <p data-editable id="footerNote">© 2026 郭如意</p>
   </footer>
 </main>
 
@@ -884,6 +884,18 @@
     <div class="modal__actions">
       <button class="btn" id="btnCancelLogin">取消</button>
       <button class="btn primary" id="btnDoLogin">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- 通用确认弹窗（替代原生 confirm，避免预览 iframe 中失效） -->
+<div class="modal" id="confirmModal">
+  <div class="modal__box modal__box--sm">
+    <h2 id="confirmTitle">请确认</h2>
+    <p class="muted" id="confirmMsg"></p>
+    <div class="modal__actions">
+      <button class="btn" id="btnConfirmCancel">取消</button>
+      <button class="btn primary" id="btnConfirmOk">确定</button>
     </div>
   </div>
 </div>
@@ -1492,7 +1504,9 @@
   }
   $("#loginBtn").addEventListener("click", function(){
     if(loggedIn){
-      if(confirm("确定退出登录？")){ loggedIn = false; try{ localStorage.removeItem(LOGIN_KEY); }catch(e){} applyLogin(); toast("已退出登录"); }
+      pmConfirm("退出后编辑功能将关闭，访客看到的页面不变。确定退出吗？", "退出登录").then(function(ok){
+        if(ok){ loggedIn = false; try{ localStorage.removeItem(LOGIN_KEY); }catch(e){} applyLogin(); toast("已退出登录"); }
+      });
     }else{ openLogin(); }
   });
   $("#btnCloseLogin").addEventListener("click", closeLogin);
@@ -1500,6 +1514,23 @@
   $("#btnDoLogin").addEventListener("click", doLogin);
   $("#loginPass").addEventListener("keydown", function(e){ if(e.key === "Enter") doLogin(); });
   loginModal.addEventListener("click", function(e){ if(e.target === loginModal) closeLogin(); });
+
+  /* ---------- 通用确认弹窗（Promise 化，替代原生 confirm） ---------- */
+  var confirmModal = $("#confirmModal");
+  var confirmResolve = null;
+  function pmConfirm(msg, title){
+    $("#confirmMsg").textContent = msg || "";
+    $("#confirmTitle").textContent = title || "请确认";
+    confirmModal.classList.add("open");
+    return new Promise(function(resolve){ confirmResolve = resolve; });
+  }
+  function closeConfirm(result){
+    confirmModal.classList.remove("open");
+    if(confirmResolve){ var r = confirmResolve; confirmResolve = null; r(result); }
+  }
+  $("#btnConfirmOk").addEventListener("click", function(){ closeConfirm(true); });
+  $("#btnConfirmCancel").addEventListener("click", function(){ closeConfirm(false); });
+  confirmModal.addEventListener("click", function(e){ if(e.target === confirmModal) closeConfirm(false); });
 
   /* ---------- 微信二维码弹层（顶栏常驻） ---------- */
   var wxBtn = $("#wxBtn"), wxPop = $("#wxPop");
