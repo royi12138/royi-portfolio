@@ -448,6 +448,37 @@
     background:#fff;display:block;margin:12px 0 14px}
   .modal__box--resume .modal__actions{justify-content:flex-end}
   @media (max-width:820px){ .resume-frame{height:52vh} }
+
+  /* ================= 兜底底色适配：素材加载失败（浅色纸底）时，浅字改深字 ================= */
+  body.bg-fallback .topbar__brand{color:var(--ink);text-shadow:none}
+  body.bg-fallback .topbar__nav a{color:var(--ink-2);text-shadow:none}
+  body.bg-fallback .topbar__nav a:hover{background:rgba(43,33,22,.08)}
+  body.bg-fallback .login-btn{color:#fdf6e4;background:rgba(43,33,22,.72);border-color:rgba(247,239,220,.55);text-shadow:none}
+  body.bg-fallback .tc-mail{color:var(--ink);border-color:rgba(70,52,28,.4);text-shadow:none;background:rgba(255,255,255,.35)}
+  body.bg-fallback .tc-wx{color:#fdf6e4;background:var(--accent);border-color:rgba(70,40,16,.4)}
+  body.bg-fallback .eyebrow{color:var(--ink-2);background:rgba(43,33,22,.07);border-color:rgba(70,52,28,.35);text-shadow:none}
+  body.bg-fallback .sec .col--l .eyebrow,body.bg-fallback .sec .col--r .eyebrow{color:var(--accent);background:rgba(250,244,230,.85)}
+  body.bg-fallback .hero .h1{color:var(--ink);text-shadow:none}
+  body.bg-fallback .hero .role{color:var(--accent);text-shadow:none}
+  body.bg-fallback .hero .tagline{color:var(--ink-2);opacity:1;text-shadow:none}
+  body.bg-fallback .intent{color:var(--accent);background:rgba(178,58,38,.1);border-color:rgba(178,58,38,.45);text-shadow:none}
+  body.bg-fallback .cta--ghost{color:var(--ink);border-color:rgba(70,52,28,.5)}
+  body.bg-fallback .cta--ghost:hover{background:rgba(43,33,22,.06)}
+  body.bg-fallback .scroll-hint{color:var(--ink-2);text-shadow:none}
+  body.bg-fallback .sec-title{color:var(--ink);text-shadow:none}
+  body.bg-fallback .sec-sub{color:var(--ink-2)}
+  body.bg-fallback .bio{color:var(--ink-2)}
+  body.bg-fallback .sec.cta h2{color:var(--ink);text-shadow:none}
+  body.bg-fallback .sec.cta p{color:var(--ink-2);opacity:1}
+  body.bg-fallback .cta-mail{color:var(--ink);background:rgba(255,255,255,.45);border-color:rgba(70,52,28,.4)}
+  body.bg-fallback .cta-mail:hover{background:var(--accent);color:#fdf6e4}
+  body.bg-fallback .career__role{color:var(--ink-2)}
+  body.bg-fallback .career__desc{color:var(--muted)}
+  body.bg-fallback .career{border-top-color:rgba(70,52,28,.2)}
+  body.bg-fallback .career__item{background:rgba(255,255,255,.35);border-color:rgba(70,52,28,.16)}
+  body.bg-fallback .info-stats span{color:var(--ink-2);border-color:rgba(70,52,28,.4)}
+  body.bg-fallback footer{color:var(--muted)}
+  body.bg-fallback .dots button{border-color:rgba(70,52,28,.55);box-shadow:none}
 </style>
 </head>
 <body>
@@ -1034,6 +1065,15 @@
     });
   }
   var videoFallbackDone = false;
+  /* 背景素材加载成功前，默认按「浅色纸底」渲染深色文字（body.bg-fallback），
+     避免加载中/加载失败时出现浅底浅字看不清；背景图加载成功后切回浅色文字。 */
+  document.body.classList.add("bg-fallback");
+  bgImg.addEventListener("load", function(){
+    if(bgImg.src && bgImg.naturalWidth > 0){
+      document.body.classList.remove("bg-fallback");
+      stage.classList.remove("is-fallback");
+    }
+  });
   videos.forEach(function(v){
     v.addEventListener("loadedmetadata", function(){ dur = v.duration || 15.1; });
     v.addEventListener("canplay", safePlay);
@@ -1046,10 +1086,11 @@
       }else{
         stage.classList.add("is-fallback");
         $("#charBox").classList.add("is-fallback");
+        document.body.classList.add("bg-fallback");
       }
     });
   });
-  bgImg.addEventListener("error", function(){ stage.classList.add("is-fallback"); });
+  bgImg.addEventListener("error", function(){ stage.classList.add("is-fallback"); document.body.classList.add("bg-fallback"); });
   charImg.addEventListener("error", function(){ $("#charBox").classList.add("is-fallback"); });
   function tryPlay(){
     if(materialMode !== "video") return;
