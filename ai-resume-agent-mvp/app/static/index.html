@@ -55,7 +55,8 @@ input[type=file]{margin:10px 0;max-width:100%}.consent{font-size:12px;line-heigh
 <label class="consent"><input id="consent" type="checkbox"> 我了解并同意：点击 AI 分析后，简历文本会先发送到本项目后端；后端会尝试隐藏手机号、邮箱和身份证号，再将文本发送到阿里云百炼（千问）。姓名、公司名称等其他信息仍可能被发送。请勿上传不愿发送给模型服务的信息。</label>
 <div id="analysisMsg" aria-live="polite"></div>
 </div>
-<div class="panel"><h3 class="details-title">结构化简历内容</h3><div id="summary"></div><details style="margin-top:12px"><summary>查看 Resume JSON（含解析文本）</summary><pre id="json"></pre></details></div>
+<div class="panel"><h3 class="details-title">结构化简历内容</h3><p class="subtle">以下栏目由程序按标题自动归类，可能无法识别所有简历格式；请同时核对下面的完整解析文本。</p><div id="summary"></div><details style="margin-top:12px"><summary>查看 Resume JSON（技术详情）</summary><pre id="json"></pre></details></div>
+<div class="panel" id="parsedTextPanel"><h3 class="details-title">完整解析文本（可逐字核对）</h3><p class="subtle">这是系统从你上传的文件中提取到的文字。若某些栏目未识别，请以此处为准；这里不会由 AI 补写内容。</p><pre id="parsedRawText" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:560px;overflow:auto;font-size:13px;line-height:1.75;color:#30343b;background:#f7f8fb;border:1px solid #e6e7ed;border-radius:12px;padding:16px"></pre></div>
 <div id="analysisResult" class="hidden">
 <div class="panel"><h3 class="details-title">AI 总体评价</h3><div id="overallSummary" style="line-height:1.75"></div><div id="strengths"></div><div class="subtle" id="privacyNote" style="margin-top:12px"></div></div>
 <div class="panel"><h3 class="details-title">可改进的问题</h3><div id="issues"></div></div>
@@ -84,6 +85,7 @@ async function parseResume(){
    renderSection('教育经历',currentResume.education)+renderSection('工作经历',currentResume.work_experience)+
    renderSection('项目经历',currentResume.project_experience)+renderSection('技能',currentResume.skills);
   document.getElementById('json').textContent=JSON.stringify(currentResume,null,2);
+  document.getElementById('parsedRawText').textContent=currentResume.raw_text||'未提取到可显示的文字。';
   document.getElementById('consent').checked=false;document.getElementById('analysisResult').classList.add('hidden');
   document.getElementById('analysisMsg').innerHTML='';document.getElementById('result').classList.add('show');
   showMessage('msg','解析完成。确认隐私提示后，可以启动 AI 分析。',false);
