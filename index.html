@@ -27,6 +27,7 @@
     --char-w:36vw;          /* 人物宽度，可在配置中修改 */
   }
   *{box-sizing:border-box;margin:0;padding:0}
+  [data-editable]{overflow-wrap:break-word}
   html{scroll-behavior:smooth}
   body{
     font-family:var(--font-sans);
@@ -246,8 +247,8 @@
   .hobby-chip:hover{transform:translateX(-4px);border-color:rgba(178,58,38,.35)}
   .hobby-chip .ic{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;
     background:rgba(178,58,38,.12);color:var(--accent);font-size:14px}
-  .hobby-chip .tx{font-family:var(--font-serif);font-weight:700;font-size:14.5px}
-  .hobby-chip .ds{color:var(--muted);font-size:12px}
+  .hobby-chip .tx{font-family:var(--font-serif);font-weight:700;font-size:14.5px;flex:none}
+  .hobby-chip .ds{color:var(--muted);font-size:12px;flex:1;min-width:0;overflow-wrap:anywhere}
 
   footer{padding:30px 20px 120px;text-align:center;color:var(--accent-ink);font-size:12.5px;letter-spacing:.5px;
     position:relative;z-index:1;text-shadow:0 2px 8px rgba(30,18,6,.45)}
@@ -263,8 +264,8 @@
   .cmp{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:13px 16px;
     box-shadow:0 8px 20px rgba(70,52,28,.14);backdrop-filter:blur(7px)}
   .cmp .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;gap:12px}
-  .cmp .name{font-size:13px;font-weight:600;color:var(--ink-2)}
-  .cmp .vals{font-family:var(--font-serif);font-size:12.5px;color:var(--muted);white-space:nowrap}
+  .cmp .name{font-size:13px;font-weight:600;color:var(--ink-2);min-width:0;overflow-wrap:anywhere}
+  .cmp .vals{font-family:var(--font-serif);font-size:12.5px;color:var(--muted);white-space:nowrap;flex:none}
   .cmp .vals b{color:var(--accent);font-size:14px}
   .cmp .bar{position:relative;height:8px;border-radius:99px;background:rgba(178,58,38,.14);overflow:hidden}
   .cmp .bar i{position:absolute;inset:0;border-radius:99px;transform-origin:left;
@@ -1008,7 +1009,7 @@
     showWechat: true
   };
   var CONFIG_KEY = "pm_portfolio_config_v5";
-  var CONTENT_KEY = "pm_portfolio_content_v3";
+  var CONTENT_KEY = "pm_portfolio_content_v4";  /* v4：页面结构调整后升级版本号，弃用旧结构下保存的内容映射 */
 
   function loadConfig(){
     try{ var c = JSON.parse(localStorage.getItem(CONFIG_KEY)); if(c) return Object.assign({}, DEFAULT_CONFIG, c); }catch(e){}
@@ -1516,8 +1517,10 @@
   /* 密码不再以明文写入源码：仅保存 SHA-256 哈希，登录时对输入做哈希比对 */
   var LOGIN_PASS_HASH = "1a2d60d7a9f05516f0ffe0870b0aca889782997abbe3c475b5fec4d9411ab090";
   var LOGIN_KEY = "pm_logged_in";
+  /* 登录态仅当次浏览有效：每次打开页面默认未登录，访客始终看到访客视图；
+     清理旧版本遗留的"永久登录"标记。 */
   var loggedIn = false;
-  try{ loggedIn = localStorage.getItem(LOGIN_KEY) === "1"; }catch(e){}
+  try{ localStorage.removeItem(LOGIN_KEY); }catch(e){}
   function applyLogin(){
     document.body.classList.toggle("logged-in", loggedIn);
     $("#loginBtn").textContent = loggedIn ? "退出登录" : "登录";
@@ -1543,8 +1546,7 @@
     if(!u || !p){ loginErr.textContent = "请输入账号和密码"; return; }
     sha256Hex(p).then(function(h){
       if(u === LOGIN_USER && h === LOGIN_PASS_HASH){
-        loggedIn = true;
-        try{ localStorage.setItem(LOGIN_KEY, "1"); }catch(e){}
+        loggedIn = true;   /* 不写入 localStorage：刷新/重开页面即回到未登录态 */
         closeLogin(); applyLogin(); toast("已登录，编辑功能已开启");
       }else{ loginErr.textContent = "账号或密码错误"; }
     }).catch(function(){ loginErr.textContent = "登录校验失败，请重试"; });
