@@ -207,7 +207,9 @@
   .metric-row .m b{color:var(--accent);font-size:17px;margin-right:5px}
   /* ================= 项目经历：时间线 ================= */
   :root{--tl-t:92px;--tl-d:22px}
-  .timeline{position:relative;width:min(600px,100%);padding:6px 0 2px}
+  .proj-wrap{max-width:1200px;margin:0 auto;padding:110px clamp(20px,4.5vw,64px) 90px;position:relative}
+  .proj-head{margin-bottom:26px;max-width:760px}
+  .timeline{position:relative;width:min(960px,100%);padding:6px 0 2px}
   .timeline::before{content:"";position:absolute;top:14px;bottom:18px;
     left:calc(var(--tl-t) + var(--tl-d) - 1px);width:2px;border-radius:1px;
     background:linear-gradient(180deg,var(--accent),rgba(178,58,38,.12))}
@@ -366,6 +368,8 @@
     .edit-hint{right:14px;bottom:calc(58px + env(safe-area-inset-bottom))}
     .chip{bottom:calc(64px + env(safe-area-inset-bottom))}
     section .wrap{padding-top:8px}
+    .proj-wrap{padding:118px 18px calc(64px + env(safe-area-inset-bottom))}
+    .proj-head{margin-bottom:18px}
   }
   @media (max-width:520px){
     .info-grid{grid-template-columns:1fr}
@@ -413,14 +417,14 @@
     color:var(--accent-ink);margin-bottom:22px;text-shadow:0 4px 18px rgba(30,18,6,.55)}
   .career__list{display:grid;gap:16px}
   .career__item{display:grid;grid-template-columns:140px 1fr;gap:18px;align-items:start;
-    padding:14px 16px;background:rgba(250,244,230,.06);border:1px solid rgba(247,239,220,.14);
-    border-radius:6px;backdrop-filter:blur(4px)}
-  .career__time{font-weight:800;color:var(--accent-ink);font-size:14px;letter-spacing:.5px;
-    text-shadow:0 1px 6px rgba(30,18,6,.5)}
-  .career__co{font-weight:800;color:var(--accent-ink);font-size:16px;margin-bottom:3px;
-    text-shadow:0 1px 6px rgba(30,18,6,.5)}
-  .career__role{font-size:13.5px;color:rgba(247,239,220,.85);margin-bottom:6px}
-  .career__desc{font-size:13.5px;color:rgba(247,239,220,.78);line-height:1.8}
+    padding:14px 16px;background:var(--card);border:1px solid var(--line);
+    border-radius:6px;backdrop-filter:blur(4px);box-shadow:0 8px 22px rgba(70,52,28,.14)}
+  .career__time{font-weight:800;color:var(--accent);font-size:14px;letter-spacing:.5px;
+    text-shadow:none}
+  .career__co{font-weight:800;color:var(--ink);font-size:16px;margin-bottom:3px;
+    text-shadow:none}
+  .career__role{font-size:13.5px;color:var(--accent);margin-bottom:6px}
+  .career__desc{font-size:13.5px;color:var(--ink-2);line-height:1.8}
 
   /* ================= 简历上传（素材配置） ================= */
   .field--resume input[type=file]{margin-top:6px;color:var(--accent-ink)}
@@ -473,10 +477,8 @@
   body.bg-fallback .sec.cta p{color:var(--ink-2);opacity:1}
   body.bg-fallback .cta-mail{color:var(--ink);background:rgba(255,255,255,.45);border-color:rgba(70,52,28,.4)}
   body.bg-fallback .cta-mail:hover{background:var(--accent);color:#fdf6e4}
-  body.bg-fallback .career__role{color:var(--ink-2)}
-  body.bg-fallback .career__desc{color:var(--muted)}
   body.bg-fallback .career{border-top-color:rgba(70,52,28,.2)}
-  body.bg-fallback .career__item{background:rgba(255,255,255,.35);border-color:rgba(70,52,28,.16)}
+  body.bg-fallback .career__title{color:var(--ink);text-shadow:none}
   body.bg-fallback .info-stats span{color:var(--ink-2);border-color:rgba(70,52,28,.4)}
   body.bg-fallback footer{color:var(--muted)}
   body.bg-fallback .dots button{border-color:rgba(70,52,28,.55);box-shadow:none}
@@ -687,8 +689,8 @@
 
   <!-- 4 项目经历 -->
   <section class="sec" id="proj" data-sec="4">
-    <div class="grid3 wrap reveal">
-      <div class="col col--l">
+    <div class="proj-wrap reveal">
+      <div class="proj-head">
         <span class="eyebrow" data-editable>04 · PROJECTS</span>
         <h2 class="sec-title" data-editable id="projTitle">项目经历</h2>
         <p class="sec-sub" data-editable id="projSub">从 0 到 1 的关键项目，按时间排列；后续可在「编辑内容」中随时追加。</p>
@@ -697,9 +699,7 @@
           <span class="m" data-editable><b>双端</b>小程序 + PC</span>
         </div>
       </div>
-      <div class="col col--c" aria-hidden="true"></div>
-      <div class="col col--r">
-        <div class="timeline" id="projTimeline">
+      <div class="timeline" id="projTimeline">
           <div class="tl-item" data-case="kf">
             <div class="tl-time" data-editable>2025.05 — 至今</div>
             <div class="tl-axis"><span class="tl-dot"></span></div>
@@ -765,7 +765,6 @@
           </div>
         </div>
         <button class="tl-add" id="tlAdd">＋ 添加项目</button>
-      </div>
     </div>
   </section>
 
