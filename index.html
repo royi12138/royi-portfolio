@@ -1438,6 +1438,7 @@
   }
   function pushCloud(manual){
     if(syncing) return;
+    try{ cloudToken = localStorage.getItem(CLOUD_TOKEN_KEY) || ""; }catch(e){}
     if(!cloudToken){ if(manual) toast("未填写 GitHub Token，无法同步到线上"); return; }
     syncing = true;
     if(manual) setSyncState("同步中…");
@@ -1501,7 +1502,9 @@
     xhr.send();
   }
   function scheduleCloudSync(){
-    if(!cloudToken || syncing) return;
+    var tk = "";
+    try{ tk = localStorage.getItem(CLOUD_TOKEN_KEY) || ""; }catch(e){}
+    if(!tk || syncing) return;
     clearTimeout(cloudSyncTimer);
     cloudSyncTimer = setTimeout(function(){ pushCloud(false); }, 1500);
   }
