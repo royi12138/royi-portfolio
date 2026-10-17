@@ -26,7 +26,7 @@ MAX_BYTES = 10 * 1024 * 1024
 MAX_ANALYSIS_CHARS = 20_000
 SUPPORTED = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 
-app = FastAPI(title="AI 岗位匹配简历助手", version="0.6.0")
+app = FastAPI(title="AI 岗位匹配简历助手", version="0.7.0")
 
 SECTION_ALIASES = {
     "basic_info": {"个人信息", "基本信息", "个人资料", "联系方式", "contact", "profile"},
@@ -229,7 +229,7 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.6.0"}
+    return {"status": "ok", "version": "0.7.0"}
 
 
 @app.post("/api/resume/parse")
@@ -284,7 +284,7 @@ async def revise_resume(request: ResumeRevisionRequest) -> dict[str, Any]:
     for item in request.accepted_issues[:8]:
         quote = str(item.get("source_quote", ""))[:300]
         if quote and quote in redact_sensitive_info(request.resume_text):
-            accepted.append({key: str(item.get(key, ""))[:600] for key in ("id", "section", "source_quote", "problem", "suggestion", "question")})
+            accepted.append({key: str(item.get(key, ""))[:600] for key in ("id", "section", "source_quote", "problem", "why_it_matters", "suggestion", "question")})
     if not accepted:
         raise HTTPException(400, "请接受至少一条带有简历原文引用的建议后再生成简历。")
     draft = await generate_resume_revision(request.resume_text, accepted, request.facts, request.target_jd)
