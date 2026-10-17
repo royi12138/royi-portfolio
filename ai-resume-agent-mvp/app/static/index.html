@@ -5,67 +5,51 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AI 岗位匹配简历助手</title>
 <style>
-body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:#f7f8fc;color:#17181c}
-.wrap{max-width:980px;margin:auto;padding:40px 20px}.hero{text-align:center;padding:34px 0 24px}
-.badge{display:inline-block;padding:7px 12px;border-radius:99px;background:#eef0ff;color:#5b5cf0;font-size:12px;font-weight:700}
-h1{font-size:40px;line-height:1.15;margin:18px 0 12px}.lead{color:#69707b;font-size:16px;line-height:1.75;max-width:700px;margin:auto}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:26px}
-.card{background:#fff;border:1px solid #e6e7ed;border-radius:20px;padding:22px;box-shadow:0 10px 28px rgba(20,24,40,.07)}
-.card h2{font-size:19px;margin:0 0 8px}.card p{color:#707680;font-size:13px;line-height:1.65}
-.btn{border:0;border-radius:12px;padding:11px 16px;font-weight:700;cursor:pointer;background:#5b5cf0;color:white}.btn:disabled{opacity:.55;cursor:wait}
-.upload{margin-top:14px;border:1.5px dashed #cfd2dd;border-radius:16px;padding:24px;text-align:center;background:#fafbff}
-input[type=file]{margin:10px 0;max-width:100%}.consent{font-size:12px;line-height:1.6;color:#646b75;margin:14px 0;text-align:left;display:block}
-.result{display:none;margin-top:22px}.result.show{display:block}.panel{background:#fff;border:1px solid #e6e7ed;border-radius:18px;padding:18px;margin-top:14px}
-.item{padding:13px 0;border-bottom:1px solid #eee}.item:last-child{border-bottom:0}.item b{display:block;font-size:14px}.item span{display:block;color:#6f7580;font-size:13px;line-height:1.6;margin-top:5px}
-.quote{background:#f7f8fb;border-left:3px solid #9b9df8;padding:10px 12px;border-radius:6px;color:#505660;font-size:13px;line-height:1.6;margin-top:10px;white-space:pre-wrap}
-.subtle{color:#747b86;font-size:12px;line-height:1.6}.ok{margin-top:10px;padding:10px 12px;border-radius:12px;background:#edf9f3;color:#14734d;font-size:12px;line-height:1.6}
-.err{margin-top:10px;padding:10px 12px;border-radius:12px;background:#fff4f4;color:#a53d3d;font-size:12px;line-height:1.6}
-.tags{font-size:11px;font-weight:700;display:inline-block;border-radius:7px;padding:4px 7px;background:#f0f1f5;color:#505660;margin-bottom:7px}
-.details-title{font-size:16px;margin:0 0 8px}.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}.compare pre{min-height:220px;max-height:520px;overflow:auto;overflow-wrap:anywhere;line-height:1.7}.hidden{display:none!important}pre{white-space:pre-wrap;background:#f7f8fb;border-radius:12px;padding:14px;font-size:11px;overflow:auto}
-@media(max-width:760px){.grid{grid-template-columns:1fr}.compare{grid-template-columns:1fr}h1{font-size:31px}.wrap{padding:22px 14px}.card,.panel{padding:16px}}
+:root{--ink:#152238;--muted:#64748b;--line:#dbe4ef;--blue:#2556d8;--blue-dark:#173da8;--pale:#eef4ff;--red:#c62828;--red-bg:#fff2f0;--green:#117454;--green-bg:#eaf7f0;--shadow:0 12px 36px rgba(27,54,93,.08)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f3f6fb;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;font-size:16px;line-height:1.65}
+.site-shell{max-width:1160px;margin:auto;padding:0 26px 60px}.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);margin-bottom:34px}.brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:.2px}.brand-mark{width:38px;height:38px;border-radius:12px;background:var(--blue);color:white;display:grid;place-items:center;font-size:20px}.privacy-link{color:var(--muted);font-size:13px;display:flex;align-items:center;gap:7px}.privacy-link:before{content:"";width:8px;height:8px;background:#24a879;border-radius:50%}
+.hero{background:linear-gradient(120deg,#14284b 0%,#1f4cae 100%);color:#fff;border-radius:24px;padding:34px 40px;margin-bottom:24px;box-shadow:var(--shadow);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;right:-90px;top:-160px;width:380px;height:380px;border:1px solid rgba(255,255,255,.14);border-radius:50%;box-shadow:0 0 0 42px rgba(255,255,255,.04),0 0 0 86px rgba(255,255,255,.03)}.eyebrow{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:#cbdcff;font-weight:800}.hero h1{font-size:36px;line-height:1.25;margin:10px 0}.hero p{max-width:690px;margin:0;color:#e0e9ff;font-size:16px}.hero .version{position:absolute;right:25px;bottom:18px;color:#cbdcff;font-size:11px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 25px}.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:11px;color:#62718a;font-weight:650;font-size:14px}.step-num{width:29px;height:29px;border-radius:50%;background:#eaf0fb;color:#4d6386;display:grid;place-items:center;font-weight:800;font-size:13px}.step:first-child{border-color:#9db7f7;color:var(--blue);box-shadow:0 5px 16px rgba(37,86,216,.07)}.step:first-child .step-num{background:var(--blue);color:#fff}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:20px;align-items:start}.main-col{min-width:0}.side-card,.panel,.card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}.side-card{padding:20px;position:sticky;top:18px}.side-card h3{margin:0 0 12px;font-size:16px}.side-card .item{border:0;border-top:1px solid #edf1f6;padding:11px 0}.side-card .item b{font-size:14px}.side-card .item span{font-size:13px}.side-tip{padding:12px;background:#f2f6ff;border-radius:12px;color:#536583;font-size:12px;margin-top:12px}
+.panel{padding:25px;margin:0 0 18px}.panel-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:15px}.step-icon{flex:none;width:38px;height:38px;border-radius:12px;background:var(--pale);color:var(--blue);display:grid;place-items:center;font-weight:850}.panel h2{font-size:20px;line-height:1.35;margin:0 0 4px}.panel h3{font-size:17px;margin:0 0 10px}.lead-small,.subtle{color:var(--muted);font-size:13px;line-height:1.7;margin:0}.upload-box{border:1.5px dashed #b9c8dc;border-radius:15px;background:#f8faff;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:16px}.upload-copy b{display:block;margin-bottom:3px}.upload-copy span{font-size:13px;color:var(--muted)}input[type=file]{max-width:100%;font:inherit;color:var(--muted)}textarea{font:inherit;color:var(--ink)}.btn{border:0;border-radius:11px;padding:12px 18px;font-size:15px;font-weight:750;cursor:pointer;background:var(--blue);color:#fff;transition:background .15s,transform .15s}.btn:hover{background:var(--blue-dark);transform:translateY(-1px)}.btn:disabled{opacity:.55;cursor:wait;transform:none}.btn.secondary{background:#edf2f8;color:#31445f}.btn.secondary:hover{background:#e1e9f4}.btn.reject{background:#f1f3f6;color:#46566d}.btn.small{font-size:13px;padding:9px 13px}.upload-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.msg{min-height:20px}#msg,#analysisMsg,#revisionMsg,#jdFileMsg,#matchResult,#jdRevisionMsg{margin-top:10px}.ok,.err{padding:11px 14px;border-radius:11px;font-size:13px;line-height:1.6}.ok{background:var(--green-bg);color:var(--green)}.err{background:#fff0f0;color:#a32323}
+.result{display:none;margin-top:20px}.result.show{display:block}.file-summary{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:14px 16px;background:#f6f8fc;border-radius:12px}.file-summary b{font-size:15px}.file-summary .subtle{display:block}.consent{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:#fffaf0;border:1px solid #f0e2ba;border-radius:12px;color:#5c5135;font-size:13px;line-height:1.6;margin:16px 0}.consent input{margin-top:4px;transform:scale(1.15)}
+.section-label{font-size:11px;color:var(--blue);font-weight:850;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px}.summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0 18px}.item{padding:12px 0;border-bottom:1px solid #edf1f6}.item:last-child{border-bottom:0}.item b{display:block;font-size:14px}.item span{display:block;color:var(--muted);font-size:13px;line-height:1.65;margin-top:4px}.quote{background:#f6f8fb;border-left:3px solid #8ca8e5;padding:10px 12px;border-radius:6px;color:#46566d;font-size:13px;line-height:1.6;margin-top:9px;white-space:pre-wrap;overflow-wrap:anywhere}.tags{font-size:11px;font-weight:800;display:inline-block;border-radius:7px;padding:4px 8px;background:#eef3ff;color:#3159ad;margin-bottom:8px}
+.score-card{background:#f7f9fd;border:1px solid #e6ecf5;border-radius:14px;padding:16px}.score-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.score-big{font-size:26px;font-weight:850;color:var(--blue)}.score-dimension{padding:8px 0;border-top:1px solid #e5ebf4}.score-dimension b{font-size:13px}.score-dimension span{display:block;font-size:12px;color:var(--muted)}
+.analysis-grid{display:grid;grid-template-columns:1fr .85fr;gap:16px}.strength-card{padding:14px;border-radius:12px;background:#f1f8f5;margin-top:12px;color:#245b47;font-size:13px}.issue-card{border:1px solid #e2e9f3;border-radius:14px;padding:16px;margin:12px 0}.issue-card p{font-size:14px;margin:9px 0;color:#46566d}.fact-label{font-size:12px;color:#526178;display:block;margin:12px 0}.fact-label textarea{display:block;width:100%;border:1px solid #d6e0ec;border-radius:9px;padding:10px;margin-top:5px;resize:vertical}.decision{font-size:12px;color:var(--muted);margin-left:8px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:14px}.compare-side{border:1px solid #e0e7f1;border-radius:14px;overflow:hidden;min-width:0}.compare-head{padding:11px 14px;background:#f4f7fb;font-size:13px;font-weight:800;display:flex;justify-content:space-between}.compare-content{padding:14px;min-height:180px;max-height:490px;overflow:auto;font:14px/1.85 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.compare-content.after{background:#fffdfd}.diff-change{color:var(--red);font-weight:750;background:var(--red-bg)}.diff-unchanged{color:#35445a}.diff-removed{text-decoration:line-through;color:var(--red);background:#fff4f3}.diff-legend{font-size:12px;color:var(--red);margin:10px 0 16px}.edit-label{display:block;font-size:13px;font-weight:750;margin:15px 0 7px}.edit-area{width:100%;border:1px solid #d4deeb;border-radius:12px;padding:13px;line-height:1.7;resize:vertical;background:#fff}.edit-area:focus,textarea:focus{outline:3px solid rgba(37,86,216,.15);border-color:#7997e9}.result-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:14px}
+.jd-upload{background:#f8faff;border:1px solid #e1eaf7;border-radius:14px;padding:17px}.jd-file-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.jd-text{width:100%;margin-top:14px;border:1px solid #d4deeb;border-radius:11px;padding:12px;resize:vertical}.match-panel{background:#f7f9fd;border-radius:13px;padding:15px;margin-top:14px}.hidden{display:none!important}
+.details-title{font-size:15px;margin:0 0 9px}.data-clear{margin-top:14px}.footer-note{text-align:center;color:#8290a4;font-size:12px;padding:18px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.side-card{position:static;order:2}.side-card .item{display:inline-block;width:48%;vertical-align:top}.analysis-grid{grid-template-columns:1fr}}
+@media(max-width:640px){.site-shell{padding:0 14px 38px}.topbar{height:62px;margin-bottom:20px}.hero{padding:26px 22px;border-radius:18px}.hero h1{font-size:29px}.hero .version{position:static;display:block;margin-top:12px}.steps{grid-template-columns:repeat(2,1fr)}.step{font-size:12px;padding:10px}.layout{gap:16px}.panel{padding:18px;border-radius:15px}.upload-box{align-items:flex-start;flex-direction:column}.summary-grid,.compare{grid-template-columns:1fr}.compare-content{min-height:120px}.side-card .item{width:100%}.privacy-link{font-size:11px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<section class="hero">
-<div class="badge">MVP 0.4 · 简历优化与岗位匹配</div>
-<h1>上传简历，找出可改进的问题。</h1>
-<p class="lead">先解析简历，再由 AI 给出有原文依据的修改建议。AI 不应替你编造业绩；每条建议都需要你核对。</p>
-</section>
-<section class="grid">
-<article class="card">
-<h2>① 简历体检</h2><p>支持 PDF、DOCX、JPG、PNG，最多 3 页、10MB。文件会在解析完成后从临时目录清理。</p>
-<div class="upload">
-<input id="resumeFile" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png">
-<div><button class="btn" id="parseBtn" onclick="parseResume()">解析简历</button></div><div id="msg" aria-live="polite"></div>
-</div>
-</article>
-<article class="card">
-<h2>② 分析原则</h2>
-<div class="item"><b>引用原文</b><span>只展示能在输入文本中找到原文引用的问题。</span></div>
-<div class="item"><b>不编造事实</b><span>缺少结果、数字或背景时，要求你补充真实信息。</span></div>
-<div class="item"><b>逐条核对</b><span>AI 给的是建议，不会自动把未经确认的内容写入简历。</span></div>
-<div class="item"><b>隐私提醒</b><span>调用 AI 前会尝试隐藏手机号、邮箱和身份证号；其他个人信息仍可能留在简历文本中。</span></div>
-</article>
-</section>
+<div class="site-shell">
+<header class="topbar"><div class="brand"><span class="brand-mark">简</span><span>简历优化助手</span></div><div class="privacy-link">隐私保护提示 · 发送前会尝试隐藏手机号、邮箱和身份证号</div></header>
+<main>
+<section class="hero"><div class="eyebrow">CAREER TOOLKIT · 求职准备</div><h1>让简历更清楚，也更贴合目标岗位</h1><p>先核对系统识别的简历内容，再看有依据的修改建议。每条改动都由你决定；新增成果和数字只使用你确认的真实信息。</p><span class="version">MVP 0.5 · 简历诊断与岗位定向</span></section>
+<nav class="steps" aria-label="操作步骤"><div class="step"><span class="step-num">1</span>上传并核对简历</div><div class="step"><span class="step-num">2</span>查看诊断建议</div><div class="step"><span class="step-num">3</span>匹配目标岗位</div><div class="step"><span class="step-num">4</span>对照修改并下载</div></nav>
+<div class="layout"><div class="main-col">
+<section class="panel" id="uploadStep"><div class="panel-head"><span class="step-icon">01</span><div><h2>上传简历</h2><p class="lead-small">支持 PDF、Word、JPG、PNG；最多 3 页、10MB。文件只用于本次解析。</p></div></div>
+<div class="upload-box"><div class="upload-copy"><b>选择你的简历文件</b><span>建议上传清晰、可复制文字的 PDF 或 DOCX</span><div><input id="resumeFile" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png"></div></div><button class="btn" id="parseBtn" onclick="parseResume()">解析简历</button></div><div id="msg" aria-live="polite"></div></section>
 <section id="result" class="result">
-<div class="panel">
-<div class="subtle">解析成功</div><div id="filename" style="font-weight:800;margin-top:5px"></div><div id="pageCount" class="subtle" style="margin-top:5px"></div>
-<div style="margin-top:16px"><button class="btn" id="analyzeBtn" onclick="analyzeResume()">开始 AI 分析</button></div>
-<label class="consent"><input id="consent" type="checkbox"> 我了解并同意：点击 AI 分析后，简历文本会先发送到本项目后端；后端会尝试隐藏手机号、邮箱和身份证号，再将文本发送到阿里云百炼（千问）。姓名、公司名称等其他信息仍可能被发送。请勿上传不愿发送给模型服务的信息。</label>
-<div id="analysisMsg" aria-live="polite"></div><button class="btn" style="margin-top:12px;background:#555" onclick="clearResumeData()">清除本页简历和分析数据</button>
-</div>
-<div class="panel"><h3 class="details-title">结构化简历内容</h3><p class="subtle">以下栏目由程序按标题自动归类，可能无法识别所有简历格式；请同时核对下面的完整解析文本。</p><div id="summary"></div><details style="margin-top:12px"><summary>查看 Resume JSON（技术详情）</summary><pre id="json"></pre></details></div>
-<div class="panel" id="parsedTextPanel"><h3 class="details-title">完整解析文本（可逐字核对）</h3><p class="subtle">这是系统从你上传的文件中提取到的文字。若某些栏目未识别，请以此处为准；这里不会由 AI 补写内容。</p><pre id="parsedRawText" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:560px;overflow:auto;font-size:13px;line-height:1.75;color:#30343b;background:#f7f8fb;border:1px solid #e6e7ed;border-radius:12px;padding:16px"></pre></div>
+<div class="panel"><div class="panel-head"><span class="step-icon">02</span><div><h2>核对识别结果并开始诊断</h2><p class="lead-small">先确认解析出的文字准确，再决定是否发送给 AI。</p></div></div><div class="file-summary"><div><b id="filename"></b><span class="subtle" id="pageCount"></span></div><button class="btn" id="analyzeBtn" onclick="analyzeResume()">开始 AI 简历诊断</button></div>
+<label class="consent"><input id="consent" type="checkbox">我已阅读并同意：点击 AI 诊断或岗位匹配后，简历文字（以及岗位文字）会发送至本项目后端；系统会尝试隐藏手机号、邮箱和身份证号，然后发送给模型服务。姓名、公司名称等仍可能被发送，请勿提交不愿发送的内容。</label><div id="analysisMsg" aria-live="polite"></div>
+<div class="summary-grid" id="summary"></div><details style="margin-top:14px"><summary class="details-title">查看系统提取的完整简历文字</summary><pre id="parsedRawText" class="compare-content"></pre></details><details style="margin-top:10px"><summary class="details-title">查看技术解析详情</summary><pre id="json"></pre></details>
+<button class="btn secondary small data-clear" onclick="clearResumeData()">清除本页简历和分析数据</button></div>
 <div id="analysisResult" class="hidden">
-<div class="panel"><h3 class="details-title">AI 总体评价</h3><div id="scoreResults" class="panel" style="margin:10px 0"></div><div id="overallSummary" style="line-height:1.75"></div><div id="strengths"></div><div class="subtle" id="privacyNote" style="margin-top:12px"></div></div>
-<div class="panel"><h3 class="details-title">可改进的问题</h3><div id="issues"></div><p class="subtle">每条建议需你主动接受；只有填写并确认的真实信息才会用于改写。</p><div id="revisionActions"><button class="btn" onclick="generateRevision()">生成优化版简历</button></div><div id="revisionMsg" aria-live="polite"></div></div>
-<div class="panel"><h3 class="details-title">招聘岗位匹配与定向优化</h3><p class="subtle">上传岗位 PDF、DOCX、TXT，或直接粘贴招聘信息。勾选上方隐私同意后，简历和岗位文字会一起发送给 AI 分析。</p><input id="jdFile" type="file" accept=".pdf,.docx,.txt"><button class="btn" style="margin-top:10px;background:#555" onclick="parseJDFile()">读取岗位文件</button><div id="jdFileMsg" aria-live="polite"></div><textarea id="jdText" rows="7" style="width:100%;box-sizing:border-box;border:1px solid #d9dce5;border-radius:10px;padding:12px;font:inherit" placeholder="也可以粘贴招聘岗位描述"></textarea><button class="btn" style="margin-top:10px" onclick="matchJD()">分析岗位并提出修改建议</button><div id="matchResult"></div><div id="jdRecommendations"></div><div id="jdRevisionActions" class="hidden"><button class="btn" onclick="generateJDRevision()">生成岗位定向优化稿</button></div><div id="jdRevisionMsg" aria-live="polite"></div><div id="jdComparison" class="hidden"><h4>岗位定向简历修改前后对照</h4><div class="compare"><div><b>改前 · 原简历</b><pre id="jdBeforeText"></pre></div><div><b>改后 · 岗位优化草稿</b><textarea id="jdRevisedText" rows="16" style="width:100%;box-sizing:border-box;border:1px solid #d9dce5;border-radius:10px;padding:12px;font:inherit"></textarea></div></div><button class="btn" style="margin-top:10px" onclick="downloadDocx('jd')">下载岗位定向 DOCX</button><div id="jdExportMsg"></div></div></div>
-<div class="panel"><h3 class="details-title">简历修改前后对照</h3><p class="subtle">改前内容来自原简历；改后内容是 AI 草稿，需你核实后再下载。</p><div class="compare"><div><b>改前 · 原简历</b><pre id="beforeResume"></pre></div><div><b>改后 · 优化草稿（可编辑）</b><textarea id="revisedText" rows="16" style="width:100%;box-sizing:border-box;border:1px solid #d9dce5;border-radius:10px;padding:12px;font:inherit"></textarea></div></div><button class="btn" style="margin-top:10px" onclick="downloadDocx('general')">下载优化版 DOCX</button><button class="btn" style="background:#555;margin-left:8px" onclick="clearResumeData()">清除本页数据</button><div id="exportMsg"></div></div>
+<section class="panel"><div class="panel-head"><span class="step-icon">诊</span><div><h2>简历诊断结果</h2><p class="lead-small">所有评分均为辅助检查，不代表录用概率。请结合自己的经历判断。</p></div></div><div class="analysis-grid"><div><h3>总体评价</h3><p id="overallSummary"></p><div id="strengths" class="strength-card"></div><p class="subtle" id="privacyNote"></p></div><div id="scoreResults" class="score-card"></div></div></section>
+<section class="panel"><div class="panel-head"><span class="step-icon">改</span><div><h2>逐条核对修改建议</h2><p class="lead-small">接受后才会进入草稿；如需补充数字或业绩，请只填写真实信息。</p></div></div><div id="issues"></div><div class="result-actions" id="revisionActions"><button class="btn" onclick="generateRevision()">生成简历优化草稿</button></div><div id="revisionMsg" aria-live="polite"></div></section>
+<section class="panel"><div class="panel-head"><span class="step-icon">03</span><div><h2>针对面试岗位定向优化</h2><p class="lead-small">上传招聘截图或海报，系统会读取图片文字并分析匹配点、差距和修改方向。</p></div></div>
+<div class="jd-upload"><div class="jd-file-row"><input id="jdFile" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png"><button class="btn secondary" onclick="parseJDFile()">读取岗位图片</button><span class="subtle">仅支持 JPG / PNG，最多 10MB</span></div><div id="jdFileMsg" aria-live="polite"></div><textarea id="jdText" class="jd-text" rows="6" placeholder="图片文字识别后会显示在这里。也可以直接粘贴招聘信息，核对无误后点击分析。"></textarea><div class="result-actions"><button class="btn" onclick="matchJD()">分析岗位匹配与定向建议</button></div></div>
+<div id="matchResult" class="match-panel"></div><div id="jdRecommendations"></div><div id="jdRevisionActions" class="hidden result-actions"><button class="btn" onclick="generateJDRevision()">生成岗位定向优化草稿</button></div><div id="jdRevisionMsg" aria-live="polite"></div>
+<div id="jdComparison" class="hidden" style="margin-top:22px"><h3>岗位简历修改前后对照</h3><div class="compare"><div class="compare-side"><div class="compare-head">改前 · 原简历</div><div class="compare-content" id="jdBeforeText"></div></div><div class="compare-side"><div class="compare-head">改后 · 岗位优化稿 <span class="diff-legend">红色为新增或调整</span></div><div class="compare-content after" id="jdDiff"></div></div></div><label class="edit-label" for="jdRevisedText">可编辑的岗位优化稿</label><textarea id="jdRevisedText" class="edit-area" rows="12" oninput="renderComparison('jdBeforeText','jdRevisedText','jdDiff',true)"></textarea><div class="result-actions"><button class="btn" onclick="downloadDocx('jd')">下载岗位定向 Word 简历</button></div><div id="jdExportMsg"></div></div></section>
+<section id="generalComparison" class="panel hidden"><div class="panel-head"><span class="step-icon">04</span><div><h2>简历修改前后对照</h2><p class="lead-small">红色文字标出新增或调整内容；请检查事实和表达，再下载。</p></div></div><div class="compare"><div class="compare-side"><div class="compare-head">改前 · 原简历</div><div class="compare-content" id="beforeResume"></div></div><div class="compare-side"><div class="compare-head">改后 · 优化稿 <span class="diff-legend">红色为新增或调整</span></div><div class="compare-content after" id="generalDiff"></div></div></div><label class="edit-label" for="revisedText">可编辑的优化稿</label><textarea id="revisedText" class="edit-area" rows="12" oninput="renderComparison('beforeResume','revisedText','generalDiff',true)"></textarea><div class="result-actions"><button class="btn" onclick="downloadDocx('general')">下载优化版 Word 简历</button><button class="btn secondary" onclick="clearResumeData()">清除本页数据</button></div><div id="exportMsg"></div></section>
+</div></section></div>
+<aside class="side-card"><h3>使用提示</h3><div class="item"><b>先核对原文</b><span>解析结果可能有漏字，请先展开完整文字检查。</span></div><div class="item"><b>事实由你确认</b><span>AI 不应替你添加未经确认的业绩、数字或技能。</span></div><div class="item"><b>改动会标红</b><span>对照区的红色文字代表新增或调整内容。</span></div><div class="side-tip">隐私提示：调用 AI 前会尝试隐藏手机号、邮箱和身份证号。其他个人信息仍可能包含在发送内容中。</div></aside>
 </div>
-</section>
-</div>
-<script>
+</main><footer class="footer-note">本工具提供简历表达和岗位匹配参考，最终内容由你核对并决定是否使用。</footer></div><script>
 var currentResume = null;
 var currentAnalysis = null;
 var currentMatch = null;
@@ -76,6 +60,33 @@ var issueFacts = {};
 function escapeHtml(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
 function showMessage(id,text,isError){document.getElementById(id).innerHTML='<div class="'+(isError?'err':'ok')+'">'+escapeHtml(text)+'</div>';}
 function renderSection(title,items){var arr=Array.isArray(items)?items:[];return '<div class="item"><b>'+escapeHtml(title)+'</b><span>'+(arr.length?arr.slice(0,5).map(escapeHtml).join('；'):'未识别到内容')+'</span></div>';}
+function renderComparison(beforeId,afterId,outputId){
+ var beforeNode=document.getElementById(beforeId),afterNode=document.getElementById(afterId),rightNode=document.getElementById(outputId);
+ if(!beforeNode||!afterNode||!rightNode)return;
+ var before=beforeNode.dataset.sourceText;
+ if(before===undefined){before=beforeNode.textContent||'';beforeNode.dataset.sourceText=before;}
+ var oldLines=before.split('\n'),newLines=(afterNode.value||'').split('\n'),n=oldLines.length,m=newLines.length,ops=[];
+ if(n*m<=150000){
+  var dp=Array(n+1);for(var r=0;r<=n;r++){dp[r]=new Uint16Array(m+1);}
+  for(var i=n-1;i>=0;i--)for(var j=m-1;j>=0;j--)dp[i][j]=oldLines[i]===newLines[j]?dp[i+1][j+1]+1:Math.max(dp[i+1][j],dp[i][j+1]);
+  var x=0,y=0;while(x<n||y<m){
+   if(x<n&&y<m&&oldLines[x]===newLines[y]){ops.push({kind:'same',text:oldLines[x]});x++;y++;}
+   else if(x<n&&(y>=m||dp[x+1][y]>=dp[x][y+1])){ops.push({kind:'removed',text:oldLines[x++]});}
+   else {ops.push({kind:'added',text:newLines[y++]});}
+  }
+ }else{
+  var limit=Math.max(n,m);for(var k=0;k<limit;k++){
+   if(k<n&&k<m&&oldLines[k]===newLines[k])ops.push({kind:'same',text:oldLines[k]});
+   else{if(k<n)ops.push({kind:'removed',text:oldLines[k]});if(k<m)ops.push({kind:'added',text:newLines[k]});}
+  }
+ }
+ var left=[],right=[];ops.forEach(function(op){var line=escapeHtml(op.text)||'&nbsp;';
+  if(op.kind==='same'){left.push('<div class="diff-unchanged">'+line+'</div>');right.push('<div class="diff-unchanged">'+line+'</div>');}
+  else if(op.kind==='removed'){left.push('<div class="diff-removed">'+line+'</div>');}
+  else{right.push('<div class="diff-change">'+line+'</div>');}
+ });
+ beforeNode.innerHTML=left.join('');rightNode.innerHTML=right.join('');
+}
 async function parseResume(){
  var file=document.getElementById('resumeFile').files[0],button=document.getElementById('parseBtn');
  if(!file){showMessage('msg','请先选择简历文件。',true);return;}
@@ -94,7 +105,7 @@ async function parseResume(){
    renderSection('项目经历',currentResume.project_experience)+renderSection('技能',currentResume.skills);
   document.getElementById('json').textContent=JSON.stringify(currentResume,null,2);
   document.getElementById('parsedRawText').textContent=currentResume.raw_text||'未提取到可显示的文字。';
-  document.getElementById('consent').checked=false;document.getElementById('analysisResult').classList.add('hidden');
+  document.getElementById('consent').checked=false;currentAnalysis=null;currentMatch=null;issueDecisions={};issueFacts={};jdIssueDecisions={};jdIssueFacts={};document.getElementById('analysisResult').classList.add('hidden');document.getElementById('generalComparison').classList.add('hidden');document.getElementById('jdComparison').classList.add('hidden');document.getElementById('jdRevisionActions').classList.add('hidden');document.getElementById('matchResult').innerHTML='';document.getElementById('jdRecommendations').innerHTML='';document.getElementById('revisedText').value='';document.getElementById('jdRevisedText').value='';
   document.getElementById('analysisMsg').innerHTML='';document.getElementById('result').classList.add('show');
   showMessage('msg','解析完成。确认隐私提示后，可以启动 AI 分析。',false);
   document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
@@ -130,7 +141,7 @@ async function analyzeResume(){
  try{
   var res=await fetch('/api/resume/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,privacy_consent:document.getElementById('consent').checked})});
   var data=await res.json();if(!res.ok)throw new Error(data.detail||'AI 分析失败');
-  document.getElementById('analysisResult').classList.remove('hidden');document.getElementById('beforeResume').textContent=currentResume.raw_text||'';
+  document.getElementById('analysisResult').classList.remove('hidden');document.getElementById('beforeResume').textContent=currentResume.raw_text||'';document.getElementById('beforeResume').dataset.sourceText=currentResume.raw_text||'';
   renderAnalysis(data.analysis||{});showMessage('analysisMsg','分析完成。请逐条核对建议，尤其是涉及成果和数字的内容。',false);
   document.getElementById('analysisResult').scrollIntoView({behavior:'smooth',block:'start'});
  }catch(e){showMessage('analysisMsg',e.message||'AI 分析失败，请稍后重试。',true);}
@@ -144,7 +155,7 @@ async function generateRevision(){
  if(!accepted.length){showMessage('revisionMsg','请先接受至少一条建议。',true);return;}
  var facts=accepted.map(function(x,i){var id=String(x.id||('I'+(i+1))),v=(issueFacts[id]||'').trim();return v?'['+id+'] '+v:'';}).filter(Boolean).join('\n');
  var button=document.querySelector('#revisionActions button');button.disabled=true;showMessage('revisionMsg','正在根据已接受建议生成草稿…',false);
- try{var res=await fetch('/api/resume/revise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,accepted_issues:accepted,facts:facts,privacy_consent:document.getElementById('consent').checked})});var data=await res.json();if(!res.ok)throw new Error(data.detail||'生成失败');document.getElementById('revisedText').value=data.revised_text||'';document.getElementById('beforeResume').textContent=currentResume.raw_text||'';showMessage('revisionMsg',data.fact_protection||'草稿已生成，请核对。',false);document.getElementById('revisedText').scrollIntoView({behavior:'smooth'});}catch(e){showMessage('revisionMsg',e.message||'生成失败，请重试。',true);}finally{button.disabled=false;}
+ try{var res=await fetch('/api/resume/revise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,accepted_issues:accepted,facts:facts,privacy_consent:document.getElementById('consent').checked})});var data=await res.json();if(!res.ok)throw new Error(data.detail||'生成失败');document.getElementById('revisedText').value=data.revised_text||'';document.getElementById('beforeResume').textContent=currentResume.raw_text||'';document.getElementById('beforeResume').dataset.sourceText=currentResume.raw_text||'';document.getElementById('generalComparison').classList.remove('hidden');renderComparison('beforeResume','revisedText','generalDiff');showMessage('revisionMsg',data.fact_protection||'草稿已生成，请核对。',false);document.getElementById('revisedText').scrollIntoView({behavior:'smooth'});}catch(e){showMessage('revisionMsg',e.message||'生成失败，请重试。',true);}finally{button.disabled=false;}
 }
 async function parseJDFile(){
  var file=document.getElementById('jdFile').files[0];if(!file){showMessage('jdFileMsg','请先选择岗位文件。',true);return;}
@@ -185,7 +196,7 @@ async function generateJDRevision(){
  var button=document.querySelector('#jdRevisionActions button');button.disabled=true;showMessage('jdRevisionMsg','正在生成岗位定向草稿…',false);
  try{
   var res=await fetch('/api/resume/revise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,accepted_issues:accepted,facts:facts,target_jd:document.getElementById('jdText').value.trim(),privacy_consent:document.getElementById('consent').checked})}),data=await res.json();if(!res.ok)throw new Error(data.detail||'生成失败');
-  document.getElementById('jdBeforeText').textContent=currentResume.raw_text||'';document.getElementById('jdRevisedText').value=data.revised_text||'';document.getElementById('jdComparison').classList.remove('hidden');showMessage('jdRevisionMsg',data.fact_protection||'岗位优化草稿已生成，请核对。',false);document.getElementById('jdComparison').scrollIntoView({behavior:'smooth'});
+  document.getElementById('jdBeforeText').textContent=currentResume.raw_text||'';document.getElementById('jdBeforeText').dataset.sourceText=currentResume.raw_text||'';document.getElementById('jdRevisedText').value=data.revised_text||'';document.getElementById('jdComparison').classList.remove('hidden');renderComparison('jdBeforeText','jdRevisedText','jdDiff');showMessage('jdRevisionMsg',data.fact_protection||'岗位优化草稿已生成，请核对。',false);document.getElementById('jdComparison').scrollIntoView({behavior:'smooth'});
  }catch(e){showMessage('jdRevisionMsg',e.message||'生成失败，请重试。',true);}finally{button.disabled=false;}
 }
 
@@ -197,8 +208,8 @@ async function downloadDocx(mode){
 function clearResumeData(){
  currentResume=null;currentAnalysis=null;currentMatch=null;jdIssueDecisions={};jdIssueFacts={};issueDecisions={};issueFacts={};
  document.getElementById('resumeFile').value='';document.getElementById('jdFile').value='';document.getElementById('result').classList.remove('show');
- ['filename','pageCount','summary','json','parsedRawText','overallSummary','strengths','privacyNote','issues','scoreResults','revisedText','jdText','matchResult','jdRecommendations','jdFileMsg','jdRevisionMsg','jdExportMsg','analysisMsg','revisionMsg','exportMsg','msg'].forEach(function(id){var n=document.getElementById(id);if(n)n.value!==undefined&&/^(TEXTAREA|INPUT)$/.test(n.tagName)?n.value='':n.textContent='';});
- document.getElementById('consent').checked=false;document.getElementById('analysisResult').classList.add('hidden');document.getElementById('jdComparison').classList.add('hidden');document.getElementById('jdRevisionActions').classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'});
+ ['filename','pageCount','summary','json','parsedRawText','overallSummary','strengths','privacyNote','issues','scoreResults','revisedText','beforeResume','generalDiff','jdBeforeText','jdDiff','jdRevisedText','jdText','matchResult','jdRecommendations','jdFileMsg','jdRevisionMsg','jdExportMsg','analysisMsg','revisionMsg','exportMsg','msg'].forEach(function(id){var n=document.getElementById(id);if(n)n.value!==undefined&&/^(TEXTAREA|INPUT)$/.test(n.tagName)?n.value='':n.textContent='';});
+ document.getElementById('consent').checked=false;document.getElementById('analysisResult').classList.add('hidden');document.getElementById('jdComparison').classList.add('hidden');document.getElementById('jdRevisionActions').classList.add('hidden');document.getElementById('generalComparison').classList.add('hidden');['beforeResume','jdBeforeText'].forEach(function(id){var n=document.getElementById(id);if(n){n.innerHTML='';delete n.dataset.sourceText;}});window.scrollTo({top:0,behavior:'smooth'});
 }
 </script>
 </body>
