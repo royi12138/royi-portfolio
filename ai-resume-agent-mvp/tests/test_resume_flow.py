@@ -1,4 +1,4 @@
-from app.ai_analysis import calculate_scores, redact_sensitive_info, validate_analysis
+from app.ai_analysis import (build_completion_payload, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
 from app.main import app, build_resume_json, parse_sections
 from fastapi.testclient import TestClient
 
@@ -112,4 +112,48 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.5.0"
+    assert response.json()["version"] == "0.6.0"
+
+
+
+def test_completion_handles_text_blocks_and_glm_payload():
+    response = {"choices": [{"message": {"content": [{"type": "text", "text": "ok"}, {"content": " done"}]}}]}
+    assert extract_completion_text(response) == "ok\n done"
+    payload = build_completion_payload("glm-5.3-flash", [], json_mode=True)
+    assert payload["thinking"] == {"type": "enabled"}
+    assert payload["reasoning_effort"] == "low"
+    assert payload["clear_thinking"] is True
+    assert payload["response_format"] == {"type": "json_object"}
+
+
+def test_match_json_parser_accepts_fenced_or_prefixed_json():
+    assert parse_json_object("```json\n{\"summary\":\"ok\"}\n```") == {"summary": "ok"}
+    assert parse_json_object("回答：{\"summary\":\"ok\"}完成") == {"summary": "ok"}
+
+
+def test_structured_resume_summary_requires_exact_source_and_supported_numbers():
+    source = "工作业绩：注册用户增长2000+，转化率提升12%。"
+    result = validate_resume_sections(
+        {
+            "work_experience": [
+                {"summary": "• 注册用户增长 2000+；转化率提升12%。", "source_quote": source},
+                {"summary": "新增营收999万元。", "source_quote": source},
+                {"summary": "完全无关的总结", "source_quote": "不存在于原文"},
+            ]
+        },
+        source,
+    )
+    assert result["work_experience"] == ["注册用户增长 2000+；转化率提升12%。"]
+    assert result["education"] == []
+
+
+def test_analysis_returns_clean_structured_resume_sections():
+    source = "教育经历：本科，信息管理专业。"
+    result = validate_analysis({
+        "summary": "清晰",
+        "resume_sections": {
+            "education": [{"summary": "• 本科，信息管理专业。", "source_quote": source}]
+        },
+        "issues": [],
+    }, source)
+    assert result["resume_sections"]["education"] == ["本科，信息管理专业。"]
