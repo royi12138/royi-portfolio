@@ -92,7 +92,10 @@ def extract_pdf(path: Path) -> tuple[str, int]:
 
 def iter_docx_blocks(container: Any):
     """Yield paragraphs and tables in their real Word document order."""
-    element = getattr(container, "_element", container)
+    if hasattr(container, "element") and hasattr(container.element, "body"):
+        element = container.element.body
+    else:
+        element = getattr(container, "_element", container)
     for child in element.iterchildren():
         if child.tag.endswith("}p"):
             yield Paragraph(child, container)
@@ -298,7 +301,7 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.7.2"}
+    return {"status": "ok", "version": "0.7.3"}
 
 
 @app.post("/api/resume/parse")
