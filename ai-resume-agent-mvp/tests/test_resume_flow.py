@@ -112,7 +112,7 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.6.0"
+    assert response.json()["version"] == "0.7.0"
 
 
 
