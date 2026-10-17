@@ -15,7 +15,7 @@ from starlette.background import BackgroundTask
 from pydantic import BaseModel, Field
 from PIL import Image, ImageOps
 
-from app.ai_analysis import analyze_resume_text, generate_resume_revision, match_resume_to_jd
+from app.ai_analysis import analyze_resume_text, generate_resume_revision, match_resume_to_jd, redact_sensitive_info
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
@@ -255,7 +255,7 @@ async def revise_resume(request: ResumeRevisionRequest) -> dict[str, Any]:
     accepted = []
     for item in request.accepted_issues[:8]:
         quote = str(item.get("source_quote", ""))[:300]
-        if quote and quote in request.resume_text:
+        if quote and quote in redact_sensitive_info(request.resume_text):
             accepted.append({key: str(item.get(key, ""))[:600] for key in ("id", "section", "source_quote", "problem", "suggestion", "question")})
     if not accepted:
         raise HTTPException(400, "请接受至少一条带有简历原文引用的建议后再生成简历。")
