@@ -161,7 +161,7 @@ def test_analysis_returns_clean_structured_resume_sections():
 def test_advisor_prompts_require_specific_evidence_and_usable_rewrites():
     analysis_messages = build_messages("负责产品规划与上线，推动用户反馈闭环。")
     analysis_prompt = analysis_messages[0]["content"]
-    assert "可直接替换原文" in analysis_prompt
+    assert "可直接替换文案" in analysis_prompt
     assert "不能添加原文没有的个人角色、决策、方法、原因" in analysis_prompt
     assert "按影响从高到低排序" in analysis_prompt
     assert "不要为了“有问题可提”而挑小毛病" in analysis_prompt
