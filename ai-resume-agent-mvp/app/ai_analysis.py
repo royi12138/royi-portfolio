@@ -40,22 +40,24 @@ def build_messages(resume_text: str) -> list[dict[str, str]]:
 - 招聘信息只代表岗位要求，不能当作候选人的经历。只有用户在“已确认的补充事实”中明确提供的内容才可加入候选人事实。
 - 所有 source_quote 必须是简历中连续、逐字一致的片段；不能拼接、改写或引用手机号、邮箱、身份证号。找不到原文依据就不要输出该问题。
 - 缺少关键信息时，明确提出一个具体、容易回答的问题；不要用猜测补全，也不要把问题或占位符伪装成已完成的简历内容。
+- suggestion 中的“可直接替换文案”只能重组 source_quote 中明确出现的事实。不能添加原文没有的个人角色、决策、方法、原因、用户/业务范围、因果关系或成果。
+- 不要给出包含假设事实的“示例”，也不要用“例如”替用户补写经历。若提升效果依赖未知事实，只在 question 中提问，并明确当前没有足够信息写出更强的成果表述。
 
 诊断工作方法（先在内部完成，不要输出思考过程）：
 1. 先判断简历想呈现的职业方向、年资和核心优势；资料不足时明确保持谨慎。
 2. 从招聘者快速筛选角度检查：求职定位是否清楚、经历是否与目标岗位相关、职责是否写成了成果、个人贡献是否清楚、证据是否具体、重点是否突出、内容是否重复或难读。不要为了“有问题可提”而挑小毛病。
 3. 只选最影响求职效果、且能通过现有事实改善的问题，按影响从高到低排序。优先指出具体段落，而不是泛泛评价整份简历。没有可靠证据就少提，不凑数量。
-4. 每条建议都要形成“原文证据 → 明确缺陷 → 招聘者可能的疑问 → 可执行改法”。suggestion 尽量给出基于现有事实的完整改写示例，可直接替换原文；若缺少数据，给出不虚构事实的稳妥写法，并在 question 中询问最关键的补充事实。
-5. 改写要自然、简洁、专业，优先使用“行动/方法 + 对象或范围 + 可证实结果”的表达。只在原文有依据时写结果；没有结果数据时不要硬套数字或“显著提升”“大幅增长”等结论。避免空话、套话、夸张形容、堆砌 JD 关键词和生硬的“赋能/闭环/抓手”。
+4. 每条建议都要形成“原文证据 → 明确缺陷 → 招聘者可能的疑问 → 可执行改法”。suggestion 按“可直接替换文案（仅重组原文明确事实）/需要补充后再增强”分开写。不能将未证实的内容写成建议文案；缺少事实时只说明目前能安全怎么改，并在 question 中询问最关键的事实。
+5. 改写要自然、简洁、专业。只有来源明确写出某个行动、个人角色、方法、对象/范围或结果，才可在建议文案中保留该信息；不可根据常见业务做法补全过程或因果。没有结果数据时，不要硬套数字或“显著提升”“大幅增长”等结论。避免空话、套话、夸张形容、堆砌 JD 关键词和生硬的“赋能/闭环/抓手”。
 6. 优点也必须对应简历里的具体事实，不要输出“经验丰富、能力强”等无法验证的评价。
 7. 另将提取文本去除项目符号、乱码、重复标点和无意义格式，按基本信息、教育经历、工作经历、项目经历分开整理。保留时间、公司/组织、岗位和成果信息；不确定归属时宁可省略，不得跨经历拼接。基本信息不输出手机号、邮箱、身份证号。
 8. 只输出有效 JSON，不要 Markdown 围栏或额外解释。每栏整理最多 5 条；strengths 最多 4 条；issues 最多 6 条且按优先级排序。summary 不超过 160 字。issues 的 suggestion 不超过 700 字。
 JSON 结构：
 {
-  "summary": "整体判断：简历目前最影响筛选的点，以及最值得先改的方向",
+  "summary": "整体判断：简历目前最影响筛选的点，以及最值得先改的方向；只陈述原文能证明的事实",
   "strengths": ["具体优势，能从原文找到依据"],
   "resume_sections": {
-    "basic_info": [{"summary": "清理格式后的信息", "source_quote": "支持该条的原文连续片段"}],
+    "basic_info": [{"summary": "只整理原文实际出现的基本信息，不推断缺少什么", "source_quote": "支持该条的原文连续片段"}],
     "education": [{"summary": "清理格式后的教育经历", "source_quote": "支持该条的原文连续片段"}],
     "work_experience": [{"summary": "清理格式后的工作经历", "source_quote": "支持该条的原文连续片段"}],
     "project_experience": [{"summary": "清理格式后的项目经历", "source_quote": "支持该条的原文连续片段"}]
@@ -66,7 +68,7 @@ JSON 结构：
       "source_quote": "简历中的连续原文",
       "problem": "指出原文具体哪里含糊、重复、缺少证据或没有突出贡献，不要泛泛而谈",
       "why_it_matters": "招聘者读到这里可能无法判断什么，或会产生什么疑问",
-      "suggestion": "先说明修改重点，再给可直接替换的改写示例；示例只能使用原文已有事实，缺少事实时用中性表达",
+      "suggestion": "分开写可直接替换文案（只能使用 source_quote 明确包含的事实）和需要补充后再增强的方向；禁止添加假设的个人角色、原因、方法、范围或结果",
       "question": "一个能帮助进一步写好的事实问题；没有必要时为空字符串"
     }
   ]
@@ -88,6 +90,12 @@ def clean_text(value: Any, limit: int = 600) -> str:
     if not isinstance(value, str):
         return ""
     return value.strip()[:limit]
+
+
+def numbers_are_supported(text: str, source_text: str) -> bool:
+    pattern = r"(?<![A-Za-z])\d+(?:[.,]\d+)?%?"
+    source_numbers = set(re.findall(pattern, source_text))
+    return set(re.findall(pattern, text)).issubset(source_numbers)
 
 
 def validate_resume_sections(data: Any, redacted_text: str) -> dict[str, list[str]]:
@@ -126,12 +134,14 @@ def validate_analysis(data: Any, redacted_text: str) -> dict[str, Any]:
         raise HTTPException(502, "AI 返回格式异常，请稍后重试。")
 
     summary = clean_text(data.get("summary"), 500)
+    if not numbers_are_supported(summary, redacted_text):
+        summary = ""
     raw_strengths = data.get("strengths")
     strengths: list[str] = []
     if isinstance(raw_strengths, list):
         for value in raw_strengths[:5]:
             item = clean_text(value, 240)
-            if item:
+            if item and numbers_are_supported(item, redacted_text):
                 strengths.append(item)
 
     raw_issues = data.get("issues")
@@ -141,8 +151,11 @@ def validate_analysis(data: Any, redacted_text: str) -> dict[str, Any]:
             if not isinstance(item, dict):
                 continue
             quote = clean_text(item.get("source_quote"), 300)
-            # Only show findings anchored to an exact quote in the redacted input.
+            # Only show findings anchored to an exact quote and supported metrics.
             if not quote or quote not in redacted_text:
+                continue
+            factual_text = " ".join(clean_text(item.get(key), 800) for key in ("problem", "why_it_matters", "suggestion"))
+            if not numbers_are_supported(factual_text, redacted_text):
                 continue
             issues.append(
                 {
@@ -362,13 +375,14 @@ def build_match_messages(resume_text: str, jd_text: str) -> list[dict[str, str]]
 - 将 JD 拆成核心职责、硬性条件、优先条件和高频能力要求。区分“明确要求”和“加分项”，不要把所有关键词等权处理。
 - 每项匹配结论必须区分：简历有直接证据、只有相邻经验、简历未提及。未提及不等于候选人没有该能力。
 - 不能把 JD 的要求当作候选人事实，不能推断简历未写的技能、年限、行业、资格或结果。
-- 只提出少量高价值、确实能通过调整简历表达改善的问题。source_quote 必须是简历中的连续原文；建议示例要能由原文支持，缺少事实时用 question 向用户核实。
+- 只提出少量高价值、确实能通过调整简历表达改善的问题。source_quote 必须是简历中能直接体现该问题的连续原文；不要用一个普通栏目标题来证明简历“缺少”某项内容。建议文案只能改写引用中已明确的事实，不得添加推测的角色、方法、因果和结果；缺少事实时只在 question 中核实，不给假设性示例。
+- 不要把简历未提到的内容写成“候选人没有”，也不要在 resume_quote 为空时制造证据。
 - 不要用“匹配度高/较高”这类空话代替证据；解释岗位为何需要该能力，以及现有材料能否证明。
 - 输出用简洁、专业、自然的中文。只输出有效 JSON，不要 Markdown 围栏或额外说明。
 
 JSON 结构：
 {
-  "summary": "概括该岗位最看重的要求、简历中最有力的证据、最关键的差距和首要优化方向，150字内",
+  "summary": "概括该岗位最看重的要求、简历中能被直接证明的证据、最关键的差距和首要优化方向，150字内；不得扩写原文事实",
   "matched_skills": ["能力/要求：简历中的具体证据；避免只列关键词"],
   "gaps": [
     {"requirement": "JD中的一项具体要求", "resume_quote": "简历中相关的连续原文；没有相关原文则为空字符串", "question": "核实候选人是否有该经历的具体问题；仅未提及不等于没有"}
@@ -379,7 +393,7 @@ JSON 结构：
       "source_quote": "简历中的连续原文",
       "problem": "说明现有表述与该岗位要求之间的具体落差",
       "why_it_matters": "该岗位的招聘者可能无法判断什么",
-      "suggestion": "给出基于原文事实、可直接替换的岗位定向改写示例；不要新增 JD 里的要求作为候选人事实",
+      "suggestion": "可直接替换文案只能重组 source_quote 明确的事实；需要新增职责、方法、个人贡献或结果时不得写进文案，只在 question 中询问",
       "question": "要让这一条更有说服力，需要用户确认的具体事实；无需补充时为空字符串"
     }
   ]
