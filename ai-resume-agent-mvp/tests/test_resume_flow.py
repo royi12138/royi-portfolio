@@ -71,3 +71,10 @@ def test_docx_export_returns_word_document():
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
     assert response.content.startswith(b"PK")
+
+
+def test_homepage_prevents_stale_consent_script():
+    response = client.get("/")
+    assert response.status_code == 200
+    assert response.headers["cache-control"] == "no-store, no-cache, must-revalidate"
+    assert "privacy_consent:document.getElementById('consent').checked" in response.text
