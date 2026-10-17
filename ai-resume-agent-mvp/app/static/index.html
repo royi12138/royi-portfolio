@@ -28,7 +28,7 @@ input[type=file]{margin:10px 0;max-width:100%}.consent{font-size:12px;line-heigh
 <body>
 <div class="wrap">
 <section class="hero">
-<div class="badge">MVP 0.2 · 简历解析 + 千问分析接口</div>
+<div class="badge">MVP 0.3 · 简历优化与岗位匹配</div>
 <h1>上传简历，找出可改进的问题。</h1>
 <p class="lead">先解析简历，再由 AI 给出有原文依据的修改建议。AI 不应替你编造业绩；每条建议都需要你核对。</p>
 </section>
@@ -125,7 +125,7 @@ async function analyzeResume(){
  var button=document.getElementById('analyzeBtn');button.disabled=true;button.textContent='正在分析…';
  showMessage('analysisMsg','正在调用模型，通常需要几十秒，请不要关闭页面。',false);
  try{
-  var res=await fetch('/api/resume/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text})});
+  var res=await fetch('/api/resume/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,privacy_consent:document.getElementById('consent').checked})});
   var data=await res.json();if(!res.ok)throw new Error(data.detail||'AI 分析失败');
   renderAnalysis(data.analysis||{});showMessage('analysisMsg','分析完成。请逐条核对建议，尤其是涉及成果和数字的内容。',false);
   document.getElementById('analysisResult').scrollIntoView({behavior:'smooth',block:'start'});
