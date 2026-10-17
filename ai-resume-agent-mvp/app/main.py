@@ -26,7 +26,7 @@ MAX_BYTES = 10 * 1024 * 1024
 MAX_ANALYSIS_CHARS = 20_000
 SUPPORTED = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 
-app = FastAPI(title="AI 岗位匹配简历助手", version="0.3.1")
+app = FastAPI(title="AI 岗位匹配简历助手", version="0.4.0")
 
 SECTION_ALIASES = {
     "basic_info": {"个人信息", "基本信息", "个人资料", "联系方式", "contact", "profile"},
@@ -48,6 +48,7 @@ class ResumeRevisionRequest(BaseModel):
     accepted_issues: list[dict[str, str]] = Field(default_factory=list, max_length=8)
     privacy_consent: bool = False
     facts: str = Field(default="", max_length=10_000)
+    target_jd: str = Field(default="", max_length=10_000)
 
 
 class ResumeMatchRequest(BaseModel):
@@ -228,7 +229,7 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.3.1"}
+    return {"status": "ok", "version": "0.4.0"}
 
 
 @app.post("/api/resume/parse")
@@ -244,6 +245,32 @@ async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
         return {"ok": True, "resume": resume}
     finally:
         shutil.rmtree(path.parent, ignore_errors=True)
+
+
+@app.post("/api/jd/parse")
+async def parse_jd(file: UploadFile = File(...)) -> dict[str, Any]:
+    filename = safe_filename(file.filename or "job-description")
+    suffix = Path(filename).suffix.lower()
+    if suffix not in {".pdf", ".docx", ".txt"}:
+        raise HTTPException(400, "岗位信息请上传 PDF、DOCX 或 TXT 文件。")
+    content = await file.read(MAX_BYTES + 1)
+    if len(content) > MAX_BYTES:
+        raise HTTPException(413, "岗位文件不能超过 10MB。")
+    directory = Path(tempfile.mkdtemp(prefix="jd_", dir=TMP_DIR))
+    path = directory / filename
+    try:
+        path.write_bytes(content)
+        if suffix == ".pdf":
+            text, _ = extract_pdf(path)
+        elif suffix == ".docx":
+            text, _ = extract_docx(path)
+        else:
+            text = normalize_text(content.decode("utf-8-sig", errors="replace"))
+        if len(text.strip()) < 30:
+            raise HTTPException(422, "没有识别到足够的岗位文字，请换一份更清晰的文件。")
+        return {"ok": True, "filename": filename, "jd_text": text[:10_000]}
+    finally:
+        shutil.rmtree(directory, ignore_errors=True)
 
 
 @app.post("/api/resume/analyze")
@@ -265,7 +292,7 @@ async def revise_resume(request: ResumeRevisionRequest) -> dict[str, Any]:
             accepted.append({key: str(item.get(key, ""))[:600] for key in ("id", "section", "source_quote", "problem", "suggestion", "question")})
     if not accepted:
         raise HTTPException(400, "请接受至少一条带有简历原文引用的建议后再生成简历。")
-    draft = await generate_resume_revision(request.resume_text, accepted, request.facts)
+    draft = await generate_resume_revision(request.resume_text, accepted, request.facts, request.target_jd)
     return {"ok": True, "revised_text": draft, "fact_protection": "只采用已接受建议和你填写的真实信息；请下载前逐项核对。", "stored": False}
 
 
