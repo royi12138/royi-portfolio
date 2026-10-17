@@ -11,10 +11,11 @@ import pytesseract
 from docx import Document
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 from pydantic import BaseModel, Field
 from PIL import Image, ImageOps
 
-from app.ai_analysis import analyze_resume_text
+from app.ai_analysis import analyze_resume_text, generate_resume_revision, match_resume_to_jd, redact_sensitive_info
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
@@ -39,6 +40,24 @@ SECTION_ALIASES = {
 
 class ResumeAnalysisRequest(BaseModel):
     resume_text: str = Field(min_length=30, max_length=MAX_ANALYSIS_CHARS)
+
+
+class ResumeRevisionRequest(BaseModel):
+    resume_text: str = Field(min_length=30, max_length=MAX_ANALYSIS_CHARS)
+    accepted_issues: list[dict[str, str]] = Field(default_factory=list, max_length=8)
+    privacy_consent: bool = False
+    facts: str = Field(default="", max_length=10_000)
+
+
+class ResumeMatchRequest(BaseModel):
+    resume_text: str = Field(min_length=30, max_length=MAX_ANALYSIS_CHARS)
+    jd_text: str = Field(min_length=30, max_length=10_000)
+    privacy_consent: bool = False
+
+
+class ResumeExportRequest(BaseModel):
+    resume_text: str = Field(min_length=30, max_length=30_000)
+    filename: str = Field(default="优化后简历", max_length=120)
 
 
 def safe_filename(name: str) -> str:
@@ -227,3 +246,49 @@ async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
 async def analyze_resume(request: ResumeAnalysisRequest) -> dict[str, Any]:
     analysis = await analyze_resume_text(request.resume_text)
     return {"ok": True, "analysis": analysis}
+
+
+@app.post("/api/resume/revise")
+async def revise_resume(request: ResumeRevisionRequest) -> dict[str, Any]:
+    if not request.privacy_consent:
+        raise HTTPException(400, "请先确认隐私提示后再发送内容进行 AI 改写。")
+    accepted = []
+    for item in request.accepted_issues[:8]:
+        quote = str(item.get("source_quote", ""))[:300]
+        if quote and quote in redact_sensitive_info(request.resume_text):
+            accepted.append({key: str(item.get(key, ""))[:600] for key in ("id", "section", "source_quote", "problem", "suggestion", "question")})
+    if not accepted:
+        raise HTTPException(400, "请接受至少一条带有简历原文引用的建议后再生成简历。")
+    draft = await generate_resume_revision(request.resume_text, accepted, request.facts)
+    return {"ok": True, "revised_text": draft, "fact_protection": "只采用已接受建议和你填写的真实信息；请下载前逐项核对。", "stored": False}
+
+
+@app.post("/api/resume/match")
+async def match_resume(request: ResumeMatchRequest) -> dict[str, Any]:
+    if not request.privacy_consent:
+        raise HTTPException(400, "请先确认隐私提示后再发送简历和招聘信息进行匹配。")
+    result = await match_resume_to_jd(request.resume_text, request.jd_text)
+    return {"ok": True, "match": result}
+
+
+@app.post("/api/resume/export")
+async def export_resume(request: ResumeExportRequest) -> FileResponse:
+    directory = Path(tempfile.mkdtemp(prefix="resume_export_", dir=TMP_DIR))
+    try:
+        filename = safe_filename(request.filename).rsplit(".", 1)[0] or "优化后简历"
+        output = directory / (filename + ".docx")
+        document = Document()
+        document.add_heading(filename, level=1)
+        for line in request.resume_text.splitlines():
+            if line.strip():
+                document.add_paragraph(line.strip())
+        document.save(output)
+        return FileResponse(
+            output,
+            filename=output.name,
+            media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            background=BackgroundTask(shutil.rmtree, directory, ignore_errors=True),
+        )
+    except Exception:
+        shutil.rmtree(directory, ignore_errors=True)
+        raise
