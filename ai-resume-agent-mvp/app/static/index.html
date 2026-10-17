@@ -130,7 +130,8 @@ async function analyzeResume(){
  try{
   var res=await fetch('/api/resume/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,privacy_consent:document.getElementById('consent').checked})});
   var data=await res.json();if(!res.ok)throw new Error(data.detail||'AI 分析失败');
-  document.getElementById('analysisResult').classList.remove('hidden');document.getElementById('beforeResume').textContent=currentResume.raw_text||'';\n  renderAnalysis(data.analysis||{});showMessage('analysisMsg','分析完成。请逐条核对建议，尤其是涉及成果和数字的内容。',false);
+  document.getElementById('analysisResult').classList.remove('hidden');document.getElementById('beforeResume').textContent=currentResume.raw_text||'';
+  renderAnalysis(data.analysis||{});showMessage('analysisMsg','分析完成。请逐条核对建议，尤其是涉及成果和数字的内容。',false);
   document.getElementById('analysisResult').scrollIntoView({behavior:'smooth',block:'start'});
  }catch(e){showMessage('analysisMsg',e.message||'AI 分析失败，请稍后重试。',true);}
  finally{button.disabled=false;button.textContent='重新分析';}
