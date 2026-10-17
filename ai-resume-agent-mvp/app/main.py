@@ -26,7 +26,7 @@ MAX_BYTES = 10 * 1024 * 1024
 MAX_ANALYSIS_CHARS = 20_000
 SUPPORTED = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 
-app = FastAPI(title="AI 岗位匹配简历助手", version="0.4.0")
+app = FastAPI(title="AI 岗位匹配简历助手", version="0.5.0")
 
 SECTION_ALIASES = {
     "basic_info": {"个人信息", "基本信息", "个人资料", "联系方式", "contact", "profile"},
@@ -229,7 +229,7 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.4.0"}
+    return {"status": "ok", "version": "0.5.0"}
 
 
 @app.post("/api/resume/parse")
@@ -251,8 +251,8 @@ async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
 async def parse_jd(file: UploadFile = File(...)) -> dict[str, Any]:
     filename = safe_filename(file.filename or "job-description")
     suffix = Path(filename).suffix.lower()
-    if suffix not in {".pdf", ".docx", ".txt"}:
-        raise HTTPException(400, "岗位信息请上传 PDF、DOCX 或 TXT 文件。")
+    if suffix not in {".jpg", ".jpeg", ".png"}:
+        raise HTTPException(400, "岗位信息请上传 JPG 或 PNG 图片。")
     content = await file.read(MAX_BYTES + 1)
     if len(content) > MAX_BYTES:
         raise HTTPException(413, "岗位文件不能超过 10MB。")
@@ -260,12 +260,7 @@ async def parse_jd(file: UploadFile = File(...)) -> dict[str, Any]:
     path = directory / filename
     try:
         path.write_bytes(content)
-        if suffix == ".pdf":
-            text, _ = extract_pdf(path)
-        elif suffix == ".docx":
-            text, _ = extract_docx(path)
-        else:
-            text = normalize_text(content.decode("utf-8-sig", errors="replace"))
+        text, _ = extract_image(path)
         if len(text.strip()) < 30:
             raise HTTPException(422, "没有识别到足够的岗位文字，请换一份更清晰的文件。")
         return {"ok": True, "filename": filename, "jd_text": text[:10_000]}
