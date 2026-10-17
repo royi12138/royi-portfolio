@@ -1264,8 +1264,8 @@
   collectEditables().forEach(function(el){
     if(!el.id && !el.dataset.k) el.dataset.k = "f" + (fIdx++);
   });
-  function saveContent(){
-    if(!document.body.classList.contains("editing")) return;
+  function saveContent(force){
+    if(!force && !document.body.classList.contains("editing")) return;
     var data = {};
     collectEditables().forEach(function(el){
       var k = el.id || el.dataset.k;
@@ -1296,13 +1296,23 @@
     el.addEventListener("input", scheduleSave);
   }
   collectEditables().forEach(wireEditable);
+  /* 粘贴自动转纯文本：避免从 Word/网页复制时带入 MsoNormal 等内联样式 */
+  document.addEventListener("paste", function(e){
+    var t = e.target;
+    if(t && t.isContentEditable && t.hasAttribute("data-editable")){
+      e.preventDefault();
+      var text = "";
+      try{ text = (e.clipboardData || window.clipboardData).getData("text/plain"); }catch(e2){}
+      if(text != null) document.execCommand("insertText", false, text);
+    }
+  });
   var btnEdit = $("#btnEdit");
   function setEditMode(on){
     document.body.classList.toggle("editing", on);
     btnEdit.classList.toggle("is-on", on);
     btnEdit.innerHTML = on ? "完成编辑" : "编辑内容";
     collectEditables().forEach(function(el){ el.contentEditable = on ? "true" : "false"; });
-    if(!on) saveContent();
+    if(!on) saveContent(true);  /* 完成编辑：强制保存并触发云端同步 */
   }
   btnEdit.addEventListener("click", function(){ setEditMode(!document.body.classList.contains("editing")); });
 
