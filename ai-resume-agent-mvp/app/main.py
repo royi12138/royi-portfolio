@@ -26,7 +26,7 @@ MAX_BYTES = 10 * 1024 * 1024
 MAX_ANALYSIS_CHARS = 20_000
 SUPPORTED = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 
-app = FastAPI(title="AI 岗位匹配简历助手", version="0.2.0")
+app = FastAPI(title="AI 岗位匹配简历助手", version="0.3.0")
 
 SECTION_ALIASES = {
     "basic_info": {"个人信息", "基本信息", "个人资料", "联系方式", "contact", "profile"},
@@ -40,6 +40,7 @@ SECTION_ALIASES = {
 
 class ResumeAnalysisRequest(BaseModel):
     resume_text: str = Field(min_length=30, max_length=MAX_ANALYSIS_CHARS)
+    privacy_consent: bool = False
 
 
 class ResumeRevisionRequest(BaseModel):
@@ -224,7 +225,7 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.2.0"}
+    return {"status": "ok", "version": "0.3.0"}
 
 
 @app.post("/api/resume/parse")
@@ -244,6 +245,8 @@ async def parse_resume(file: UploadFile = File(...)) -> dict[str, Any]:
 
 @app.post("/api/resume/analyze")
 async def analyze_resume(request: ResumeAnalysisRequest) -> dict[str, Any]:
+    if not request.privacy_consent:
+        raise HTTPException(400, "请先确认隐私提示后再发送简历进行 AI 分析。")
     analysis = await analyze_resume_text(request.resume_text)
     return {"ok": True, "analysis": analysis}
 
