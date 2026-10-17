@@ -1,4 +1,4 @@
-from app.ai_analysis import (build_completion_payload, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
+from app.ai_analysis import (build_match_messages, build_messages, build_revision_messages, build_completion_payload, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
 from app.main import app, build_resume_json, parse_sections
 from fastapi.testclient import TestClient
 
@@ -157,3 +157,30 @@ def test_analysis_returns_clean_structured_resume_sections():
         "issues": [],
     }, source)
     assert result["resume_sections"]["education"] == ["本科，信息管理专业。"]
+
+def test_advisor_prompts_require_specific_evidence_and_usable_rewrites():
+    analysis_messages = build_messages("负责产品规划与上线，推动用户反馈闭环。")
+    analysis_prompt = analysis_messages[0]["content"]
+    assert "可直接替换原文" in analysis_prompt
+    assert "按影响从高到低排序" in analysis_prompt
+    assert "不要为了“有问题可提”而挑小毛病" in analysis_prompt
+
+    revision_messages = build_revision_messages(
+        "工作经历\n负责产品规划与上线",
+        [{"section": "工作经历", "source_quote": "负责产品规划与上线", "suggestion": "突出行动和结果"}],
+        "用户确认上线范围为3个城市",
+        "招聘产品经理，负责产品规划",
+    )
+    revision_system, revision_user = revision_messages[0]["content"], revision_messages[1]["content"]
+    assert "不要只替换近义词" in revision_system
+    assert "用户确认的真实补充事实" in revision_user
+    assert "招聘产品经理" in revision_user
+    assert "3个城市" in revision_user
+    assert "不要添加【请补充真实信息】" in revision_system
+
+    match_messages = build_match_messages("负责产品规划", "招聘产品经理，要求数据分析")
+    match_prompt = match_messages[0]["content"]
+    assert "核心职责、硬性条件、优先条件" in match_prompt
+    assert "未提及不等于候选人没有该能力" in match_prompt
+    assert "可直接替换的岗位定向改写示例" in match_prompt
+
