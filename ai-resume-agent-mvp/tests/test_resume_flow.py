@@ -80,15 +80,23 @@ def test_homepage_prevents_stale_consent_script():
     assert "privacy_consent:document.getElementById('consent').checked" in response.text
 
 
-def test_jd_txt_upload_extracts_text():
+def test_jd_image_upload_extracts_text(monkeypatch):
     jd = "招聘产品经理，负责产品规划、需求分析、用户研究、跨团队协作、项目推进与产品上线交付。"
+    monkeypatch.setattr("app.main.extract_image", lambda path: (jd, 1))
     response = client.post(
         "/api/jd/parse",
-        files={"file": ("岗位.txt", jd.encode("utf-8"), "text/plain")},
+        files={"file": ("岗位.png", b"image bytes", "image/png")},
     )
     assert response.status_code == 200
     assert response.json()["jd_text"] == jd
 
+
+def test_jd_text_upload_is_rejected():
+    response = client.post(
+        "/api/jd/parse",
+        files={"file": ("岗位.txt", b"job description long enough to pass", "text/plain")},
+    )
+    assert response.status_code == 400
 
 def test_analysis_page_reveals_results_and_contains_comparison_views():
     response = client.get("/")
@@ -97,8 +105,11 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
     assert 'id="beforeResume"' in response.text
     assert 'id="jdBeforeText"' in response.text
     assert "async function generateJDRevision()" in response.text
+    assert "function renderComparison(beforeId,afterId,outputId)" in response.text
+    assert "diff-change" in response.text
+    assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png"' in response.text
 
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.4.0"
+    assert response.json()["version"] == "0.5.0"
