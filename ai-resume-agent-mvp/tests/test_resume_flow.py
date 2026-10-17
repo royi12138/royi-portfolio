@@ -68,7 +68,7 @@ def test_docx_extraction_preserves_order_and_reads_nested_tables_headers_and_foo
     assert "张三" in text and "13800138000" in text and "个人信息" in text
     sections = parse_sections(text)
     assert sections["education"] == ["本科｜某某大学｜2020年"]
-    assert sections["project_experience"] == ["校园服务平台｜负责需求梳理", "项目结束后补充说明"]
+    assert sections["project_experience"] == ["校园服务平台｜负责需求梳理", "持续负责后续维护"]
     assert pages >= 1
 
 
