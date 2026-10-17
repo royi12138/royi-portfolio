@@ -58,13 +58,15 @@ input[type=file]{margin:10px 0;max-width:100%}.consent{font-size:12px;line-heigh
 <div class="panel"><h3 class="details-title">结构化简历内容</h3><p class="subtle">以下栏目由程序按标题自动归类，可能无法识别所有简历格式；请同时核对下面的完整解析文本。</p><div id="summary"></div><details style="margin-top:12px"><summary>查看 Resume JSON（技术详情）</summary><pre id="json"></pre></details></div>
 <div class="panel" id="parsedTextPanel"><h3 class="details-title">完整解析文本（可逐字核对）</h3><p class="subtle">这是系统从你上传的文件中提取到的文字。若某些栏目未识别，请以此处为准；这里不会由 AI 补写内容。</p><pre id="parsedRawText" style="white-space:pre-wrap;overflow-wrap:anywhere;max-height:560px;overflow:auto;font-size:13px;line-height:1.75;color:#30343b;background:#f7f8fb;border:1px solid #e6e7ed;border-radius:12px;padding:16px"></pre></div>
 <div id="analysisResult" class="hidden">
-<div class="panel"><h3 class="details-title">AI 总体评价</h3><div id="overallSummary" style="line-height:1.75"></div><div id="strengths"></div><div class="subtle" id="privacyNote" style="margin-top:12px"></div></div>
-<div class="panel"><h3 class="details-title">可改进的问题</h3><div id="issues"></div></div>
+<div class="panel"><h3 class="details-title">AI 总体评价</h3><div id="scoreResults" class="panel" style="margin:10px 0"></div><div id="overallSummary" style="line-height:1.75"></div><div id="strengths"></div><div class="subtle" id="privacyNote" style="margin-top:12px"></div></div>
+<div class="panel"><h3 class="details-title">可改进的问题</h3><div id="issues"></div><p class="subtle">每条建议需你主动接受；只有填写并确认的真实信息才会用于改写。</p><div id="revisionActions"><button class="btn" onclick="generateRevision()">生成优化版简历</button></div><div id="revisionMsg" aria-live="polite"></div></div>
+<div class="panel"><h3 class="details-title">招聘岗位匹配</h3><p class="subtle">粘贴招聘信息后，可以查看匹配点和需要核实的差距。</p><textarea id="jdText" rows="7" style="width:100%;box-sizing:border-box;border:1px solid #d9dce5;border-radius:10px;padding:12px;font:inherit" placeholder="粘贴招聘岗位描述"></textarea><button class="btn" style="margin-top:10px" onclick="matchJD()">分析岗位匹配</button><div id="matchResult"></div></div>
+<div class="panel"><h3 class="details-title">优化后简历预览</h3><p class="subtle">检查并可直接编辑生成的文本，再下载 Word 文件。</p><textarea id="revisedText" rows="16" style="width:100%;box-sizing:border-box;border:1px solid #d9dce5;border-radius:10px;padding:12px;font:inherit"></textarea><button class="btn" onclick="downloadDocx()">下载 DOCX</button><button class="btn" style="background:#555;margin-left:8px" onclick="clearResumeData()">清除本页数据</button><div id="exportMsg"></div></div>
 </div>
 </section>
 </div>
 <script>
-var currentResume = null;
+var currentResume = null;\nvar currentAnalysis = null;\nvar issueDecisions = {};\nvar issueFacts = {};
 function escapeHtml(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
 function showMessage(id,text,isError){document.getElementById(id).innerHTML='<div class="'+(isError?'err':'ok')+'">'+escapeHtml(text)+'</div>';}
 function renderSection(title,items){var arr=Array.isArray(items)?items:[];return '<div class="item"><b>'+escapeHtml(title)+'</b><span>'+(arr.length?arr.slice(0,5).map(escapeHtml).join('；'):'未识别到内容')+'</span></div>';}
@@ -93,18 +95,24 @@ async function parseResume(){
  }catch(e){showMessage('msg',e.message||'解析失败，请稍后重试。',true);}finally{button.disabled=false;}
 }
 function renderAnalysis(analysis){
+ currentAnalysis=analysis;issueDecisions={};issueFacts={};
  document.getElementById('overallSummary').textContent=analysis.summary||'暂无总体评价。';
  document.getElementById('privacyNote').textContent=analysis.privacy_note||'';
+ var scores=analysis.scores||{},dims=Array.isArray(scores.dimensions)?scores.dimensions:[];
+ document.getElementById('scoreResults').innerHTML='<b>简历检查分：'+escapeHtml(scores.overall==null?'—':scores.overall)+'/100</b><div class="subtle">'+escapeHtml(scores.method||'')+'</div>'+dims.map(function(d){return '<div class="item"><b>'+escapeHtml(d.name)+'：'+escapeHtml(d.score)+'/100</b><span>权重 '+escapeHtml(Math.round((d.weight||0)*100))+'% · '+escapeHtml(d.reason)+'</span></div>';}).join('');
  var strengths=Array.isArray(analysis.strengths)?analysis.strengths:[];
  document.getElementById('strengths').innerHTML=strengths.length?'<div class="item"><b>简历现有优势</b><span>'+strengths.map(escapeHtml).join('；')+'</span></div>':'';
  var issues=Array.isArray(analysis.issues)?analysis.issues:[];
- if(!issues.length){document.getElementById('issues').textContent='本次没有找到可展示且能引用原文的问题。可以尝试上传文字更清晰、结构更完整的简历。';return;}
+ if(!issues.length){document.getElementById('issues').textContent='本次没有找到可展示且能引用原文的问题。';return;}
  document.getElementById('issues').innerHTML=issues.map(function(item,index){
+  var id=String(item.id||('I'+(index+1))),safeId=escapeHtml(id);
   var html='<div class="item"><span class="tags">'+escapeHtml(item.section||'整体结构')+' · 问题 '+(index+1)+'</span><div><b>'+escapeHtml(item.problem||'可改进之处')+'</b></div>';
   html+='<div class="quote">简历原文：'+escapeHtml(item.source_quote||'')+'</div>';
   if(item.why_it_matters)html+='<p><b>为什么建议改</b><br>'+escapeHtml(item.why_it_matters)+'</p>';
   if(item.suggestion)html+='<p><b>修改方向</b><br>'+escapeHtml(item.suggestion)+'</p>';
   if(item.question)html+='<p><b>需要你补充的真实信息</b><br>'+escapeHtml(item.question)+'</p>';
+  html+='<label class="subtle">仅填写你能确认的真实信息：<textarea rows="2" oninput="setIssueFact(\''+safeId+'\',this.value)" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:8px"></textarea></label>';
+  html+='<button class="btn" style="margin:8px 6px 0 0" onclick="setIssueDecision(\''+safeId+'\',\'accept\')">接受并应用</button><button class="btn" style="margin-top:8px;background:#777" onclick="setIssueDecision(\''+safeId+'\',\'reject\')">拒绝</button><span class="subtle" id="decision_'+safeId+'">尚未选择</span>';
   return html+'</div>';
  }).join('');
 }
@@ -120,6 +128,32 @@ async function analyzeResume(){
   document.getElementById('analysisResult').scrollIntoView({behavior:'smooth',block:'start'});
  }catch(e){showMessage('analysisMsg',e.message||'AI 分析失败，请稍后重试。',true);}
  finally{button.disabled=false;button.textContent='重新分析';}
+}
+function setIssueDecision(id,value){issueDecisions[id]=value;var n=document.getElementById('decision_'+id);if(n)n.textContent=value==='accept'?'已接受':'已拒绝';}
+function setIssueFact(id,value){issueFacts[id]=value;}
+async function generateRevision(){
+ if(!currentResume||!currentAnalysis)return;
+ var accepted=(currentAnalysis.issues||[]).filter(function(x,i){return issueDecisions[String(x.id||('I'+(i+1)))]==='accept';});
+ if(!accepted.length){showMessage('revisionMsg','请先接受至少一条建议。',true);return;}
+ var facts=accepted.map(function(x,i){var id=String(x.id||('I'+(i+1))),v=(issueFacts[id]||'').trim();return v?'['+id+'] '+v:'';}).filter(Boolean).join('\n');
+ var button=document.querySelector('#revisionActions button');button.disabled=true;showMessage('revisionMsg','正在根据已接受建议生成草稿…',false);
+ try{var res=await fetch('/api/resume/revise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,accepted_issues:accepted,facts:facts})});var data=await res.json();if(!res.ok)throw new Error(data.detail||'生成失败');document.getElementById('revisedText').value=data.revised_text||'';showMessage('revisionMsg',data.fact_protection||'草稿已生成，请核对。',false);document.getElementById('revisedText').scrollIntoView({behavior:'smooth'});}catch(e){showMessage('revisionMsg',e.message||'生成失败，请重试。',true);}finally{button.disabled=false;}
+}
+async function matchJD(){
+ if(!currentResume||!document.getElementById('consent').checked){showMessage('analysisMsg','请先解析简历并确认隐私提示。',true);return;}
+ var jd=document.getElementById('jdText').value.trim();if(jd.length<30){showMessage('matchResult','请粘贴至少 30 个字的招聘信息。',true);return;}
+ showMessage('matchResult','正在分析岗位匹配…',false);
+ try{var res=await fetch('/api/resume/match',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,jd_text:jd})});var data=await res.json();if(!res.ok)throw new Error(data.detail||'匹配失败');var m=data.match||{};document.getElementById('matchResult').innerHTML='<p>'+escapeHtml(m.summary||'')+'</p><b>匹配点</b><p>'+((m.matched_skills||[]).map(escapeHtml).join('；')||'暂无')+'</p><b>差距与待确认问题</b>'+((m.gaps||[]).map(function(g){return '<div class="item"><b>'+escapeHtml(g.requirement)+'</b><span>'+escapeHtml(g.question)+'</span>'+(g.resume_quote?'<div class="quote">简历原文：'+escapeHtml(g.resume_quote)+'</div>':'')+'</div>';}).join('')||'<p>暂无</p>')+'<p class="subtle">'+escapeHtml(m.privacy_note||'')+'</p>';}catch(e){showMessage('matchResult',e.message||'匹配失败，请重试。',true);}
+}
+async function downloadDocx(){
+ var text=document.getElementById('revisedText').value.trim();if(!text){showMessage('exportMsg','请先生成或编辑简历文本。',true);return;}
+ try{var res=await fetch('/api/resume/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:text,filename:'优化后简历'})});if(!res.ok){var d=await res.json();throw new Error(d.detail||'导出失败');}var blob=await res.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='优化后简历.docx';a.click();URL.revokeObjectURL(url);showMessage('exportMsg','Word 文件已生成并下载。',false);}catch(e){showMessage('exportMsg',e.message||'导出失败，请重试。',true);}
+}
+function clearResumeData(){
+ currentResume=null;currentAnalysis=null;issueDecisions={};issueFacts={};
+ document.getElementById('resumeFile').value='';document.getElementById('result').classList.remove('show');
+ ['filename','pageCount','summary','json','parsedRawText','overallSummary','strengths','privacyNote','issues','scoreResults','revisedText','jdText','matchResult','analysisMsg','revisionMsg','exportMsg','msg'].forEach(function(id){var n=document.getElementById(id);if(n)n.value!==undefined&&/^(TEXTAREA|INPUT)$/.test(n.tagName)?n.value='':n.textContent='';});
+ document.getElementById('consent').checked=false;document.getElementById('analysisResult').classList.add('hidden');window.scrollTo({top:0,behavior:'smooth'});
 }
 </script>
 </body>
