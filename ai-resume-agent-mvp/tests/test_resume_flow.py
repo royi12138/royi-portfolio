@@ -183,7 +183,7 @@ def test_advisor_prompts_require_specific_evidence_and_usable_rewrites():
     match_prompt = match_messages[0]["content"]
     assert "核心职责、硬性条件、优先条件" in match_prompt
     assert "未提及不等于候选人没有该能力" in match_prompt
-    assert "可直接替换的岗位定向改写示例" in match_prompt
+    assert "可直接替换文案只能重组 source_quote 明确的事实" in match_prompt
 
 def test_analysis_filters_unsupported_numbers_from_model_claims():
     source = "会员续费率从68%提升至76%，月活会员增加1.2万人。"
