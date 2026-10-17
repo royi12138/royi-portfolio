@@ -9,6 +9,8 @@ from typing import Any
 import fitz
 import pytesseract
 from docx import Document
+from docx.table import Table
+from docx.text.paragraph import Paragraph
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from starlette.background import BackgroundTask
@@ -26,7 +28,7 @@ MAX_BYTES = 10 * 1024 * 1024
 MAX_ANALYSIS_CHARS = 20_000
 SUPPORTED = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 
-app = FastAPI(title="AI 岗位匹配简历助手", version="0.7.2")
+app = FastAPI(title="AI 岗位匹配简历助手", version="0.7.3")
 
 SECTION_ALIASES = {
     "basic_info": {"个人信息", "基本信息", "个人资料", "联系方式", "contact", "profile"},
@@ -88,27 +90,94 @@ def extract_pdf(path: Path) -> tuple[str, int]:
         doc.close()
 
 
-def estimate_docx_pages(document: Document, text: str) -> int:
-    breaks = 0
-    for paragraph in document.paragraphs:
-        breaks += paragraph._p.xml.count('w:type="page"')
-    estimated = max(1, (len(text) + 1049) // 1050)
-    return max(estimated, breaks + 1)
+def iter_docx_blocks(container: Any):
+    """Yield paragraphs and tables in their real Word document order."""
+    element = getattr(container, "_element", container)
+    for child in element.iterchildren():
+        if child.tag.endswith("}p"):
+            yield Paragraph(child, container)
+        elif child.tag.endswith("}tbl"):
+            yield Table(child, container)
+
+
+def extract_docx_cell(cell: Any) -> list[str]:
+    parts: list[str] = []
+    for block in iter_docx_blocks(cell):
+        if isinstance(block, Paragraph):
+            if block.text.strip():
+                parts.append(block.text.strip())
+        else:
+            rows = []
+            seen_cells: set[int] = set()
+            for row in block.rows:
+                cells = []
+                for nested_cell in row.cells:
+                    cell_id = id(nested_cell._tc)
+                    if cell_id in seen_cells:
+                        continue
+                    seen_cells.add(cell_id)
+                    nested_parts = extract_docx_cell(nested_cell)
+                    if nested_parts:
+                        cells.append("\n".join(nested_parts))
+                if cells:
+                    rows.append(" | ".join(cells))
+            parts.extend(rows)
+    return parts
 
 
 def extract_docx(path: Path) -> tuple[str, int]:
     doc = Document(path)
-    parts = []
-    for p in doc.paragraphs:
-        if p.text.strip():
-            parts.append(p.text.strip())
-    for table in doc.tables:
-        for row in table.rows:
-            cells = [cell.text.strip() for cell in row.cells]
-            if any(cells):
-                parts.append(" | ".join(cells))
+    parts: list[str] = []
+    seen_header_footer_parts: set[tuple[int, str]] = set()
+
+    # Include text in page headers/footers (contact details are often placed there).
+    for section in doc.sections:
+        for attribute in (
+            "first_page_header", "header", "even_page_header",
+            "first_page_footer", "footer", "even_page_footer",
+        ):
+            container = getattr(section, attribute)
+            key = (id(container.part), attribute.endswith("footer"))
+            if key in seen_header_footer_parts:
+                continue
+            seen_header_footer_parts.add(key)
+            for block in iter_docx_blocks(container):
+                if isinstance(block, Paragraph):
+                    if block.text.strip():
+                        parts.append(block.text.strip())
+                else:
+                    for row in block.rows:
+                        values = ["\n".join(extract_docx_cell(cell)) for cell in row.cells]
+                        values = [value for value in values if value]
+                        if values:
+                            parts.append(" | ".join(values))
+    body_paragraphs = []
+    for block in iter_docx_blocks(doc):
+        if isinstance(block, Paragraph):
+            if block.text.strip():
+                parts.append(block.text.strip())
+                body_paragraphs.append(block)
+        else:
+            rows = []
+            seen_cells: set[int] = set()
+            for row in block.rows:
+                cells = []
+                for cell in row.cells:
+                    cell_id = id(cell._tc)
+                    if cell_id in seen_cells:
+                        continue
+                    seen_cells.add(cell_id)
+                    cell_parts = extract_docx_cell(cell)
+                    if cell_parts:
+                        cells.append("\n".join(cell_parts))
+                if cells:
+                    rows.append(" | ".join(cells))
+            parts.extend(rows)
     text = normalize_text("\n".join(parts))
-    return text, estimate_docx_pages(doc, text)
+    breaks = sum(paragraph._p.xml.count('w:type="page"') for paragraph in body_paragraphs)
+    estimated = max(1, (len(text) + 1049) // 1050)
+    pages = max(estimated, breaks + 1)
+    return text, pages
 
 
 def extract_image(path: Path) -> tuple[str, int]:
