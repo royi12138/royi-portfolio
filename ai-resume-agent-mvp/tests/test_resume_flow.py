@@ -1,6 +1,7 @@
 from app.ai_analysis import (apply_resume_replacements, build_match_messages, build_messages, build_revision_messages, build_completion_payload, numbers_are_supported, restore_sensitive_info, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
-from app.main import app, build_resume_json, parse_sections
+from app.main import app, build_resume_json, extract_docx, parse_sections
 from fastapi.testclient import TestClient
+from docx import Document
 import pytest
 
 client = TestClient(app)
@@ -42,6 +43,33 @@ def test_resume_parser_keeps_sections_and_raw_text():
     assert sections["work_experience"] == ["负责产品上线"]
     resume = build_resume_json("resume.docx", ".docx", raw, 1)
     assert resume["raw_text"] == raw
+
+
+
+
+def test_docx_extraction_preserves_order_and_reads_nested_tables_headers_and_footers(tmp_path):
+    document = Document()
+    document.sections[0].header.paragraphs[0].text = "张三｜电话 13800138000"
+    document.sections[0].footer.paragraphs[0].text = "个人信息"
+    document.add_paragraph("教育经历")
+    outer = document.add_table(rows=1, cols=1)
+    outer.cell(0, 0).text = "本科｜某某大学｜2020年"
+    nested = outer.cell(0, 0).add_table(rows=1, cols=1)
+    nested.cell(0, 0).text = "项目经历"
+    nested.cell(0, 0).add_paragraph("校园服务平台｜负责需求梳理")
+    document.add_paragraph("持续负责后续维护")
+    path = tmp_path / "synthetic_resume.docx"
+    document.save(path)
+
+    text, pages = extract_docx(path)
+
+    assert text.index("教育经历") < text.index("本科") < text.index("项目经历")
+    assert text.index("项目经历") < text.index("校园服务平台") < text.index("持续负责后续维护")
+    assert "张三" in text and "13800138000" in text and "个人信息" in text
+    sections = parse_sections(text)
+    assert sections["education"] == ["本科｜某某大学｜2020年"]
+    assert sections["project_experience"] == ["校园服务平台｜负责需求梳理", "持续负责后续维护"]
+    assert pages >= 1
 
 
 def test_analysis_requires_privacy_consent():
@@ -106,6 +134,8 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
     assert 'id="beforeResume"' in response.text
     assert 'id="jdBeforeText"' in response.text
     assert "async function generateJDRevision()" in response.text
+    assert "function renderParsedResume(resume)" in response.text
+    assert "以下是系统从简历文件中直接提取" in response.text
     assert "function renderComparison(beforeId,afterId,outputId)" in response.text
     assert "diff-change" in response.text
     assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png"' in response.text
@@ -113,7 +143,7 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.7.2"
+    assert response.json()["version"] == "0.7.3"
 
 
 
