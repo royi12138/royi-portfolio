@@ -66,7 +66,10 @@ input[type=file]{margin:10px 0;max-width:100%}.consent{font-size:12px;line-heigh
 </section>
 </div>
 <script>
-var currentResume = null;\nvar currentAnalysis = null;\nvar issueDecisions = {};\nvar issueFacts = {};
+var currentResume = null;
+var currentAnalysis = null;
+var issueDecisions = {};
+var issueFacts = {};
 function escapeHtml(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
 function showMessage(id,text,isError){document.getElementById(id).innerHTML='<div class="'+(isError?'err':'ok')+'">'+escapeHtml(text)+'</div>';}
 function renderSection(title,items){var arr=Array.isArray(items)?items:[];return '<div class="item"><b>'+escapeHtml(title)+'</b><span>'+(arr.length?arr.slice(0,5).map(escapeHtml).join('；'):'未识别到内容')+'</span></div>';}
