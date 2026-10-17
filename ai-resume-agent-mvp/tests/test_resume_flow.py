@@ -1,6 +1,7 @@
-from app.ai_analysis import (build_match_messages, build_messages, build_revision_messages, build_completion_payload, numbers_are_supported, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
+from app.ai_analysis import (apply_resume_replacements, build_match_messages, build_messages, build_revision_messages, build_completion_payload, numbers_are_supported, restore_sensitive_info, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
 from app.main import app, build_resume_json, parse_sections
 from fastapi.testclient import TestClient
+import pytest
 
 client = TestClient(app)
 
@@ -112,7 +113,7 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.7.1"
+    assert response.json()["version"] == "0.7.2"
 
 
 
@@ -173,11 +174,11 @@ def test_advisor_prompts_require_specific_evidence_and_usable_rewrites():
         "招聘产品经理，负责产品规划",
     )
     revision_system, revision_user = revision_messages[0]["content"], revision_messages[1]["content"]
-    assert "不要只替换近义词" in revision_system
+    assert "其余简历由程序原样保留" in revision_system
     assert "用户确认的真实补充事实" in revision_user
     assert "招聘产品经理" in revision_user
     assert "3个城市" in revision_user
-    assert "不要添加【请补充真实信息】" in revision_system
+    assert "不要编造基本信息、联系方式、技能栏目" in revision_system
 
     match_messages = build_match_messages("负责产品规划", "招聘产品经理，要求数据分析")
     match_prompt = match_messages[0]["content"]
@@ -213,4 +214,53 @@ def test_analysis_filters_unsupported_numbers_from_model_claims():
     assert len(result["issues"]) == 1
     assert numbers_are_supported("月活会员增加1.2万人", source)
     assert not numbers_are_supported("月活会员增加2万人", source)
+
+def test_revision_only_replaces_accepted_quote_and_restores_redacted_contact():
+    resume = "邮箱：candidate@example.com\n工作经历\n负责产品规划与上线。\n项目经历\n保留此段不变。电话13800138000"
+    accepted = [{
+        "id": "I1",
+        "source_quote": "负责产品规划与上线。",
+        "suggestion": "调整语序",
+    }]
+    result = {
+        "replacements": [{
+            "id": "I1",
+            "source_quote": "负责产品规划与上线。",
+            "replacement": "负责产品上线与规划。",
+        }]
+    }
+    revised = apply_resume_replacements(resume, accepted, result)
+    assert "负责产品上线与规划。" in revised
+    assert "保留此段不变。" in revised
+    assert "candidate@example.com" in revised
+    assert "13800138000" in revised
+    assert "邮箱已隐藏" not in revised
+
+
+def test_revision_rejects_unanchored_or_unsupported_numeric_rewrites():
+    resume = "工作经历\n续费率提升至76%。\n项目经历\n保留。"
+    accepted = [{"id": "I1", "source_quote": "续费率提升至76%。"}]
+    with pytest.raises(Exception) as err:
+        apply_resume_replacements(
+            resume,
+            accepted,
+            {"replacements": [{
+                "id": "I1",
+                "source_quote": "续费率提升至76%。",
+                "replacement": "续费率提升至80%。",
+            }]},
+        )
+    assert getattr(err.value, "status_code", None) == 422
+
+    with pytest.raises(Exception) as err:
+        apply_resume_replacements(
+            resume,
+            accepted,
+            {"replacements": [{
+                "id": "I1",
+                "source_quote": "续费率提升至80%。",
+                "replacement": "续费率提升至80%。",
+            }]},
+        )
+    assert getattr(err.value, "status_code", None) == 502
 
