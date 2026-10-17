@@ -190,8 +190,10 @@ async def generate_resume_revision(resume_text: str, accepted: list[dict[str, st
     ]
     draft = await _completion(messages)
     allowed = resume_text + "\n" + facts
-    numbers = set(re.findall(r"(?<![A-Za-z])\d+(?:[.,]\d+)?%?", draft))
-    unsupported = [number for number in numbers if number not in allowed]
+    number_pattern = r"(?<![A-Za-z])\d+(?:[.,]\d+)?%?"
+    allowed_numbers = set(re.findall(number_pattern, allowed))
+    draft_numbers = set(re.findall(number_pattern, draft))
+    unsupported = [number for number in draft_numbers if number not in allowed_numbers]
     if unsupported:
         raise HTTPException(422, "修改稿包含原简历和你补充事实中没有的数字。请补充或核对相关信息后重试。")
     return draft[:30_000]
