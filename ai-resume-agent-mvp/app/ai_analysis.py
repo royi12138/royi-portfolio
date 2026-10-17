@@ -33,15 +33,14 @@ def redact_sensitive_info(text: str) -> str:
 def restore_sensitive_info(text: str, source_text: str) -> str:
     """Restore identifiers locally after model work so they never need to reach the model."""
     patterns = (
-        (r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}", "[邮箱已隐藏]"),
-        (r"(?<!\\d)(?:\\+?86[-\\s]?)?1[3-9]\\d{9}(?!\\d)", "[手机号已隐藏]"),
-        (r"(?<!\\d)\\d{17}[\\dXx](?!\\d)", "[身份证号已隐藏]"),
+        (r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", "[邮箱已隐藏]"),
+        (r"(?<!\d)(?:\+?86[-\s]?)?1[3-9]\d{9}(?!\d)", "[手机号已隐藏]"),
+        (r"(?<!\d)\d{17}[\dXx](?!\d)", "[身份证号已隐藏]"),
     )
     for pattern, marker in patterns:
         for value in re.findall(pattern, source_text):
             text = text.replace(marker, value, 1)
     return text
-
 
 
 def build_messages(resume_text: str) -> list[dict[str, str]]:
