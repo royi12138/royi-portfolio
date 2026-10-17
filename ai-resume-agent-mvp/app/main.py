@@ -26,7 +26,7 @@ MAX_BYTES = 10 * 1024 * 1024
 MAX_ANALYSIS_CHARS = 20_000
 SUPPORTED = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 
-app = FastAPI(title="AI 岗位匹配简历助手", version="0.3.0")
+app = FastAPI(title="AI 岗位匹配简历助手", version="0.3.1")
 
 SECTION_ALIASES = {
     "basic_info": {"个人信息", "基本信息", "个人资料", "联系方式", "contact", "profile"},
@@ -220,12 +220,15 @@ def parse_file(path: Path) -> tuple[str, int]:
 
 @app.get("/")
 def index() -> FileResponse:
-    return FileResponse(STATIC_DIR / "index.html")
+    response = FileResponse(STATIC_DIR / "index.html")
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    return response
 
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.3.0"}
+    return {"status": "ok", "version": "0.3.1"}
 
 
 @app.post("/api/resume/parse")
