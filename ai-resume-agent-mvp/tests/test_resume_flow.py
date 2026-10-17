@@ -1,4 +1,4 @@
-from app.ai_analysis import (build_match_messages, build_messages, build_revision_messages, build_completion_payload, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
+from app.ai_analysis import (build_match_messages, build_messages, build_revision_messages, build_completion_payload, numbers_are_supported, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
 from app.main import app, build_resume_json, parse_sections
 from fastapi.testclient import TestClient
 
@@ -112,7 +112,7 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.7.0"
+    assert response.json()["version"] == "0.7.1"
 
 
 
@@ -162,6 +162,7 @@ def test_advisor_prompts_require_specific_evidence_and_usable_rewrites():
     analysis_messages = build_messages("负责产品规划与上线，推动用户反馈闭环。")
     analysis_prompt = analysis_messages[0]["content"]
     assert "可直接替换原文" in analysis_prompt
+    assert "不能添加原文没有的个人角色、决策、方法、原因" in analysis_prompt
     assert "按影响从高到低排序" in analysis_prompt
     assert "不要为了“有问题可提”而挑小毛病" in analysis_prompt
 
@@ -183,4 +184,33 @@ def test_advisor_prompts_require_specific_evidence_and_usable_rewrites():
     assert "核心职责、硬性条件、优先条件" in match_prompt
     assert "未提及不等于候选人没有该能力" in match_prompt
     assert "可直接替换的岗位定向改写示例" in match_prompt
+
+def test_analysis_filters_unsupported_numbers_from_model_claims():
+    source = "会员续费率从68%提升至76%，月活会员增加1.2万人。"
+    result = validate_analysis(
+        {
+            "summary": "续费率提升至80%。",
+            "strengths": ["续费率提升至76%。", "用户规模达到2万人。"],
+            "issues": [
+                {
+                    "source_quote": source,
+                    "problem": "成果数据清楚。",
+                    "why_it_matters": "便于评估业务结果。",
+                    "suggestion": "保留续费率从68%提升至76%的表述。",
+                },
+                {
+                    "source_quote": source,
+                    "problem": "数据不足。",
+                    "why_it_matters": "缺少业务数据。",
+                    "suggestion": "改成续费率提升至80%。",
+                },
+            ],
+        },
+        source,
+    )
+    assert result["summary"] == "分析已完成，请逐条核对建议是否符合你的真实经历。"
+    assert result["strengths"] == ["续费率提升至76%。"]
+    assert len(result["issues"]) == 1
+    assert numbers_are_supported("月活会员增加1.2万人", source)
+    assert not numbers_are_supported("月活会员增加2万人", source)
 
