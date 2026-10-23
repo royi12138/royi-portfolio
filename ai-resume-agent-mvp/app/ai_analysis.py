@@ -359,9 +359,11 @@ def safe_vision_error_message(data: Any) -> str:
     if not isinstance(data, dict):
         return ""
     message = data.get("message")
+    if not isinstance(message, str):
+        message = data.get("msg")
     error = data.get("error")
     if not isinstance(message, str) and isinstance(error, dict):
-        message = error.get("message")
+        message = error.get("message") or error.get("msg")
     if not isinstance(message, str):
         return ""
     message = re.sub(r"data:image/[^;,]+;base64,[A-Za-z0-9+/=]+", "[图片数据]", message)
@@ -450,6 +452,21 @@ async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str
         data = response.json()
         text = extract_vision_text(data)
     except (ValueError, KeyError, TypeError) as exc:
+        provider_message = safe_vision_error_message(data)
+        if provider_message:
+            code = data.get("code") if isinstance(data, dict) else None
+            safe_code = str(code)[:40] if isinstance(code, (str, int)) else ""
+            logger.warning(
+                "JD vision provider rejected request: status=%s model=%s code=%s message=%s",
+                response.status_code,
+                model,
+                safe_code,
+                provider_message,
+            )
+            detail = "岗位图片识别暂时不可用：" + provider_message
+            if safe_code:
+                detail += "（服务码：" + safe_code + "）"
+            raise HTTPException(502, detail) from exc
         shape = summarize_vision_response_shape(data)
         logger.warning(
             "JD vision OCR response shape was unusable: status=%s model=%s shape=%s",
