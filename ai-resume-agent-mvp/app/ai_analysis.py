@@ -455,7 +455,7 @@ async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str
         provider_message = safe_vision_error_message(data)
         if provider_message:
             code = data.get("code") if isinstance(data, dict) else None
-            safe_code = str(code)[:40] if isinstance(code, (str, int)) else ""
+            safe_code = str(code) if isinstance(code, (str, int)) and re.fullmatch(r"[A-Za-z0-9_-]{1,40}", str(code)) else ""
             logger.warning(
                 "JD vision provider rejected request: status=%s model=%s code=%s message=%s",
                 response.status_code,
