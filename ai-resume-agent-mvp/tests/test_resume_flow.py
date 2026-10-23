@@ -188,7 +188,7 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.7.6"
+    assert response.json()["version"] == "0.7.7"
 
 
 
@@ -202,6 +202,10 @@ def test_completion_handles_text_blocks_and_glm_payload():
     assert payload["response_format"] == {"type": "json_object"}
 
 
+
+
+def test_extract_vision_text_accepts_dashscope_text_result():
+    assert extract_vision_text({"output": {"text": "识别出的招聘文字"}}) == "识别出的招聘文字"
 
 
 def test_provider_error_message_is_sanitized():

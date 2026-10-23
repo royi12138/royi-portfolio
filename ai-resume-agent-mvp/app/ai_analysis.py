@@ -303,19 +303,22 @@ def extract_vision_text(data: Any) -> str:
     """Extract final text from the DashScope multimodal-generation response."""
     output = data.get("output") if isinstance(data, dict) else None
     choices = output.get("choices") if isinstance(output, dict) else None
-    if not isinstance(choices, list) or not choices or not isinstance(choices[0], dict):
-        raise ValueError("missing multimodal choices")
-    message = choices[0].get("message")
-    content = message.get("content") if isinstance(message, dict) else None
-    if isinstance(content, str):
-        text = content
-    elif isinstance(content, list):
-        text = " ".join(
-            item["text"] for item in content
-            if isinstance(item, dict) and isinstance(item.get("text"), str)
-        )
+    if isinstance(choices, list) and choices and isinstance(choices[0], dict):
+        message = choices[0].get("message")
+        content = message.get("content") if isinstance(message, dict) else None
+        if isinstance(content, str):
+            text = content
+        elif isinstance(content, dict) and isinstance(content.get("text"), str):
+            text = content["text"]
+        elif isinstance(content, list):
+            text = " ".join(
+                item["text"] for item in content
+                if isinstance(item, dict) and isinstance(item.get("text"), str)
+            )
+        else:
+            text = ""
     else:
-        text = ""
+        text = output.get("text", "") if isinstance(output, dict) else ""
     if not text.strip():
         raise ValueError("missing multimodal text")
     return text.strip()
@@ -372,6 +375,7 @@ async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str
                 ],
             }],
         },
+        "parameters": {"result_format": "message"},
     }
     headers = {"Authorization": "Bearer " + api_key, "Content-Type": "application/json"}
     try:
