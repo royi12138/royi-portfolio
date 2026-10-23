@@ -304,7 +304,7 @@ async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str
     if not api_key:
         raise HTTPException(503, "岗位图片识别需要配置模型服务，请联系管理员检查部署设置。")
     base_url = os.getenv("DASHSCOPE_BASE_URL", DEFAULT_BASE_URL).strip().rstrip("/")
-    model = os.getenv("DASHSCOPE_VISION_MODEL", "qwen-vl-plus").strip() or "qwen-vl-plus"
+    model = os.getenv("DASHSCOPE_VISION_MODEL", "qwen3-vl-plus").strip() or "qwen3-vl-plus"
     encoded = base64.b64encode(image_bytes).decode("ascii")
     data_url = "data:" + mime_type + ";base64," + encoded
     payload = {
@@ -339,8 +339,26 @@ async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str
     if response.status_code == 429:
         raise HTTPException(429, "岗位图片识别服务暂时繁忙，请稍后重试。")
     if response.status_code >= 400:
-        logger.warning("JD vision OCR upstream rejected request: status=%s model=%s", response.status_code, model)
-        raise HTTPException(502, f"岗位图片识别服务请求失败（上游 HTTP {response.status_code}），请稍后重试。")
+        error_code = ""
+        try:
+            error_data = response.json()
+            error = error_data.get("error", {}) if isinstance(error_data, dict) else {}
+            raw_code = error_data.get("code") if isinstance(error_data, dict) else ""
+            if not raw_code and isinstance(error, dict):
+                raw_code = error.get("code", "")
+            if isinstance(raw_code, str):
+                error_code = re.sub(r"[^A-Za-z0-9_.-]", "", raw_code)[:80]
+        except ValueError:
+            pass
+        logger.warning(
+            "JD vision OCR upstream rejected request: status=%s model=%s error_code=%s",
+            response.status_code, model, error_code or "unknown",
+        )
+        safe_code = f"，错误码 {error_code}" if error_code else ""
+        raise HTTPException(
+            502,
+            f"岗位图片识别服务请求失败（上游 HTTP {response.status_code}{safe_code}），请稍后重试。",
+        )
     try:
         data = response.json()
         text = extract_completion_text(data)
