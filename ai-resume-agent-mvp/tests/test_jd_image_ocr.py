@@ -8,6 +8,7 @@ from fastapi import UploadFile
 from PIL import Image
 
 from app.main import parse_jd
+from app.ai_analysis import summarize_vision_response_shape
 
 
 def png_bytes():
@@ -17,6 +18,21 @@ def png_bytes():
 
 
 class JobImageParsingTests(unittest.TestCase):
+    def test_response_shape_summary_never_includes_provider_text(self):
+        private_text = "candidate private content"
+        summary = summarize_vision_response_shape({
+            "output": {
+                "choices": [{
+                    "message": {"content": [{"text": private_text}]},
+                    "finish_reason": "stop",
+                }],
+            },
+        })
+
+        self.assertIn("content", summary)
+        self.assertIn("array[1]", summary)
+        self.assertNotIn(private_text, summary)
+
     def test_png_is_sent_to_vision_model_without_tesseract(self):
         upload = UploadFile(filename="job.png", file=BytesIO(png_bytes()))
         with patch(
