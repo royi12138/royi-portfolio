@@ -30,6 +30,26 @@ def test_analysis_only_keeps_exact_source_quotes():
     assert "scores" in result
 
 
+def test_analysis_includes_safe_per_issue_rewrite_and_validates_numbers():
+    source = "负责产品上线，使用Python整理需求"
+    result = validate_analysis(
+        {"issues": [
+            {"source_quote": source, "problem": "表达不够具体", "suggestion": "突出原文中的行动",
+             "suggested_text": "负责产品上线，使用Python整理需求"},
+            {"source_quote": source, "problem": "表达不够具体", "suggested_text": "负责产品上线，新增用户1000人"},
+        ]},
+        source,
+    )
+    assert result["issues"][0]["suggested_text"] == source
+    assert result["issues"][1]["suggested_text"] == ""
+
+
+def test_analysis_prompt_requests_source_bounded_rewrite():
+    messages = build_messages("负责产品上线")
+    assert '"suggested_text"' in messages[0]["content"]
+    assert "不增加角色" in messages[0]["content"]
+
+
 def test_common_identifiers_are_redacted():
     redacted = redact_sensitive_info("邮箱 a.user@example.com，电话 13800138000")
     assert "a.user@example.com" not in redacted
@@ -138,12 +158,19 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
     assert "以下是系统从简历文件中直接提取" in response.text
     assert "function renderComparison(beforeId,afterId,outputId)" in response.text
     assert "diff-change" in response.text
-    assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png"' in response.text
+    assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple' in response.text
+    assert "function renderIssueComparison(before,after)" in response.text
+    assert "async function parseSelectedJDImages()" in response.text
+    assert "parseJDFile" not in response.text
+    assert "开始 AI 简历诊断" in response.text
+    assert response.text.index('id="consent"') < response.text.index('id="parseBtn"')
+    assert "await analyzeResume(button)" in response.text
+    assert "issue-added" in response.text
 
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.7.3"
+    assert response.json()["version"] == "0.7.4"
 
 
 

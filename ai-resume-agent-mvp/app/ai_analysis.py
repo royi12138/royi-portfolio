@@ -64,7 +64,7 @@ def build_messages(resume_text: str) -> list[dict[str, str]]:
 5. 改写要自然、简洁、专业。只有来源明确写出某个行动、个人角色、方法、对象/范围或结果，才可在建议文案中保留该信息；不可根据常见业务做法补全过程或因果。没有结果数据时，不要硬套数字或“显著提升”“大幅增长”等结论。避免空话、套话、夸张形容、堆砌 JD 关键词和生硬的“赋能/闭环/抓手”。
 6. 优点也必须对应简历里的具体事实，不要输出“经验丰富、能力强”等无法验证的评价。
 7. 另将提取文本去除项目符号、乱码、重复标点和无意义格式，按基本信息、教育经历、工作经历、项目经历分开整理。保留时间、公司/组织、岗位和成果信息；不确定归属时宁可省略，不得跨经历拼接。基本信息不输出手机号、邮箱、身份证号。
-8. 只输出有效 JSON，不要 Markdown 围栏或额外解释。每栏整理最多 5 条；strengths 最多 4 条；issues 最多 6 条且按优先级排序。summary 不超过 160 字。issues 的 suggestion 不超过 700 字。
+8. 只输出有效 JSON，不要 Markdown 围栏或额外解释。每栏整理最多 5 条；strengths 最多 4 条；issues 最多 6 条且按优先级排序。summary 不超过 160 字。issues 的 suggestion 不超过 700 字；suggested_text 不超过 500 字。
 JSON 结构：
 {
   "summary": "整体判断：简历目前最影响筛选的点，以及最值得先改的方向；只陈述原文能证明的事实",
@@ -82,6 +82,7 @@ JSON 结构：
       "problem": "指出原文具体哪里含糊、重复、缺少证据或没有突出贡献，不要泛泛而谈",
       "why_it_matters": "招聘者读到这里可能无法判断什么，或会产生什么疑问",
       "suggestion": "分开写可直接替换文案（只能使用 source_quote 明确包含的事实）和需要补充后再增强的方向；禁止添加假设的个人角色、原因、方法、范围或结果",
+      "suggested_text": "针对 source_quote 的整段安全改写，只能重组其中明确写出的事实，不增加角色、方法、对象、因果、结果或数字；无法安全改写时返回空字符串",
       "question": "一个能帮助进一步写好的事实问题；没有必要时为空字符串"
     }
   ]
@@ -170,6 +171,11 @@ def validate_analysis(data: Any, redacted_text: str) -> dict[str, Any]:
             factual_text = " ".join(clean_text(item.get(key), 800) for key in ("problem", "why_it_matters", "suggestion"))
             if not numbers_are_supported(factual_text, redacted_text):
                 continue
+            suggested_text = clean_text(item.get("suggested_text"), 500)
+            # A rewrite shown as ready to use must not introduce figures absent from its exact source quote.
+            if suggested_text and not numbers_are_supported(suggested_text, quote):
+                suggested_text = ""
+            suggested_text = redact_sensitive_info(suggested_text)
             issues.append(
                 {
                     "id": "I" + str(len(issues) + 1),
@@ -178,6 +184,7 @@ def validate_analysis(data: Any, redacted_text: str) -> dict[str, Any]:
                     "problem": clean_text(item.get("problem"), 400),
                     "why_it_matters": clean_text(item.get("why_it_matters"), 400),
                     "suggestion": clean_text(item.get("suggestion"), 700),
+                    "suggested_text": suggested_text,
                     "question": clean_text(item.get("question"), 400),
                 }
             )
@@ -345,6 +352,7 @@ def build_revision_messages(resume_text: str, accepted: list[dict[str, str]], fa
             "problem": clean_text(item.get("problem"), 400),
             "why_it_matters": clean_text(item.get("why_it_matters"), 400),
             "suggestion": clean_text(item.get("suggestion"), 700),
+            "suggested_text": clean_text(item.get("suggested_text"), 500),
             "question": clean_text(item.get("question"), 400),
         }
         for item in accepted[:8]
