@@ -161,7 +161,7 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
     assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple' in response.text
     assert "function renderIssueComparison(before,after)" in response.text
     assert "async function parseSelectedJDImages()" in response.text
-    assert "onclick=\\"parseJDFile()" not in response.text
+    assert "parseJDFile" not in response.text
     assert "开始 AI 简历诊断" in response.text
     assert response.text.index('id="consent"') < response.text.index('id="parseBtn"')
     assert "await analyzeResume(button)" in response.text
