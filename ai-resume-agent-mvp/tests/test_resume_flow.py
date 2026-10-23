@@ -166,11 +166,15 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
     assert response.text.index('id="consent"') < response.text.index('id="parseBtn"')
     assert "await analyzeResume(button)" in response.text
     assert "issue-added" in response.text
+    assert "--ink:#182a27" in response.text
+    assert ".hero{margin:0 0 20px" in response.text
+    assert "@media(max-width:640px)" in response.text
+    assert "MVP 0.5" not in response.text
 
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.7.4"
+    assert response.json()["version"] == "0.7.5"
 
 
 
