@@ -8,7 +8,7 @@ from fastapi import UploadFile
 from PIL import Image
 
 from app.main import parse_jd
-from app.ai_analysis import summarize_vision_response_shape
+from app.ai_analysis import safe_vision_error_message, summarize_vision_response_shape
 
 
 def png_bytes():
@@ -18,6 +18,16 @@ def png_bytes():
 
 
 class JobImageParsingTests(unittest.TestCase):
+    def test_provider_error_message_is_sanitized(self):
+        message = safe_vision_error_message({
+            "success": False,
+            "code": "InvalidInput",
+            "msg": "Invalid image for user 13812345678",
+        })
+
+        self.assertIn("Invalid image", message)
+        self.assertNotIn("13812345678", message)
+
     def test_response_shape_summary_never_includes_provider_text(self):
         private_text = "candidate private content"
         summary = summarize_vision_response_shape({
