@@ -139,6 +139,9 @@ body{background:#f3f6f2;color:var(--ink);font-size:16px;line-height:1.65}
  .side-card{padding:17px}
 }
 
+
+/* Diagnosis report inspired by the supplied mobile reference */
+.score-card{padding:20px;background:linear-gradient(165deg,#f4faef 0%,#fff 78%);border:0;border-radius:18px}.diagnosis-summary{padding:18px 4px 8px}.diagnosis-summary h3{font-size:20px;margin:0 0 8px}.diagnosis-summary p{font-size:15px;line-height:1.8;margin:0 0 10px}.score-layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:10px;align-items:center}.score-topline{display:flex;align-items:center;justify-content:space-between;gap:8px}.score-topline h3{margin:0;font-size:18px}.score-topline span,.score-method{color:#7b867e;font-size:11px}.score-big{font-size:52px;line-height:1.12;font-weight:850;letter-spacing:-2px;color:#1e2923}.score-big small{font-size:22px;letter-spacing:0;margin-left:4px}.score-rule{width:120px;height:7px;border-radius:99px;background:linear-gradient(90deg,#f6bd39,#f5e4aa);margin:2px 0 13px}.score-summary{color:#33423a;font-size:14px;line-height:1.75}.score-radar{width:100%;max-width:250px;overflow:visible}.radar-grid{fill:none;stroke:#e8ece8;stroke-width:1}.radar-axis{stroke:#e8ece8;stroke-width:1}.radar-value{fill:rgba(239,190,77,.2);stroke:#eab94e;stroke-width:2.5}.radar-label{font:9px -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;fill:#68756d}.score-dimensions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 18px;margin-top:16px}.score-dimension{border-top:1px solid #e8ede7;padding-top:9px}.score-dimension b{display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#35443b}.score-dimension b span{font-weight:700;color:#68756d;white-space:nowrap}.score-track{height:5px;background:#e9eee8;border-radius:99px;margin:7px 0}.score-track i{display:block;height:100%;border-radius:inherit;background:#95a983}.score-dimension small{font-size:10px;color:#7a857e;line-height:1.5;display:block}.score-method{line-height:1.5;margin:12px 0 0}.issue-compare{background:#fff;border-color:#ecefed;border-radius:14px;padding:14px;font:14px/1.85 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}.issue-compare:first-child{background:#fffaf4}.issue-compare:last-child{background:#f7fbf4}.issue-added{color:#b6531f;background:#fff0df;text-decoration:underline;text-decoration-color:#df9758;text-underline-offset:3px}.result.show #analysisResult:not(.hidden){animation:result-in .35s ease-out}@keyframes result-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}@media(max-width:700px){.score-layout{grid-template-columns:minmax(0,1fr) 180px}.score-big{font-size:44px}.score-radar{max-width:180px}.score-dimensions{gap:8px 12px}.score-dimension small{font-size:9px}.issue-compare-grid{grid-template-columns:1fr}}@media(max-width:430px){.score-layout{grid-template-columns:1fr}.score-copy{display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:8px}.score-topline{grid-column:1/-1}.score-big{grid-column:1;grid-row:2}.score-rule{grid-column:1;grid-row:3;margin-bottom:0}.score-summary{grid-column:1/-1;grid-row:4}.score-radar{grid-column:2;grid-row:2/4;width:150px}.score-dimensions{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -150,13 +153,9 @@ body{background:#f3f6f2;color:var(--ink);font-size:16px;line-height:1.65}
 <div class="layout"><div class="main-col">
 <section class="panel" id="uploadStep"><div class="panel-head"><span class="step-icon">01</span><div><h2>从简历开始</h2><p class="lead-small">支持 PDF、Word、JPG、PNG · 最多 3 页、10MB</p></div></div>
 <label class="consent"><input id="consent" type="checkbox">我已阅读并同意：点击开始诊断或岗位匹配后，简历文字（以及岗位文字）会发送至本项目后端；系统会尝试隐藏手机号、邮箱和身份证号，然后发送给模型服务。姓名、公司名称等仍可能被发送，请勿提交不愿发送的内容。</label><div class="upload-box"><div class="upload-copy"><b>选择你的简历文件</b><span>建议上传清晰、可复制文字的 PDF 或 DOCX</span><div><input id="resumeFile" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png"></div></div><button class="btn" id="parseBtn" onclick="parseResume()">开始 AI 简历诊断</button></div><div id="msg" aria-live="polite"></div></section>
-<section id="result" class="result">
-<div class="panel"><div class="panel-head"><span class="step-icon">02</span><div><h2>简历识别与 AI 诊断</h2><p class="lead-small">勾选隐私同意并点击“开始 AI 简历诊断”，系统会解析文件并自动展示诊断结果。</p></div></div><div class="file-summary"><div><b id="filename"></b><span class="subtle" id="pageCount"></span></div><button class="btn secondary" id="analyzeBtn" onclick="analyzeResume()">重新分析当前简历</button></div>
-<div id="analysisMsg" aria-live="polite"></div>
-<div class="section-label" id="summaryTitle">识别到的简历信息（初步）</div><p class="lead-small" id="summaryHelp" style="margin-bottom:10px">上传后会先显示系统从 Word 中提取并初步归类的信息；启动 AI 诊断后，模型再整理表达和经历分类。原始文字可在下方核对。</p><div class="summary-grid" id="summary"><div class="summary-pending">开始诊断后，这里会展示系统识别到的简历内容。</div></div><details style="margin-top:14px"><summary class="details-title">查看系统提取的原始文字（核对用）</summary><pre id="parsedRawText" class="compare-content"></pre></details><details style="margin-top:10px"><summary class="details-title">查看技术解析详情</summary><pre id="json"></pre></details>
-<button class="btn secondary small data-clear" onclick="clearResumeData()">清除本页简历和分析数据</button></div>
+<section id="result" class="result"><div id="analysisMsg" aria-live="polite"></div>
 <div id="analysisResult" class="hidden">
-<section class="panel"><div class="panel-head"><span class="step-icon">诊</span><div><h2>简历诊断结果</h2><p class="lead-small">所有评分均为辅助检查，不代表录用概率。请结合自己的经历判断。</p></div></div><div class="analysis-grid"><div><h3>总体评价</h3><p id="overallSummary"></p><div id="strengths" class="strength-card"></div><p class="subtle" id="privacyNote"></p></div><div id="scoreResults" class="score-card"></div></div></section>
+<section class="panel"><div class="panel-head"><span class="step-icon">诊</span><div><h2>简历诊断结果</h2><p class="lead-small">所有评分均为辅助检查，不代表录用概率。请结合自己的经历判断。</p></div></div><div id="scoreResults" class="score-card"></div><div class="diagnosis-summary"><h3>诊断摘要</h3><p id="overallSummary"></p><div id="strengths" class="strength-card"></div><p class="subtle" id="privacyNote"></p></div></section>
 <section class="panel"><div class="panel-head"><span class="step-icon">改</span><div><h2>逐条核对修改建议</h2><p class="lead-small">每条建议显示改前和改后段落，红字表示调整；确认事实无误后再接受。</p></div></div><div id="issues"></div><div class="result-actions" id="revisionActions"><button class="btn" onclick="generateRevision()">生成简历优化草稿</button></div><div id="revisionMsg" aria-live="polite"></div></section>
 <section class="panel"><div class="panel-head"><span class="step-icon">03</span><div><h2>针对面试岗位定向优化</h2><p class="lead-small">上传招聘截图或海报，系统会读取图片文字并分析匹配点、差距和修改方向。</p></div></div>
 <div class="jd-upload"><div class="jd-file-row"><input id="jdFile" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple onchange="showSelectedJDImages()"><span class="subtle" id="jdFilesLabel">可同时选择最多 5 张 JPG / PNG；点击下方分析后自动识别</span></div><div id="jdFileMsg" aria-live="polite"></div><textarea id="jdText" class="jd-text" rows="6" placeholder="图片文字识别后会显示在这里。也可以直接粘贴招聘信息，核对无误后点击分析。"></textarea><div class="result-actions"><button class="btn" id="matchBtn" onclick="matchJD()">分析岗位匹配与定向建议</button></div></div>
@@ -176,6 +175,12 @@ var issueDecisions = {};
 var issueFacts = {};
 function escapeHtml(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
 function showMessage(id,text,isError){document.getElementById(id).innerHTML='<div class="'+(isError?'err':'ok')+'">'+escapeHtml(text)+'</div>';}
+async function readApiJson(response,failureMessage){
+ var body=await response.text(),data=null;
+ try{data=body?JSON.parse(body):{};}catch(_){var hint=response.status>=500?'服务器暂时无法处理请求，请稍后重试。':'服务器返回内容格式异常，请刷新页面后重试。';throw new Error(failureMessage+'（HTTP '+response.status+'）。'+hint);}
+ if(!response.ok)throw new Error((data&&data.detail)||failureMessage+'（HTTP '+response.status+'）');
+ return data;
+}
 function renderSection(title,items){var arr=Array.isArray(items)?items:[];return '<div class="item"><b>'+escapeHtml(title)+'</b><span>'+(arr.length?arr.slice(0,5).map(escapeHtml).join('；'):'未识别到内容')+'</span></div>';}
 function renderResumeSections(sections){
  var definitions=[['basic_info','基本信息'],['education','教育经历'],['work_experience','工作经历'],['project_experience','项目经历']];
@@ -225,17 +230,11 @@ async function parseResume(){
  button.disabled=true;button.textContent='正在解析简历…';showMessage('msg','正在读取简历，请稍候…',false);
  var fd=new FormData();fd.append('file',file);
  try{
-  var res=await fetch('/api/resume/parse',{method:'POST',body:fd}),data=await res.json();
-  if(!res.ok)throw new Error(data.detail||'解析失败');
+  var res=await fetch('/api/resume/parse',{method:'POST',body:fd}),data=await readApiJson(res,'简历解析失败');
   currentResume=data.resume;
-  document.getElementById('filename').textContent=currentResume.document.filename;
-  document.getElementById('pageCount').textContent=currentResume.document.pages+' 页';
-  document.getElementById('summaryTitle').textContent='识别到的简历信息（初步）';document.getElementById('summaryHelp').textContent='以下是系统从简历文件中直接提取并按标题初步归类的内容；随后会开始 AI 诊断。';document.getElementById('summary').classList.remove('summary-grid');document.getElementById('summary').classList.add('resume-sections');document.getElementById('summary').innerHTML=renderParsedResume(currentResume);
-  document.getElementById('json').textContent=JSON.stringify(currentResume,null,2);
-  document.getElementById('parsedRawText').textContent=currentResume.raw_text||'未提取到可显示的文字。';
   currentAnalysis=null;currentMatch=null;issueDecisions={};issueFacts={};jdIssueDecisions={};jdIssueFacts={};document.getElementById('analysisResult').classList.add('hidden');document.getElementById('generalComparison').classList.add('hidden');document.getElementById('jdComparison').classList.add('hidden');document.getElementById('jdRevisionActions').classList.add('hidden');document.getElementById('matchResult').innerHTML='';document.getElementById('jdRecommendations').innerHTML='';document.getElementById('revisedText').value='';document.getElementById('jdRevisedText').value='';
   document.getElementById('analysisMsg').innerHTML='';document.getElementById('result').classList.add('show');
-  showMessage('msg','简历已识别，正在自动开始 AI 诊断…',false);
+  showMessage('msg','正在生成简历诊断结果…',false);
   await analyzeResume(button);
   document.getElementById('result').scrollIntoView({behavior:'smooth',block:'start'});
  }catch(e){showMessage('msg',e.message||'解析失败，请稍后重试。',true);}finally{button.disabled=false;button.textContent='开始 AI 简历诊断';}
@@ -260,12 +259,13 @@ function renderIssueComparison(before,after){
 }
 function renderAnalysis(analysis){
  currentAnalysis=analysis;issueDecisions={};issueFacts={};
- document.getElementById('summaryTitle').textContent='AI 整理后的简历内容';document.getElementById('summaryHelp').textContent='模型已根据提取文字整理基本信息与经历；请对照下方原始文字核对，尤其留意日期、数字和成果。';
- document.getElementById('summary').classList.remove('summary-grid');document.getElementById('summary').classList.add('resume-sections');document.getElementById('summary').innerHTML=renderResumeSections(analysis.resume_sections||{});
  document.getElementById('overallSummary').textContent=analysis.summary||'暂无总体评价。';
  document.getElementById('privacyNote').textContent=analysis.privacy_note||'';
  var scores=analysis.scores||{},dims=Array.isArray(scores.dimensions)?scores.dimensions:[];
- document.getElementById('scoreResults').innerHTML='<b>简历检查分：'+escapeHtml(scores.overall==null?'—':scores.overall)+'/100</b><div class="subtle">'+escapeHtml(scores.method||'')+'</div>'+dims.map(function(d){return '<div class="item"><b>'+escapeHtml(d.name)+'：'+escapeHtml(d.score)+'/100</b><span>权重 '+escapeHtml(Math.round((d.weight||0)*100))+'% · '+escapeHtml(d.reason)+'</span></div>';}).join('');
+ var scoreValue=Number(scores.overall),scoreLabel=Number.isFinite(scoreValue)?Math.max(0,Math.min(100,scoreValue)):'—';
+ var points=dims.map(function(d,i){var angle=(-90+360*i/Math.max(dims.length,1))*Math.PI/180,r=72*(Math.max(0,Math.min(100,Number(d.score)||0))/100);return (128+Math.cos(angle)*r).toFixed(1)+','+(106+Math.sin(angle)*r).toFixed(1);}).join(' ');
+ var rings=[25,50,75,100].map(function(level){return '<polygon points="'+dims.map(function(_,i){var angle=(-90+360*i/Math.max(dims.length,1))*Math.PI/180,r=72*level/100;return (128+Math.cos(angle)*r).toFixed(1)+','+(106+Math.sin(angle)*r).toFixed(1);}).join(' ')+'" class="radar-grid"></polygon>';}).join('');
+ document.getElementById('scoreResults').innerHTML='<div class="score-layout"><div class="score-copy"><div class="score-topline"><h3>简历评分</h3><span>辅助参考</span></div><div class="score-big">'+escapeHtml(scoreLabel)+'<small>分</small></div><div class="score-rule"></div><div class="score-summary">'+escapeHtml(analysis.summary||'结合各项指标查看简历表现。')+'</div></div><svg class="score-radar" viewBox="0 0 256 212" role="img" aria-label="简历评分维度图">'+rings+dims.map(function(_,i){var a=(-90+360*i/Math.max(dims.length,1))*Math.PI/180;return '<line x1="128" y1="106" x2="'+(128+72*Math.cos(a)).toFixed(1)+'" y2="'+(106+72*Math.sin(a)).toFixed(1)+'" class="radar-axis"></line>';}).join('')+'<polygon points="'+points+'" class="radar-value"></polygon>'+dims.map(function(d,i){var a=(-90+360*i/Math.max(dims.length,1))*Math.PI/180,r=92,anchor=Math.cos(a)<-.3?'end':Math.cos(a)>.3?'start':'middle';return '<text x="'+(128+r*Math.cos(a)).toFixed(1)+'" y="'+(106+r*Math.sin(a)).toFixed(1)+'" text-anchor="'+anchor+'" class="radar-label">'+escapeHtml(d.name)+'</text>';}).join('')+'</svg></div><div class="score-dimensions">'+dims.map(function(d){return '<div class="score-dimension"><b>'+escapeHtml(d.name)+' <span>'+escapeHtml(d.score)+'/100</span></b><div class="score-track"><i style="width:'+Math.max(0,Math.min(100,Number(d.score)||0))+'%"></i></div><small>'+escapeHtml(d.reason)+'</small></div>';}).join('')+'</div><p class="score-method">'+escapeHtml(scores.method||'评分仅用于辅助检查，不代表录用概率。')+'</p>';
  var strengths=Array.isArray(analysis.strengths)?analysis.strengths:[];
  document.getElementById('strengths').innerHTML=strengths.length?'<div class="item"><b>简历现有优势</b><span>'+strengths.map(escapeHtml).join('；')+'</span></div>':'';
  var issues=Array.isArray(analysis.issues)?analysis.issues:[];
@@ -275,11 +275,9 @@ function renderAnalysis(analysis){
   var html='<div class="item"><span class="tags">'+escapeHtml(item.section||'整体结构')+' · 问题 '+(index+1)+'</span><div><b>'+escapeHtml(item.problem||'可改进之处')+'</b></div>';
   html+='<div class="quote">简历原文：'+escapeHtml(item.source_quote||'')+'</div>';
   if(item.suggested_text)html+=renderIssueComparison(item.source_quote||'',item.suggested_text);
-  else html+='<p class="subtle">暂未生成可依据原文安全改写的段落。可补充真实信息后，再生成优化草稿。</p>';
+  else html+='<p class="subtle">暂未生成可依据原文安全改写的段落，此条建议不会加入优化草稿。</p>';
   if(item.why_it_matters)html+='<p><b>为什么建议改</b><br>'+escapeHtml(item.why_it_matters)+'</p>';
   if(item.suggestion)html+='<p><b>修改方向</b><br>'+escapeHtml(item.suggestion)+'</p>';
-  if(item.question)html+='<p><b>需要你补充的真实信息</b><br>'+escapeHtml(item.question)+'</p>';
-  html+='<label class="subtle">仅填写你能确认的真实信息：<textarea rows="2" oninput="setIssueFact(\''+safeId+'\',this.value)" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:8px"></textarea></label>';
   html+='<button class="btn" style="margin:8px 6px 0 0" onclick="setIssueDecision(\''+safeId+'\',\'accept\')">接受并应用</button><button class="btn" style="margin-top:8px;background:#777" onclick="setIssueDecision(\''+safeId+'\',\'reject\')">拒绝</button><span class="subtle" id="decision_'+safeId+'">尚未选择</span>';
   return html+'</div>';
  }).join('');
@@ -287,11 +285,11 @@ function renderAnalysis(analysis){
 async function analyzeResume(triggerButton){
  if(!currentResume||!currentResume.raw_text){showMessage('analysisMsg','请先成功解析简历。',true);return;}
  if(!document.getElementById('consent').checked){showMessage('analysisMsg','请先阅读并勾选 AI 分析的隐私提示。',true);return;}
- var button=triggerButton||document.getElementById('analyzeBtn');button.disabled=true;button.textContent='正在分析…';
+ var button=triggerButton||document.getElementById('parseBtn');button.disabled=true;button.textContent='正在分析…';
  showMessage('analysisMsg','正在调用模型，通常需要几十秒，请不要关闭页面。',false);
  try{
   var res=await fetch('/api/resume/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,privacy_consent:document.getElementById('consent').checked})});
-  var data=await res.json();if(!res.ok)throw new Error(data.detail||'AI 分析失败');
+  var data=await readApiJson(res,'AI 分析失败');
   document.getElementById('analysisResult').classList.remove('hidden');document.getElementById('beforeResume').textContent=currentResume.raw_text||'';document.getElementById('beforeResume').dataset.sourceText=currentResume.raw_text||'';
   renderAnalysis(data.analysis||{});showMessage('analysisMsg','分析完成。请逐条核对建议，尤其是涉及成果和数字的内容。',false);
   document.getElementById('analysisResult').scrollIntoView({behavior:'smooth',block:'start'});
@@ -306,7 +304,7 @@ async function generateRevision(){
  if(!accepted.length){showMessage('revisionMsg','请先接受至少一条建议。',true);return;}
  var facts=accepted.map(function(x,i){var id=String(x.id||('I'+(i+1))),v=(issueFacts[id]||'').trim();return v?'['+id+'] '+v:'';}).filter(Boolean).join('\n');
  var button=document.querySelector('#revisionActions button');button.disabled=true;showMessage('revisionMsg','正在根据已接受建议生成草稿…',false);
- try{var res=await fetch('/api/resume/revise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,accepted_issues:accepted,facts:facts,privacy_consent:document.getElementById('consent').checked})});var data=await res.json();if(!res.ok)throw new Error(data.detail||'生成失败');document.getElementById('revisedText').value=data.revised_text||'';document.getElementById('beforeResume').textContent=currentResume.raw_text||'';document.getElementById('beforeResume').dataset.sourceText=currentResume.raw_text||'';document.getElementById('generalComparison').classList.remove('hidden');renderComparison('beforeResume','revisedText','generalDiff');showMessage('revisionMsg',data.fact_protection||'草稿已生成，请核对。',false);document.getElementById('revisedText').scrollIntoView({behavior:'smooth'});}catch(e){showMessage('revisionMsg',e.message||'生成失败，请重试。',true);}finally{button.disabled=false;}
+ try{var res=await fetch('/api/resume/revise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,accepted_issues:accepted,facts:facts,privacy_consent:document.getElementById('consent').checked})});var data=await readApiJson(res,'简历优化稿生成失败');document.getElementById('revisedText').value=data.revised_text||'';document.getElementById('beforeResume').textContent=currentResume.raw_text||'';document.getElementById('beforeResume').dataset.sourceText=currentResume.raw_text||'';document.getElementById('generalComparison').classList.remove('hidden');renderComparison('beforeResume','revisedText','generalDiff');showMessage('revisionMsg',data.fact_protection||'草稿已生成，请核对。',false);document.getElementById('revisedText').scrollIntoView({behavior:'smooth'});}catch(e){showMessage('revisionMsg',e.message||'生成失败，请重试。',true);}finally{button.disabled=false;}
 }
 function showSelectedJDImages(){
  var files=Array.from(document.getElementById('jdFile').files||[]),label=document.getElementById('jdFilesLabel');
@@ -323,8 +321,9 @@ async function parseSelectedJDImages(){
   var file=files[i];if(file.size>10*1024*1024)throw new Error(file.name+' 超过 10MB，请移除后重试。');
   showMessage('jdFileMsg','正在识别岗位图片（'+(i+1)+'/'+files.length+'）：'+file.name,false);
   var fd=new FormData();fd.append('file',file);
-  var res=await fetch('/api/jd/parse',{method:'POST',body:fd}),data=await res.json();
-  if(!res.ok)throw new Error((data.detail||'岗位图片识别失败')+'（'+file.name+'）');
+  var res=await fetch('/api/jd/parse',{method:'POST',body:fd}),data;
+  try{data=await readApiJson(res,'岗位图片识别失败');}catch(error){throw new Error(error.message+' 图片：'+file.name);}
+
   extracted.push('【'+(data.filename||file.name)+'】\\n'+(data.jd_text||''));
  }
  return extracted.join('\\n\\n');
@@ -338,8 +337,8 @@ function renderJDRecommendations(issues){
   var id=String(item.id||('J'+(index+1))),safe=escapeHtml(id),x='<div class="item"><span class="tags">'+escapeHtml(item.section||'岗位针对性')+' · 建议 '+(index+1)+'</span><b>'+escapeHtml(item.problem||'可调整表达')+'</b><div class="quote">简历原文：'+escapeHtml(item.source_quote||'')+'</div>';
   if(item.why_it_matters)x+='<p><b>岗位相关性</b><br>'+escapeHtml(item.why_it_matters)+'</p>';
   if(item.suggestion)x+='<p><b>修改方向</b><br>'+escapeHtml(item.suggestion)+'</p>';
-  if(item.question)x+='<p><b>请补充真实信息</b><br>'+escapeHtml(item.question)+'</p>';
-  x+='<label class="subtle">只填写可确认的真实信息：<textarea rows="2" oninput="setJDFact(\''+safe+'\',this.value)" style="display:block;width:100%;box-sizing:border-box;margin-top:5px;padding:8px"></textarea></label><button class="btn" style="margin:8px 6px 0 0" onclick="setJDDecision(\''+safe+'\',\'accept\')">接受此建议</button><button class="btn" style="margin-top:8px;background:#777" onclick="setJDDecision(\''+safe+'\',\'reject\')">拒绝</button><span class="subtle" id="jdDecision_'+safe+'">尚未选择</span></div>';return x;
+  x+='<button class="btn" style="margin:8px 6px 0 0" onclick="setJDDecision(\''+safe+'\',\'accept\')">接受此建议</button><button class="btn" style="margin-top:8px;background:#777" onclick="setJDDecision(\''+safe+'\',\'reject\')">拒绝</button><span class="subtle" id="jdDecision_'+safe+'">尚未选择</span></div>';
+  return x;
  }).join('');
  document.getElementById('jdRevisionActions').classList.remove('hidden');
 }
@@ -355,9 +354,9 @@ async function matchJD(){
   if(jd.length<30)throw new Error('请至少选择一张岗位图片，或粘贴不少于 30 个字的招聘信息。');
   showMessage('jdFileMsg',extracted?'岗位图片已全部识别，正在合并分析…':'正在分析岗位匹配与定向建议…',false);
   showMessage('matchResult','正在分析岗位匹配并生成针对性建议…',false);
-  var res=await fetch('/api/resume/match',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,jd_text:jd,privacy_consent:true})}),data=await res.json();if(!res.ok)throw new Error(data.detail||'匹配失败');
+  var res=await fetch('/api/resume/match',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,jd_text:jd,privacy_consent:true})}),data=await readApiJson(res,'岗位匹配失败');
   var m=data.match||{};currentMatch=m;jdIssueDecisions={};jdIssueFacts={};
-  document.getElementById('matchResult').innerHTML='<div class="ok">'+escapeHtml(m.summary||'岗位匹配已完成。')+'</div><p><b>简历已有匹配点</b><br>'+((m.matched_skills||[]).map(escapeHtml).join('；')||'暂无')+'</p><b>岗位要求与待核实差距</b>'+((m.gaps||[]).map(function(g){return '<div class="item"><b>'+escapeHtml(g.requirement)+'</b><span>'+escapeHtml(g.question)+'</span>'+(g.resume_quote?'<div class="quote">简历原文：'+escapeHtml(g.resume_quote)+'</div>':'')+'</div>';}).join('')||'<p>暂无明显差距</p>')+'<p class="subtle">'+escapeHtml(m.privacy_note||'')+'</p>';
+  document.getElementById('matchResult').innerHTML='<div class="ok">'+escapeHtml(m.summary||'岗位匹配已完成。')+'</div><p><b>简历已有匹配点</b><br>'+((m.matched_skills||[]).map(escapeHtml).join('；')||'暂无')+'</p><b>岗位要求与待核实差距</b>'+((m.gaps||[]).map(function(g){return '<div class="item"><b>'+escapeHtml(g.requirement)+'</b><span>简历材料中未找到明确证据，建议你根据实际经历判断是否相关。</span>'+(g.resume_quote?'<div class="quote">简历原文：'+escapeHtml(g.resume_quote)+'</div>':'')+'</div>';}).join('')||'<p>暂无明显差距</p>')+'<p class="subtle">'+escapeHtml(m.privacy_note||'')+'</p>';
   renderJDRecommendations(Array.isArray(m.issues)?m.issues:[]);
   showMessage('jdFileMsg',extracted?'已识别 '+document.getElementById('jdFile').files.length+' 张岗位图片并完成分析。':'岗位匹配分析已完成。',false);
   document.getElementById('matchResult').scrollIntoView({behavior:'smooth',block:'center'});
@@ -370,7 +369,7 @@ async function generateJDRevision(){
  var facts=accepted.map(function(x,i){var id=String(x.id||('J'+(i+1))),v=(jdIssueFacts[id]||'').trim();return v?'['+id+'] '+v:'';}).filter(Boolean).join('\n');
  var button=document.querySelector('#jdRevisionActions button');button.disabled=true;showMessage('jdRevisionMsg','正在生成岗位定向草稿…',false);
  try{
-  var res=await fetch('/api/resume/revise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,accepted_issues:accepted,facts:facts,target_jd:document.getElementById('jdText').value.trim(),privacy_consent:document.getElementById('consent').checked})}),data=await res.json();if(!res.ok)throw new Error(data.detail||'生成失败');
+  var res=await fetch('/api/resume/revise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:currentResume.raw_text,accepted_issues:accepted,facts:facts,target_jd:document.getElementById('jdText').value.trim(),privacy_consent:document.getElementById('consent').checked})}),data=await readApiJson(res,'简历优化稿生成失败');
   document.getElementById('jdBeforeText').textContent=currentResume.raw_text||'';document.getElementById('jdBeforeText').dataset.sourceText=currentResume.raw_text||'';document.getElementById('jdRevisedText').value=data.revised_text||'';document.getElementById('jdComparison').classList.remove('hidden');renderComparison('jdBeforeText','jdRevisedText','jdDiff');showMessage('jdRevisionMsg',data.fact_protection||'岗位优化草稿已生成，请核对。',false);document.getElementById('jdComparison').scrollIntoView({behavior:'smooth'});
  }catch(e){showMessage('jdRevisionMsg',e.message||'生成失败，请重试。',true);}finally{button.disabled=false;}
 }
@@ -378,7 +377,7 @@ async function generateJDRevision(){
 async function downloadDocx(mode){
  var jdMode=mode==='jd',text=document.getElementById(jdMode?'jdRevisedText':'revisedText').value.trim(),msgId=jdMode?'jdExportMsg':'exportMsg';
  if(!text){showMessage(msgId,'请先生成或编辑简历文本。',true);return;}
- try{var res=await fetch('/api/resume/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:text,filename:jdMode?'岗位定向优化简历':'优化后简历'})});if(!res.ok){var d=await res.json();throw new Error(d.detail||'导出失败');}var blob=await res.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=jdMode?'岗位定向优化简历.docx':'优化后简历.docx';a.click();URL.revokeObjectURL(url);showMessage(msgId,'Word 文件已生成并下载。',false);}catch(e){showMessage(msgId,e.message||'导出失败，请重试。',true);}
+ try{var res=await fetch('/api/resume/export',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resume_text:text,filename:jdMode?'岗位定向优化简历':'优化后简历'})});if(!res.ok){await readApiJson(res,'Word 导出失败');}var blob=await res.blob(),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=jdMode?'岗位定向优化简历.docx':'优化后简历.docx';a.click();URL.revokeObjectURL(url);showMessage(msgId,'Word 文件已生成并下载。',false);}catch(e){showMessage(msgId,e.message||'导出失败，请重试。',true);}
 }
 function clearResumeData(){
  currentResume=null;currentAnalysis=null;currentMatch=null;jdIssueDecisions={};jdIssueFacts={};issueDecisions={};issueFacts={};
