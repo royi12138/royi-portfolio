@@ -324,6 +324,36 @@ def extract_vision_text(data: Any) -> str:
     return text.strip()
 
 
+def summarize_vision_response_shape(data: Any) -> str:
+    """Describe provider response structure without exposing any response values."""
+    def describe(value: Any) -> str:
+        if isinstance(value, dict):
+            keys = sorted(
+                key for key in value.keys()
+                if isinstance(key, str) and re.fullmatch(r"[A-Za-z0-9_.-]{1,40}", key)
+            )[:20]
+            return "object[" + ",".join(keys) + "]"
+        if isinstance(value, list):
+            return f"array[{len(value)}]"
+        return type(value).__name__
+
+    if not isinstance(data, dict):
+        return "root=" + type(data).__name__
+    output = data.get("output")
+    choices = output.get("choices") if isinstance(output, dict) else None
+    first = choices[0] if isinstance(choices, list) and choices else None
+    message = first.get("message") if isinstance(first, dict) else None
+    content = message.get("content") if isinstance(message, dict) else None
+    return (
+        "root=" + describe(data)
+        + "; output=" + describe(output)
+        + "; choices=" + describe(choices)
+        + "; first_choice=" + describe(first)
+        + "; message=" + describe(message)
+        + "; content=" + describe(content)
+    )
+
+
 def safe_vision_error_message(data: Any) -> str:
     """Return a short provider error explanation without credentials or image payloads."""
     if not isinstance(data, dict):
@@ -415,12 +445,22 @@ async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str
             f"岗位图片识别服务请求失败（上游 HTTP {response.status_code}{safe_code}{safe_message}），请稍后重试。",
         )
 
+    data: Any = None
     try:
         data = response.json()
         text = extract_vision_text(data)
     except (ValueError, KeyError, TypeError) as exc:
-        logger.warning("JD vision OCR returned no usable text: status=%s model=%s", response.status_code, model)
-        raise HTTPException(502, "岗位图片识别服务返回内容异常，请重试或粘贴招聘文字。") from exc
+        shape = summarize_vision_response_shape(data)
+        logger.warning(
+            "JD vision OCR response shape was unusable: status=%s model=%s shape=%s",
+            response.status_code,
+            model,
+            shape,
+        )
+        raise HTTPException(
+            502,
+            "岗位图片识别服务返回内容异常，请重试或粘贴招聘文字。 (" + shape + ")",
+        ) from exc
     return text[:10_000]
 
 async def _completion(
