@@ -204,6 +204,10 @@ def test_completion_handles_text_blocks_and_glm_payload():
 
 
 
+def test_extract_vision_text_accepts_dashscope_text_result():
+    assert extract_vision_text({"output": {"text": "识别出的招聘文字"}}) == "识别出的招聘文字"
+
+
 def test_provider_error_message_is_sanitized():
     message = safe_vision_error_message(
         {"code": 1211, "message": "url error; email user@example.com; Authorization: Bearer abc123"}
