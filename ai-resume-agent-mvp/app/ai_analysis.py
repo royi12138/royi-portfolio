@@ -321,6 +321,23 @@ def extract_vision_text(data: Any) -> str:
     return text.strip()
 
 
+def safe_vision_error_message(data: Any) -> str:
+    """Return a short provider error explanation without credentials or image payloads."""
+    if not isinstance(data, dict):
+        return ""
+    message = data.get("message")
+    error = data.get("error")
+    if not isinstance(message, str) and isinstance(error, dict):
+        message = error.get("message")
+    if not isinstance(message, str):
+        return ""
+    message = re.sub(r"data:image/[^;,]+;base64,[A-Za-z0-9+/=]+", "[图片数据]", message)
+    message = re.sub(r"(?i)(authorization|api[_ -]?key|bearer)\s*[:=]\s*[^\s,;]+", "[凭据已隐藏]", message)
+    message = re.sub(r"\bsk-[A-Za-z0-9_-]+\b", "[凭据已隐藏]", message)
+    message = redact_sensitive_info(message)
+    return re.sub(r"\s+", " ", message).strip()[:160]
+
+
 async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str:
     """Read text from a job-posting image using DashScope's multimodal API."""
     api_key = os.getenv("DASHSCOPE_API_KEY", "").strip()
@@ -374,11 +391,13 @@ async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str
         raise HTTPException(429, "岗位图片识别服务暂时繁忙，请稍后重试。")
     if response.status_code >= 400:
         error_code = ""
+        error_message = ""
         try:
             error_data = response.json()
             raw_code = error_data.get("code", "") if isinstance(error_data, dict) else ""
             if isinstance(raw_code, (str, int)):
                 error_code = re.sub(r"[^A-Za-z0-9_.-]", "", str(raw_code))[:80]
+            error_message = safe_vision_error_message(error_data)
         except ValueError:
             pass
         logger.warning(
@@ -386,9 +405,10 @@ async def extract_job_text_from_image(image_bytes: bytes, mime_type: str) -> str
             response.status_code, model, error_code or "unknown",
         )
         safe_code = f"，错误码 {error_code}" if error_code else ""
+        safe_message = f"：{error_message}" if error_message else ""
         raise HTTPException(
             502,
-            f"岗位图片识别服务请求失败（上游 HTTP {response.status_code}{safe_code}），请稍后重试。",
+            f"岗位图片识别服务请求失败（上游 HTTP {response.status_code}{safe_code}{safe_message}），请稍后重试。",
         )
 
     try:
