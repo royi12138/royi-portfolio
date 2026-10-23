@@ -17,7 +17,7 @@ from starlette.background import BackgroundTask
 from pydantic import BaseModel, Field
 from PIL import Image, ImageOps
 
-from app.ai_analysis import analyze_resume_text, generate_resume_revision, match_resume_to_jd, redact_sensitive_info
+from app.ai_analysis import analyze_resume_text, extract_job_text_from_image, generate_resume_revision, match_resume_to_jd, redact_sensitive_info
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
@@ -28,7 +28,7 @@ MAX_BYTES = 10 * 1024 * 1024
 MAX_ANALYSIS_CHARS = 20_000
 SUPPORTED = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 
-app = FastAPI(title="AI 岗位匹配简历助手", version="0.7.5")
+app = FastAPI(title="AI 岗位匹配简历助手", version="0.7.6")
 
 SECTION_ALIASES = {
     "basic_info": {"个人信息", "基本信息", "个人资料", "联系方式", "contact", "profile"},
@@ -301,7 +301,7 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.7.5"}
+    return {"status": "ok", "version": "0.7.6"}
 
 
 @app.post("/api/resume/parse")
@@ -332,7 +332,13 @@ async def parse_jd(file: UploadFile = File(...)) -> dict[str, Any]:
     path = directory / filename
     try:
         path.write_bytes(content)
-        text, _ = extract_image(path)
+        try:
+            with Image.open(path) as image:
+                image.verify()
+        except (OSError, ValueError, Image.DecompressionBombError) as exc:
+            raise HTTPException(422, "岗位图片无法读取，请上传清晰的 JPG 或 PNG 文件。") from exc
+        mime_type = "image/jpeg" if suffix in {".jpg", ".jpeg"} else "image/png"
+        text = await extract_job_text_from_image(content, mime_type)
         if len(text.strip()) < 30:
             raise HTTPException(422, "没有识别到足够的岗位文字，请换一份更清晰的文件。")
         return {"ok": True, "filename": filename, "jd_text": text[:10_000]}
