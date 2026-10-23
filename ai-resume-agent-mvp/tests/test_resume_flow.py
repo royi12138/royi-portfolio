@@ -2,6 +2,8 @@ from app.ai_analysis import (apply_resume_replacements, build_match_messages, bu
 from app.main import app, build_resume_json, extract_docx, parse_sections
 from fastapi.testclient import TestClient
 from docx import Document
+from io import BytesIO
+from PIL import Image
 import pytest
 
 client = TestClient(app)
@@ -131,10 +133,16 @@ def test_homepage_prevents_stale_consent_script():
 
 def test_jd_image_upload_extracts_text(monkeypatch):
     jd = "招聘产品经理，负责产品规划、需求分析、用户研究、跨团队协作、项目推进与产品上线交付。"
-    monkeypatch.setattr("app.main.extract_image", lambda path: (jd, 1))
+    async def fake_vision(content, mime_type):
+        assert content.startswith(b"\x89PNG")
+        assert mime_type == "image/png"
+        return jd
+    monkeypatch.setattr("app.main.extract_job_text_from_image", fake_vision)
+    image = BytesIO()
+    Image.new("RGB", (40, 30), "white").save(image, format="PNG")
     response = client.post(
         "/api/jd/parse",
-        files={"file": ("岗位.png", b"image bytes", "image/png")},
+        files={"file": ("岗位.png", image.getvalue(), "image/png")},
     )
     assert response.status_code == 200
     assert response.json()["jd_text"] == jd
@@ -155,7 +163,13 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
     assert 'id="jdBeforeText"' in response.text
     assert "async function generateJDRevision()" in response.text
     assert "function renderParsedResume(resume)" in response.text
-    assert "以下是系统从简历文件中直接提取" in response.text
+    assert "简历识别与 AI 诊断" not in response.text
+    assert "识别到的简历信息（初步）" not in response.text
+    assert 'id="scoreResults" class="score-card"' in response.text
+    assert "score-radar" in response.text
+    assert "需要你补充的真实信息" not in response.text
+    assert "只填写可确认的真实信息" not in response.text
+    assert "function readApiJson(response,failureMessage)" in response.text
     assert "function renderComparison(beforeId,afterId,outputId)" in response.text
     assert "diff-change" in response.text
     assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple' in response.text
@@ -174,7 +188,7 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.7.5"
+    assert response.json()["version"] == "0.7.6"
 
 
 
