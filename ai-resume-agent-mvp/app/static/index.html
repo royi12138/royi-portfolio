@@ -22,21 +22,138 @@
 .details-title{font-size:15px;margin:0 0 9px}.data-clear{margin-top:14px}.footer-note{text-align:center;color:#8290a4;font-size:12px;padding:18px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.side-card{position:static;order:2}.side-card .item{display:inline-block;width:48%;vertical-align:top}.analysis-grid{grid-template-columns:1fr}}
 @media(max-width:640px){.site-shell{padding:0 14px 38px}.topbar{height:62px;margin-bottom:20px}.hero{padding:26px 22px;border-radius:18px}.hero h1{font-size:29px}.hero .version{position:static;display:block;margin-top:12px}.steps{grid-template-columns:repeat(2,1fr)}.step{font-size:12px;padding:10px}.layout{gap:16px}.panel{padding:18px;border-radius:15px}.upload-box{align-items:flex-start;flex-direction:column}.summary-grid,.resume-sections,.compare{grid-template-columns:1fr}.compare-content{min-height:120px}.side-card .item{width:100%}.privacy-link{font-size:11px}.issue-compare-grid{grid-template-columns:1fr}}
+
+/* Refined career workspace */
+:root{
+ --ink:#182a27;--muted:#62726d;--line:#e2e9e5;--blue:#176b57;--blue-dark:#105142;
+ --pale:#e8f4ef;--red:#b42318;--red-bg:#fff0ed;--green:#176b57;--green-bg:#e8f4ef;
+ --shadow:0 12px 36px rgba(24,52,43,.07)
+}
+html{scroll-padding-top:24px}
+body{background:#f3f6f2;color:var(--ink);font-size:16px;line-height:1.65}
+.site-shell{max-width:1240px;padding:0 30px 64px}
+.topbar{height:72px;border-bottom:1px solid rgba(24,42,39,.08);margin-bottom:24px}
+.brand{font-size:16px;letter-spacing:0}
+.brand-mark{width:40px;height:40px;border-radius:13px;background:#163c34;font-size:19px;box-shadow:0 5px 12px rgba(16,81,66,.15)}
+.privacy-link{font-size:12px;color:#526660}
+.privacy-link:before{background:#2f9a74}
+.hero{margin:0 0 20px;border-radius:26px;padding:40px 44px;background:linear-gradient(118deg,#123c34 0%,#176b57 72%,#1e8067 100%);box-shadow:0 20px 48px rgba(16,81,66,.16)}
+.hero:after{right:-120px;top:-190px;width:440px;height:440px;border-color:rgba(221,241,117,.20);box-shadow:0 0 0 54px rgba(221,241,117,.06),0 0 0 108px rgba(255,255,255,.035)}
+.eyebrow{color:#e3ef87;font-size:12px;letter-spacing:1.3px;font-weight:800}
+.hero h1{max-width:720px;font-size:clamp(30px,4vw,43px);line-height:1.22;letter-spacing:-.7px;margin:10px 0 12px}
+.hero p{max-width:690px;color:rgba(255,255,255,.84);font-size:15px;line-height:1.8;margin:0}
+.version{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.19);border-radius:999px;padding:7px 12px;font-size:12px;right:28px;top:26px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 0 22px}
+.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 13px;color:#596a64;font-size:13px;font-weight:650;box-shadow:0 4px 12px rgba(25,53,43,.025)}
+.step-num{background:#edf1ed;color:#53655e;width:26px;height:26px;margin-right:7px}
+.step.current{border-color:#b7d9ca;background:#f8fcf8;color:#145c4a}
+.step.current .step-num{background:#176b57;color:#fff}
+.layout{grid-template-columns:minmax(0,1fr) 285px;gap:20px;align-items:start}
+.main-col{min-width:0}
+.panel{padding:25px 27px;margin:0 0 18px;background:#fff;border:1px solid #e5ebe7;border-radius:20px;box-shadow:0 8px 26px rgba(31,57,47,.045)}
+.panel-head{gap:13px;margin-bottom:18px;align-items:center}
+.step-icon{width:38px;height:38px;border-radius:12px;background:#e9f4ef;color:#176b57;font-size:14px}
+.panel h2{font-size:20px;line-height:1.35;letter-spacing:-.2px;color:#1b302b}
+.panel h3{font-size:16px;color:#253d36}
+.lead-small,.subtle{color:#65756f;font-size:13px;line-height:1.65}
+.consent{margin:0 0 15px;background:#f6f8f1;border:1px solid #e7ebd8;border-radius:13px;padding:12px 14px;color:#536048;font-size:12px;line-height:1.6}
+.consent input{accent-color:#176b57;transform:scale(1.15);margin-top:3px}
+.upload-box{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:18px;padding:20px;border:1.5px dashed #aacabb;background:linear-gradient(110deg,#f4faf6,#fbfcf8);border-radius:16px}
+.upload-copy b{font-size:15px;color:#203a31;margin-bottom:4px}
+.upload-copy span{font-size:13px;color:#6b7973}
+.upload-copy input[type=file]{margin-top:10px;font-size:13px}
+.btn{background:#176b57;color:#fff;border-radius:11px;padding:12px 17px;font-size:14px;box-shadow:0 4px 10px rgba(23,107,87,.12);transition:transform .15s,background .15s,box-shadow .15s}
+.btn:hover{background:#105142;transform:translateY(-1px);box-shadow:0 7px 15px rgba(23,107,87,.17)}
+.btn.secondary{background:#edf3ef;color:#315349;box-shadow:none;border:1px solid #e1e9e4}
+.btn.secondary:hover{background:#e4eee8}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid rgba(39,134,102,.3);outline-offset:2px}
+.file-summary{padding:13px 15px;border:1px solid #e7ede9;background:#f7faf8;border-radius:13px}
+.file-summary b{font-size:14px}
+.result{margin-top:20px}
+.section-label{color:#176b57;letter-spacing:.7px;font-size:11px}
+.summary-pending{background:#f6f8f6;color:#65756f;border:1px solid #e9eeea}
+.resume-section{background:#fbfcfa;border-color:#e4ebe5;border-radius:14px;padding:16px}
+.resume-section h3{color:#245b49}
+.item{border-bottom-color:#e8eeea}
+.quote{border-left-color:#75aa93;background:#f5f8f6;color:#394f46}
+.tags{background:#eaf4ef;color:#21634f}
+.issue-compare{background:#fbfcfa;border-color:#e5ebe7;border-radius:11px}
+.issue-compare b{color:#52645d}
+.issue-removed,.issue-added{color:#b42318;background:#fff0ed}
+.score-card{background:#f6faf7;border-color:#e3ebe5;border-radius:15px}
+.strength-card{background:#edf7f0;color:#265a43;border:1px solid #dceee1}
+.jd-upload{border:1px solid #e5ebe7;background:#fbfcfa;border-radius:15px;padding:15px}
+.jd-file-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.jd-file-row input[type=file]{flex:0 1 310px}
+.jd-text,.edit-area{border:1px solid #d9e3dc;border-radius:12px;background:#fff;padding:13px;line-height:1.7}
+.jd-text:focus,.edit-area:focus{outline:3px solid rgba(39,134,102,.14);border-color:#7eaf99}
+.compare{gap:14px}
+.compare-side{border:1px solid #e4eae6;border-radius:14px;overflow:hidden;background:#fff}
+.compare-head{background:#f4f7f4;color:#3a5147;font-weight:750;padding:10px 13px;border-bottom:1px solid #e5ebe7}
+.compare-content{background:#fff;color:#354b41;line-height:1.8;padding:14px}
+.after .diff-change{color:#b42318;background:#fff0ed}
+.side-card{position:sticky;top:18px;border:1px solid #e4ebe6;border-radius:18px;background:#fff;padding:20px;box-shadow:0 8px 24px rgba(31,57,47,.045)}
+.side-card h3{margin:0 0 8px;font-size:16px;color:#203a31}
+.side-card .item{padding:12px 0}
+.side-card .item b{font-size:13px;color:#2d4a3f}
+.side-card .item span{font-size:12px;line-height:1.6}
+.side-tip{margin-top:13px;padding:12px;border-radius:12px;background:#f4f8f2;color:#60705f;font-size:12px;line-height:1.65}
+.details-title{font-size:13px;color:#425a50}
+.data-clear{margin-top:16px}
+.footer-note{padding:22px 10px 0;color:#78867f;font-size:12px;text-align:center}
+#msg,#analysisMsg,#revisionMsg,#jdFileMsg,#matchResult,#jdRevisionMsg{margin-top:11px}
+.ok{background:#e8f4ef;color:#165d49}
+.err{background:#fff0ed;color:#a12c22}
+@media(max-width:900px){
+ .site-shell{padding-left:20px;padding-right:20px}
+ .layout{grid-template-columns:1fr}
+ .side-card{position:static;order:2}
+ .side-card .item{display:block;width:100%}
+ .analysis-grid{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+ .site-shell{padding:0 14px 42px}
+ .topbar{height:62px;margin-bottom:17px}
+ .brand-mark{width:35px;height:35px}
+ .privacy-link{font-size:10px;max-width:145px;text-align:right;line-height:1.35}
+ .hero{padding:27px 23px;border-radius:20px;margin-bottom:15px}
+ .hero h1{font-size:30px;max-width:100%;padding-right:0}
+ .hero p{font-size:14px}
+ .hero:after{width:280px;height:280px;right:-155px;top:-130px}
+ .version{position:static;display:inline-block;margin-top:17px}
+ .steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:16px}
+ .step{padding:9px 10px;font-size:12px}
+ .step-num{width:23px;height:23px}
+ .panel{padding:19px 17px;border-radius:17px}
+ .panel-head{align-items:flex-start}
+ .panel h2{font-size:18px}
+ .upload-box{grid-template-columns:1fr;padding:15px}
+ .upload-box .btn{width:100%}
+ .summary-grid,.resume-sections,.compare,.issue-compare-grid{grid-template-columns:1fr}
+ .compare-content{min-height:110px}
+ .jd-file-row input[type=file]{width:100%;flex-basis:100%}
+ .jd-file-row .subtle{overflow-wrap:anywhere}
+ .file-summary{align-items:flex-start;flex-direction:column}
+ .file-summary .btn{width:100%}
+ .result-actions .btn{width:100%}
+ .side-card{padding:17px}
+}
+
 </style>
 </head>
 <body>
 <div class="site-shell">
 <header class="topbar"><div class="brand"><span class="brand-mark">简</span><span>简历优化助手</span></div><div class="privacy-link">隐私保护提示 · 发送前会尝试隐藏手机号、邮箱和身份证号</div></header>
 <main>
-<section class="hero"><div class="eyebrow">CAREER TOOLKIT · 求职准备</div><h1>让简历更清楚，也更贴合目标岗位</h1><p>先核对系统识别的简历内容，再看有依据的修改建议。每条改动都由你决定；新增成果和数字只使用你确认的真实信息。</p><span class="version">MVP 0.5 · 简历诊断与岗位定向</span></section>
-<nav class="steps" aria-label="操作步骤"><div class="step"><span class="step-num">1</span>上传并核对简历</div><div class="step"><span class="step-num">2</span>查看诊断建议</div><div class="step"><span class="step-num">3</span>匹配目标岗位</div><div class="step"><span class="step-num">4</span>对照修改并下载</div></nav>
+<section class="hero"><div class="eyebrow">求职工具 · 简历优化</div><h1>让简历更清楚，也更贴合目标岗位</h1><p>上传简历后查看有依据的诊断与改写建议，也可匹配岗位图片。每项改动都由你确认，AI 不会替你编造成果。</p><span class="version">简历诊断 · 岗位匹配 · 修改对照</span></section>
+<nav class="steps" aria-label="操作步骤"><div class="step current"><span class="step-num">1</span>上传简历</div><div class="step"><span class="step-num">2</span>查看诊断</div><div class="step"><span class="step-num">3</span>匹配岗位</div><div class="step"><span class="step-num">4</span>确认并下载</div></nav>
 <div class="layout"><div class="main-col">
-<section class="panel" id="uploadStep"><div class="panel-head"><span class="step-icon">01</span><div><h2>上传简历</h2><p class="lead-small">支持 PDF、Word、JPG、PNG；最多 3 页、10MB。文件只用于本次解析。</p></div></div>
+<section class="panel" id="uploadStep"><div class="panel-head"><span class="step-icon">01</span><div><h2>从简历开始</h2><p class="lead-small">支持 PDF、Word、JPG、PNG · 最多 3 页、10MB</p></div></div>
 <label class="consent"><input id="consent" type="checkbox">我已阅读并同意：点击开始诊断或岗位匹配后，简历文字（以及岗位文字）会发送至本项目后端；系统会尝试隐藏手机号、邮箱和身份证号，然后发送给模型服务。姓名、公司名称等仍可能被发送，请勿提交不愿发送的内容。</label><div class="upload-box"><div class="upload-copy"><b>选择你的简历文件</b><span>建议上传清晰、可复制文字的 PDF 或 DOCX</span><div><input id="resumeFile" type="file" accept=".pdf,.docx,.jpg,.jpeg,.png"></div></div><button class="btn" id="parseBtn" onclick="parseResume()">开始 AI 简历诊断</button></div><div id="msg" aria-live="polite"></div></section>
 <section id="result" class="result">
 <div class="panel"><div class="panel-head"><span class="step-icon">02</span><div><h2>简历识别与 AI 诊断</h2><p class="lead-small">勾选隐私同意并点击“开始 AI 简历诊断”，系统会解析文件并自动展示诊断结果。</p></div></div><div class="file-summary"><div><b id="filename"></b><span class="subtle" id="pageCount"></span></div><button class="btn secondary" id="analyzeBtn" onclick="analyzeResume()">重新分析当前简历</button></div>
 <div id="analysisMsg" aria-live="polite"></div>
-<div class="section-label" id="summaryTitle">识别到的简历信息（初步）</div><p class="lead-small" id="summaryHelp" style="margin-bottom:10px">上传后会先显示系统从 Word 中提取并初步归类的信息；启动 AI 诊断后，模型再整理表达和经历分类。原始文字可在下方核对。</p><div class="summary-grid" id="summary"><div class="summary-pending">开始 AI 简历诊断后，这里会整理显示基本信息、教育经历、工作经历和项目经历。</div></div><details style="margin-top:14px"><summary class="details-title">查看系统提取的原始文字（核对用）</summary><pre id="parsedRawText" class="compare-content"></pre></details><details style="margin-top:10px"><summary class="details-title">查看技术解析详情</summary><pre id="json"></pre></details>
+<div class="section-label" id="summaryTitle">识别到的简历信息（初步）</div><p class="lead-small" id="summaryHelp" style="margin-bottom:10px">上传后会先显示系统从 Word 中提取并初步归类的信息；启动 AI 诊断后，模型再整理表达和经历分类。原始文字可在下方核对。</p><div class="summary-grid" id="summary"><div class="summary-pending">开始诊断后，这里会展示系统识别到的简历内容。</div></div><details style="margin-top:14px"><summary class="details-title">查看系统提取的原始文字（核对用）</summary><pre id="parsedRawText" class="compare-content"></pre></details><details style="margin-top:10px"><summary class="details-title">查看技术解析详情</summary><pre id="json"></pre></details>
 <button class="btn secondary small data-clear" onclick="clearResumeData()">清除本页简历和分析数据</button></div>
 <div id="analysisResult" class="hidden">
 <section class="panel"><div class="panel-head"><span class="step-icon">诊</span><div><h2>简历诊断结果</h2><p class="lead-small">所有评分均为辅助检查，不代表录用概率。请结合自己的经历判断。</p></div></div><div class="analysis-grid"><div><h3>总体评价</h3><p id="overallSummary"></p><div id="strengths" class="strength-card"></div><p class="subtle" id="privacyNote"></p></div><div id="scoreResults" class="score-card"></div></div></section>
