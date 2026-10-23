@@ -332,7 +332,7 @@ def safe_vision_error_message(data: Any) -> str:
     if not isinstance(message, str):
         return ""
     message = re.sub(r"data:image/[^;,]+;base64,[A-Za-z0-9+/=]+", "[图片数据]", message)
-    message = re.sub(r"(?i)(authorization|api[_ -]?key|bearer)\s*[:=]\s*[^\s,;]+", "[凭据已隐藏]", message)
+    message = re.sub(r"(?i)(authorization|api[_ -]?key)\s*[:=]\s*(?:bearer\s+)?[^\s,;]+", "[凭据已隐藏]", message)
     message = re.sub(r"\bsk-[A-Za-z0-9_-]+\b", "[凭据已隐藏]", message)
     message = redact_sensitive_info(message)
     return re.sub(r"\s+", " ", message).strip()[:160]
