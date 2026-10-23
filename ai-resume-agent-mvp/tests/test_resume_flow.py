@@ -1,4 +1,4 @@
-from app.ai_analysis import (apply_resume_replacements, build_match_messages, build_messages, build_revision_messages, build_completion_payload, numbers_are_supported, restore_sensitive_info, calculate_scores, extract_completion_text, extract_vision_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
+from app.ai_analysis import (apply_resume_replacements, build_match_messages, build_messages, build_revision_messages, build_completion_payload, numbers_are_supported, restore_sensitive_info, calculate_scores, extract_completion_text, extract_vision_text, safe_vision_error_message, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
 from app.main import app, build_resume_json, extract_docx, parse_sections
 from fastapi.testclient import TestClient
 from docx import Document
@@ -201,6 +201,16 @@ def test_completion_handles_text_blocks_and_glm_payload():
     assert payload["clear_thinking"] is True
     assert payload["response_format"] == {"type": "json_object"}
 
+
+
+
+def test_provider_error_message_is_sanitized():
+    message = safe_vision_error_message(
+        {"code": 1211, "message": "url error; email user@example.com; Authorization: Bearer abc123"}
+    )
+    assert "url error" in message
+    assert "user@example.com" not in message
+    assert "abc123" not in message
 
 
 def test_extract_vision_text_reads_dashscope_native_response():
