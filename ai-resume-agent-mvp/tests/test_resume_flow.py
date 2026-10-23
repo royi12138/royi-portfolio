@@ -1,4 +1,4 @@
-from app.ai_analysis import (apply_resume_replacements, build_match_messages, build_messages, build_revision_messages, build_completion_payload, numbers_are_supported, restore_sensitive_info, calculate_scores, extract_completion_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
+from app.ai_analysis import (apply_resume_replacements, build_match_messages, build_messages, build_revision_messages, build_completion_payload, numbers_are_supported, restore_sensitive_info, calculate_scores, extract_completion_text, extract_vision_text, parse_json_object, redact_sensitive_info, validate_analysis, validate_resume_sections)
 from app.main import app, build_resume_json, extract_docx, parse_sections
 from fastapi.testclient import TestClient
 from docx import Document
@@ -200,6 +200,20 @@ def test_completion_handles_text_blocks_and_glm_payload():
     assert payload["reasoning_effort"] == "low"
     assert payload["clear_thinking"] is True
     assert payload["response_format"] == {"type": "json_object"}
+
+
+
+def test_extract_vision_text_reads_dashscope_native_response():
+    response = {
+        "output": {
+            "choices": [{
+                "message": {
+                    "content": [{"text": "岗位职责一"}, {"text": "岗位要求二"}]
+                }
+            }]
+        }
+    }
+    assert extract_vision_text(response) == "岗位职责一 岗位要求二"
 
 
 def test_match_json_parser_accepts_fenced_or_prefixed_json():
