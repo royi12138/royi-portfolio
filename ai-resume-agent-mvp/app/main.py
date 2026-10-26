@@ -301,7 +301,7 @@ def index() -> FileResponse:
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "version": "0.7.9"}
+    return {"status": "ok", "version": "0.8.0"}
 
 
 @app.post("/api/resume/parse")
