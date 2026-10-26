@@ -8,7 +8,12 @@ from fastapi import UploadFile
 from PIL import Image
 
 from app.main import parse_jd
-from app.ai_analysis import safe_vision_error_message, summarize_vision_response_shape
+from app.ai_analysis import (
+    build_bigmodel_vision_payload,
+    extract_vision_text,
+    safe_vision_error_message,
+    summarize_vision_response_shape,
+)
 
 
 def png_bytes():
@@ -18,6 +23,27 @@ def png_bytes():
 
 
 class JobImageParsingTests(unittest.TestCase):
+    def test_bigmodel_payload_uses_openai_vision_format(self):
+        payload = build_bigmodel_vision_payload(
+            "glm-4.6v",
+            "data:image/png;base64,c2FmZQ==",
+            "read the image",
+        )
+
+        self.assertEqual(payload["model"], "glm-4.6v")
+        self.assertFalse(payload["stream"])
+        self.assertEqual(payload["messages"][0]["content"][0]["type"], "text")
+        image = payload["messages"][0]["content"][1]
+        self.assertEqual(image["type"], "image_url")
+        self.assertEqual(image["image_url"]["url"], "data:image/png;base64,c2FmZQ==")
+
+    def test_extracts_bigmodel_top_level_choices(self):
+        text = extract_vision_text({
+            "choices": [{"message": {"content": "招聘岗位：产品经理"}}],
+        })
+
+        self.assertEqual(text, "招聘岗位：产品经理")
+
     def test_provider_error_message_is_sanitized(self):
         message = safe_vision_error_message({
             "success": False,
