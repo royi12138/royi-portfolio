@@ -159,36 +159,47 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
     response = client.get("/")
     assert response.status_code == 200
     assert "analysisResult').classList.remove('hidden')" in response.text
-    assert 'id="beforeResume"' in response.text
-    assert 'id="jdBeforeText"' in response.text
-    assert "async function generateJDRevision()" in response.text
+    assert 'id="scoreResults" class="score-card"' in response.text
+    assert "score-radar" in response.text
     assert "function renderParsedResume(resume)" in response.text
     assert "简历识别与 AI 诊断" not in response.text
     assert "识别到的简历信息（初步）" not in response.text
-    assert 'id="scoreResults" class="score-card"' in response.text
-    assert "score-radar" in response.text
     assert "需要你补充的真实信息" not in response.text
     assert "只填写可确认的真实信息" not in response.text
     assert "function readApiJson(response,failureMessage)" in response.text
-    assert "function renderComparison(beforeId,afterId,outputId)" in response.text
-    assert "diff-change" in response.text
-    assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple' in response.text
     assert "function renderIssueComparison(before,after)" in response.text
+    assert "issue-removed" in response.text
+    assert "issue-added" in response.text
+    assert "改前</b><p>" in response.text
+    assert response.text.index('id="issues"') < response.text.index("针对面试岗位定向优化")
+    assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple' in response.text
     assert "async function parseSelectedJDImages()" in response.text
     assert "parseJDFile" not in response.text
     assert "开始 AI 简历诊断" in response.text
     assert response.text.index('id="consent"') < response.text.index('id="parseBtn"')
     assert "await analyzeResume(button)" in response.text
-    assert "issue-added" in response.text
     assert "--ink:#182a27" in response.text
     assert ".hero{margin:0 0 20px" in response.text
     assert "@media(max-width:640px)" in response.text
-    assert "MVP 0.5" not in response.text
+    assert ".issue-compare-grid{grid-template-columns:1fr}" in response.text
+    for removed in (
+        "接受并应用",
+        "接受此建议",
+        "拒绝",
+        "生成简历优化草稿",
+        "生成岗位定向优化草稿",
+        "function generateRevision()",
+        "async function generateJDRevision()",
+        "function renderComparison(beforeId,afterId,outputId)",
+        'id="generalComparison"',
+        'id="jdComparison"',
+    ):
+        assert removed not in response.text
 
 
 def test_health_version_is_current():
     response = client.get("/api/health")
-    assert response.json()["version"] == "0.7.9"
+    assert response.json()["version"] == "0.8.0"
 
 
 
