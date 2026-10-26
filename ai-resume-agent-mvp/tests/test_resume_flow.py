@@ -170,7 +170,7 @@ def test_analysis_page_reveals_results_and_contains_comparison_views():
     assert "function renderIssueComparison(before,after)" in response.text
     assert "issue-removed" in response.text
     assert "issue-added" in response.text
-    assert "'<p>'+oldHtml" in response.text
+    assert "改前</b><p>" in response.text
     assert response.text.index('id="issues"') < response.text.index("针对面试岗位定向优化")
     assert 'accept=".jpg,.jpeg,.png,image/jpeg,image/png" multiple' in response.text
     assert "async function parseSelectedJDImages()" in response.text
